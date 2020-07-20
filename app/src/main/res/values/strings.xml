@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">skvirrel</string>
+    <!-- common app -->
+    <string name="app_name" translatable="false">skvirrel</string>
+
+    <!-- other -->
+    <string name="filter_view_skvirrel" translatable="false">View skvirrel</string>
 </resources>
