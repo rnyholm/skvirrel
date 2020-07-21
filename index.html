@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="msapplication-TileColor" content="#da532c">
+	<meta name="theme-color" content="#ffffff">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Web page of the skvirrel application">
+	<meta name="author" content="Robert Nyholm">
+
+	<title>skvirrel</title>
+
+	<link rel="stylesheet" href="css/mini-default.css" />
+</head>
+
+<body>
+	<header class="sticky">
+		<!-- <label for="drawer-control" class="button drawer-toggle persistent hidden-md hidden-lg"></label> -->
+		<a href="#" class="logo">skvirrel</a>
+		<a href="#" class="button hidden-sm">Introduction</a>
+		<a href="#features" class="button hidden-sm">Features</a>
+		<a href="#open_source" class="button hidden-sm">Open source</a>
+	</header>
+
+	<input type="checkbox" id="drawer-control" class="drawer persistent">
+	<nav class="drawer hidden-md hidden-lg">
+		<label for="drawer-control" class="close"></label>
+		<a href="">Introduction</a>
+		<a href="#features">Features</a>
+		<a href="#open_source">Open source</a>
+	</nav>
+
+	<div class="container">
+		<div class="row">
+			<div class="col-sm-12 col-md-10 col-md-offset-1">
+				<br />
+				<h1>Introduction</h1>
+				<p>skvirrel is an application for monitoring preferred stocks and some key values for them. 
+				Depending on user settings notifications will be dispatched to notify user of changes of selected key values, eg. price crossing, RSI below and so on.</p>
+				<a name="features"></a>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-12 col-md-10 col-md-offset-1">
+				<br />
+				<h1>Features</h1>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-12 col-md-10 col-md-offset-1">
+				<h3>Feature still to come</h3>
+				<p>Still to come....</p>
+			</div>
+
+		</div>
+
+		<div class="row">
+			<div class="col-sm-12 col-md-10 col-md-offset-1">
+				<br />
+				<h3>Sleek user interface</h3>
+				<p>The user interface is designed with a minimalistic, simple and sleek mindset. This is to make the app as simple as possible to use and understand.
+					This along with custom fonts and a fresh color palette makes the app a joy to use.</p>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-12 col-md-10 col-md-offset-1">
+				<br />
+				<h3>Simple input</h3>
+				<p>In order to make the app even easier to use, it has a completely custom made keyboard. Which prevents the user for giving faulty input and makes input a lot faster.</p>
+
+				<p>Even though it's almost foolproof to give user input it's still possible to give faulty input. The input validation is handled in realtime when the input is made and shows directly
+					to the user if someting is wrong by changing color of the input field.</p>
+				<a name="open_source"></a>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-12 col-md-10 col-md-offset-1">
+				<br />
+				<h1>Open source</h1>
+				<p>This application is made as an open source hobby project, just because I'm a developer and interested in the stock market and investing. 
+				The source code is completely free to check out, use and do whatever you want with according to the MIT license.
+				But I would be extremely happy if you leave a comment on any forum, star <a href="https://github.com/rnyholm/skvirrel" target="_blank">this project on github</a> 
+				or in any other way show your support.</p>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-12 col-md-10 col-md-offset-1">
+				<br />
+				<h1>At last</h1>
+				<p>Don't involve your feelings in investing and trade wisely!🤑</p>
+			</div>
+		</div>
+	</div>
+
+	<footer class="container">
+		<div class="row">
+			<div class="col-sm-12 col-md-10 col-md-offset-1">
+				Created by <a href="mailto:skvirrel.app@gmail.com">Robert Nyholm</a> <br />
+				skvirrel <span id="year">2020</span> <br />
+				<figure>
+					<a href="https://github.com/rnyholm/skvirrel" target="_blank">
+						<img src="css/img/github-logo.png" alt="GitHub logo" />
+					</a>
+				</figure>
+			</div>
+		</div>
+	</footer>
+
+	<script>
+		document.getElementById("year").innerHTML = new Date().getFullYear();
+	</script>
+</body>
+
+</html>
