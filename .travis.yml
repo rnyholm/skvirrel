@@ -44,7 +44,7 @@ script:
 
 deploy:
   provider: releases
-  skip_cleanup: true
+  cleanup: false
   overwrite: true
   file_glob: true
   file: /home/travis/build/rnyholm/skvirrel/app/build/outputs/apk/release/*.apk
