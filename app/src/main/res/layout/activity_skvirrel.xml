@@ -29,29 +29,13 @@
 
             <include layout="@layout/stock_content_card"/>
 
-<!--            <include-->
-<!--                layout="@layout/calculations_content_card"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginTop="10dp" />-->
-
-<!--            <include-->
-<!--                layout="@layout/heart_rate_zones_content_card"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginTop="10dp" />-->
-
-<!--            <include-->
-<!--                layout="@layout/finish_time_predictions_content_card"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginTop="10dp" />-->
-
-<!--            <include-->
-<!--                layout="@layout/vo2max_estimate_content_card"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginTop="10dp" />-->
+            <TextView
+                android:id="@+id/debug_stock_info_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/montserrat"
+                android:text="@string/debug_stock_info"
+                android:textSize="14sp" />
 
         </LinearLayout>
 

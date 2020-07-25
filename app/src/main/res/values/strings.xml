@@ -24,4 +24,5 @@
 
     <!-- other -->
     <string name="filter_view_skvirrel" translatable="false">View skvirrel</string>
+    <string name="debug_stock_info" translatable="false">Stock information for debugging purposes...</string>
 </resources>
