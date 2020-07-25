@@ -14,7 +14,7 @@
         android:fillViewport="true">
 
         <LinearLayout
-            android:id="@+id/options_ll"
+            android:id="@+id/stocks_ll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clickable="true"
@@ -27,7 +27,7 @@
             android:paddingEnd="7dp"
             android:paddingBottom="7dp">
 
-<!--            <include layout="@layout/conversions_content_card"/>-->
+            <include layout="@layout/stock_content_card"/>
 
 <!--            <include-->
 <!--                layout="@layout/calculations_content_card"-->
