@@ -3,6 +3,12 @@
     <string name="app_name" translatable="false">skvirrel</string>
     <string name="author" translatable="false">by @rupert,</string>
 
+    <!-- stock card -->
+    <string name="company_name_hint">Begin by add a company\'s stock ticker</string>
+    <string name="hint_ticker" translatable="false">Ticker</string>
+    <string name="default_ticker" translatable="false">Eg. NVDA</string>
+    <string name="poll_stock">Poll stock</string>
+
     <!-- keyboard -->
     <string name="keyboard_0" translatable="false">0</string>
     <string name="keyboard_1" translatable="false">1</string>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/stock_content_card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/content_card_background">
+
+    <TextView
+        android:id="@+id/company_tv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="6dp"
+        android:fontFamily="@font/montserrat_bold"
+        android:text="@string/company_name_hint"
+        android:textColor="@color/colorHeadingText"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/ticker_hint_tv"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:id="@+id/ticker_hint_tv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/open_sans"
+        android:text="@string/hint_ticker"
+        android:textAlignment="center"
+        android:textColor="@color/colorText"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="@+id/ticker_et"
+        app:layout_constraintStart_toStartOf="@+id/ticker_et"
+        app:layout_constraintTop_toBottomOf="@+id/company_tv" />
+
+    <ax.stardust.skvirrel.component.widget.KeyboardlessEditText
+        android:id="@+id/ticker_et"
+        android:layout_width="0dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/input_default"
+        android:ems="10"
+        android:fontFamily="@font/open_sans"
+        android:gravity="start|center_horizontal"
+        android:hint="@string/default_ticker"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:textAlignment="center"
+        android:textColor="@color/colorInputText"
+        android:textCursorDrawable="@drawable/input_cursor_default"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/poll_stock_btn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ticker_hint_tv" />
+
+    <Button
+        android:id="@+id/poll_stock_btn"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="7dp"
+        android:background="@drawable/button_selector"
+        android:fontFamily="@font/montserrat"
+        android:textAllCaps="false"
+        android:text="@string/poll_stock"
+        android:textColor="@color/colorButtonText"
+        app:layout_constraintBottom_toBottomOf="@+id/ticker_et"
+        app:layout_constraintEnd_toEndOf="@+id/company_tv"
+        app:layout_constraintStart_toEndOf="@+id/ticker_et"
+        app:layout_constraintTop_toBottomOf="@+id/ticker_hint_tv" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
