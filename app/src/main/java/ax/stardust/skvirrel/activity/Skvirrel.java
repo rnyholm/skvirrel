@@ -1,24 +1,26 @@
 package ax.stardust.skvirrel.activity;
 
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-
-import java.io.IOException;
 
 import ax.stardust.skvirrel.R;
 import ax.stardust.skvirrel.component.keyboard.KeyboardHandler;
 import ax.stardust.skvirrel.component.keyboard.SkvirrelKeyboard;
 import ax.stardust.skvirrel.component.widget.KeyboardlessEditText;
-import yahoofinance.Stock;
-import yahoofinance.YahooFinance;
+import ax.stardust.skvirrel.service.YahooFinanceService;
 
 public class Skvirrel extends AppCompatActivity {
     private static final String LOG_TAG = Skvirrel.class.getSimpleName();
+
+    private static final int GET_STOCK_QUOTE_REQUEST_CODE = 0;
 
     private SkvirrelKeyboard skvirrelKeyboard;
 
@@ -39,31 +41,12 @@ public class Skvirrel extends AppCompatActivity {
         tickerEditText.setText("AMD");
 
         pollStockButton.setOnClickListener(view -> {
-            StringBuilder sb = new StringBuilder();
-
-            // dangerous as fuck and discouraged in android, do this in other service later
-            new Thread(() -> {
-                // Do network action in this function
-                try {
-                    Stock stock = YahooFinance.get(tickerEditText.getText().toString());
-                    Log.d(LOG_TAG, stock.toString());
-
-                    sb.append("Name: " + stock.getName() + "\n");
-                    sb.append("Symbol: " + stock.getSymbol() + "\n");
-                    sb.append("Stock exchange: " + stock.getStockExchange() + "\n");
-                    sb.append("Currency: " + stock.getCurrency() + "\n");
-                    sb.append("Price: " + stock.getQuote().getPrice() + "\n");
-                    sb.append("Bid: " + stock.getQuote().getBid() + "\n");
-                    sb.append("Ask: " + stock.getQuote().getAsk() + "\n");
-                    sb.append("Prev close: " + stock.getQuote().getPreviousClose() + "\n");
-
-                    companyTextView.setText(stock.getName());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Log.e(LOG_TAG, "Something wen't wrong fetching stock info", e);
-                }
-            }).start();
-            debugStockInfoTextView.setText(sb.toString());
+            PendingIntent pendingResult = createPendingResult(GET_STOCK_QUOTE_REQUEST_CODE, new Intent(), 0);
+            Intent intent = new Intent(getApplicationContext(), YahooFinanceService.class);
+            intent.putExtra(YahooFinanceService.YAHOO_FINANCE_API_OPERATION, YahooFinanceService.GET);
+            intent.putExtra(YahooFinanceService.STOCK_SYMBOL, tickerEditText.getText().toString());
+            intent.putExtra(YahooFinanceService.PENDING_RESULT, pendingResult);
+            startService(intent);
         });
     }
 
@@ -89,5 +72,18 @@ public class Skvirrel extends AppCompatActivity {
         tickerEditText = findViewById(R.id.ticker_et);
         tickerEditText.setOnFocusChangeListener(new KeyboardHandler(skvirrelKeyboard));
         tickerEditText.setOnTouchListener(new KeyboardHandler(skvirrelKeyboard));
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == GET_STOCK_QUOTE_REQUEST_CODE) {
+            if (resultCode == YahooFinanceService.REQUEST_SUCESS_CODE) {
+                debugStockInfoTextView.setText(data.getStringExtra(YahooFinanceService.STOCK_INFO));
+                companyTextView.setText(data.getStringExtra(YahooFinanceService.STOCK_NAME));
+            } else {
+                Toast.makeText(getApplicationContext(), data.getStringExtra(YahooFinanceService.ERROR_SITUATION), Toast.LENGTH_LONG).show();
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }
