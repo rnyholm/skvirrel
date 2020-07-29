@@ -15,12 +15,11 @@ import ax.stardust.skvirrel.R;
 import ax.stardust.skvirrel.component.keyboard.KeyboardHandler;
 import ax.stardust.skvirrel.component.keyboard.SkvirrelKeyboard;
 import ax.stardust.skvirrel.component.widget.KeyboardlessEditText;
-import ax.stardust.skvirrel.service.YahooFinanceService;
+import ax.stardust.skvirrel.service.ServiceParams;
+import ax.stardust.skvirrel.service.StockService;
 
 public class Skvirrel extends AppCompatActivity {
     private static final String LOG_TAG = Skvirrel.class.getSimpleName();
-
-    private static final int GET_STOCK_QUOTE_REQUEST_CODE = 0;
 
     private SkvirrelKeyboard skvirrelKeyboard;
 
@@ -41,11 +40,11 @@ public class Skvirrel extends AppCompatActivity {
         symbolEditText.setText("AMD");
 
         pollStockButton.setOnClickListener(view -> {
-            PendingIntent pendingResult = createPendingResult(GET_STOCK_QUOTE_REQUEST_CODE, new Intent(), 0);
-            Intent intent = new Intent(getApplicationContext(), YahooFinanceService.class);
-            intent.putExtra(YahooFinanceService.YAHOO_FINANCE_API_OPERATION, YahooFinanceService.GET);
-            intent.putExtra(YahooFinanceService.STOCK_SYMBOL, symbolEditText.getText().toString());
-            intent.putExtra(YahooFinanceService.PENDING_RESULT, pendingResult);
+            PendingIntent pendingResult = createPendingResult(ServiceParams.RequestCode.GET_COMPANY_NAME.getCode(), new Intent(), 0);
+            Intent intent = new Intent(getApplicationContext(), StockService.class);
+            intent.putExtra(ServiceParams.STOCK_SERVICE, ServiceParams.Operation.GET_COMPANY_NAME.get());
+            intent.putExtra(ServiceParams.RequestExtra.SYMBOL.get(), symbolEditText.getText().toString());
+            intent.putExtra(ServiceParams.PENDING_RESULT, pendingResult);
             startService(intent);
         });
     }
@@ -76,12 +75,11 @@ public class Skvirrel extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == GET_STOCK_QUOTE_REQUEST_CODE) {
-            if (resultCode == YahooFinanceService.REQUEST_SUCESS_CODE) {
-                debugStockInfoTextView.setText(data.getStringExtra(YahooFinanceService.STOCK_INFO));
-                companyTextView.setText(data.getStringExtra(YahooFinanceService.STOCK_NAME));
+        if (requestCode == ServiceParams.RequestCode.GET_COMPANY_NAME.getCode()) {
+            if (resultCode == ServiceParams.ResultCode.SUCCESS.getCode()) {
+                companyTextView.setText(data.getStringExtra(ServiceParams.ResultExtra.COMPANY_NAME.get()));
             } else {
-                Toast.makeText(getApplicationContext(), data.getStringExtra(YahooFinanceService.ERROR_SITUATION), Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), data.getStringExtra(ServiceParams.ERROR_SITUATION), Toast.LENGTH_LONG).show();
             }
         }
         super.onActivityResult(requestCode, resultCode, data);

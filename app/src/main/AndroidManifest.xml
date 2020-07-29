@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="ax.stardust.skvirrel">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -40,9 +42,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".service.YahooFinanceService" android:exported="false"/>
+        <service android:name=".service.StockService" android:exported="false"/>
     </application>
-
-    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>
