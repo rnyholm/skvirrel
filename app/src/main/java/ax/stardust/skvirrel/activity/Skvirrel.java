@@ -30,7 +30,7 @@ public class Skvirrel extends AppCompatActivity {
 
     private Button pollStockButton;
 
-    private KeyboardlessEditText tickerEditText;
+    private KeyboardlessEditText symbolEditText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,13 +38,13 @@ public class Skvirrel extends AppCompatActivity {
         setContentView(R.layout.activity_skvirrel);
         findViews();
 
-        tickerEditText.setText("AMD");
+        symbolEditText.setText("AMD");
 
         pollStockButton.setOnClickListener(view -> {
             PendingIntent pendingResult = createPendingResult(GET_STOCK_QUOTE_REQUEST_CODE, new Intent(), 0);
             Intent intent = new Intent(getApplicationContext(), YahooFinanceService.class);
             intent.putExtra(YahooFinanceService.YAHOO_FINANCE_API_OPERATION, YahooFinanceService.GET);
-            intent.putExtra(YahooFinanceService.STOCK_SYMBOL, tickerEditText.getText().toString());
+            intent.putExtra(YahooFinanceService.STOCK_SYMBOL, symbolEditText.getText().toString());
             intent.putExtra(YahooFinanceService.PENDING_RESULT, pendingResult);
             startService(intent);
         });
@@ -69,9 +69,9 @@ public class Skvirrel extends AppCompatActivity {
 
         pollStockButton = findViewById(R.id.poll_stock_btn);
 
-        tickerEditText = findViewById(R.id.ticker_et);
-        tickerEditText.setOnFocusChangeListener(new KeyboardHandler(skvirrelKeyboard));
-        tickerEditText.setOnTouchListener(new KeyboardHandler(skvirrelKeyboard));
+        symbolEditText = findViewById(R.id.symbol_et);
+        symbolEditText.setOnFocusChangeListener(new KeyboardHandler(skvirrelKeyboard));
+        symbolEditText.setOnTouchListener(new KeyboardHandler(skvirrelKeyboard));
     }
 
     @Override
