@@ -20,6 +20,8 @@ import yahoofinance.quotes.stock.StockQuote;
 import yahoofinance.quotes.stock.StockStats;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ParcelableStockTest {
@@ -122,47 +124,46 @@ public class ParcelableStockTest {
         Mockito.when(mockedStats.getMarketCap()).thenReturn(MARKET_CAP);
 
         ParcelableStock ps = ParcelableStock.from(mockedStock);
-        System.out.println(ps);
+        char separatorCharacter = ps.getPrice().contains(".") ? '.' : ',';
+
         assertEquals(NAME, ps.getName());
         assertEquals(SYMBOL, ps.getSymbol());
         assertEquals(STOCK_EXCHANGE, ps.getStockExchange());
         assertEquals(CURRENCY, ps.getCurrency());
-        assertEquals(replaceSeparatorCharacter(PRICE_STR), ps.getPrice());
-        assertEquals(replaceSeparatorCharacter(CHANGE_STR), ps.getChange());
-        assertEquals(replaceSeparatorCharacter(CHANGE_PERCENT_STR), ps.getChangePercent());
-        assertEquals(replaceSeparatorCharacter(PREVIOUS_CLOSE_STR), ps.getPreviousClose());
-        assertEquals(replaceSeparatorCharacter(OPEN_STR), ps.getOpen());
-        assertEquals(replaceSeparatorCharacter(LOW_STR), ps.getLow());
-        assertEquals(replaceSeparatorCharacter(HIGH_STR), ps.getHigh());
-        assertEquals(replaceSeparatorCharacter(LOW_52_WEEK_STR), ps.getLow52Week());
-        assertEquals(replaceSeparatorCharacter(HIGH_52_WEEK_STR), ps.getHigh52Week());
-        assertEquals(replaceSeparatorCharacter(MARKET_CAP_STR), ps.getMarketCap());
+        assertEquals(replaceSeparatorCharacter(PRICE_STR, separatorCharacter), ps.getPrice());
+        assertEquals(replaceSeparatorCharacter(CHANGE_STR, separatorCharacter), ps.getChange());
+        assertEquals(replaceSeparatorCharacter(CHANGE_PERCENT_STR, separatorCharacter), ps.getChangePercent());
+        assertEquals(replaceSeparatorCharacter(PREVIOUS_CLOSE_STR, separatorCharacter), ps.getPreviousClose());
+        assertEquals(replaceSeparatorCharacter(OPEN_STR, separatorCharacter), ps.getOpen());
+        assertEquals(replaceSeparatorCharacter(LOW_STR, separatorCharacter), ps.getLow());
+        assertEquals(replaceSeparatorCharacter(HIGH_STR, separatorCharacter), ps.getHigh());
+        assertEquals(replaceSeparatorCharacter(LOW_52_WEEK_STR, separatorCharacter), ps.getLow52Week());
+        assertEquals(replaceSeparatorCharacter(HIGH_52_WEEK_STR, separatorCharacter), ps.getHigh52Week());
+        assertEquals(replaceSeparatorCharacter(MARKET_CAP_STR, separatorCharacter), ps.getMarketCap());
         assertEquals(VOLUME_FORMAT.format(VOLUME), ps.getVolume());
         assertEquals(VOLUME_FORMAT.format(AVG_VOLUME), ps.getAvgVolume());
-        assertEquals(replaceSeparatorCharacter(PE_STR), ps.getPe());
-        assertEquals(replaceSeparatorCharacter(EPS_STR), ps.getEps());
+        assertEquals(replaceSeparatorCharacter(PE_STR, separatorCharacter), ps.getPe());
+        assertEquals(replaceSeparatorCharacter(EPS_STR, separatorCharacter), ps.getEps());
         assertEquals(DATE_FORMAT.format(EARNINGS.getTime()), ps.getEarnings());
-        assertEquals(String.format(DIVIDEND_FORMAT, replaceSeparatorCharacter(DIVIDEND_STR), replaceSeparatorCharacter(DIVIDEND_YIELD_STR)), ps.getDividend());
+        assertEquals(String.format(DIVIDEND_FORMAT, replaceSeparatorCharacter(DIVIDEND_STR, separatorCharacter),
+                replaceSeparatorCharacter(DIVIDEND_YIELD_STR, separatorCharacter)), ps.getDividend());
     }
 
     @Test
     public void testFromMissingDividend() {
         Mockito.when(mockedStock.getDividend()).thenReturn(null);
         ParcelableStock ps = ParcelableStock.from(mockedStock);
-        System.out.println(ps);
         assertEquals(NOT_AVAILABLE, ps.getDividend());
 
         Mockito.when(mockedDividend.getAnnualYield()).thenReturn(null);
         Mockito.when(mockedStock.getDividend()).thenReturn(mockedDividend);
         ps = ParcelableStock.from(mockedStock);
-        System.out.println(ps);
         assertEquals(NOT_AVAILABLE, ps.getDividend());
 
         Mockito.when(mockedDividend.getAnnualYield()).thenReturn(DIVIDEND);
         Mockito.when(mockedDividend.getAnnualYieldPercent()).thenReturn(null);
         Mockito.when(mockedStock.getDividend()).thenReturn(mockedDividend);
         ps = ParcelableStock.from(mockedStock);
-        System.out.println(ps);
         assertEquals(NOT_AVAILABLE, ps.getDividend());
     }
 
@@ -170,41 +171,44 @@ public class ParcelableStockTest {
     public void testFromMarketCapFormatting() {
         Mockito.when(mockedStats.getMarketCap()).thenReturn(BigDecimal.ONE);
         ParcelableStock ps = ParcelableStock.from(mockedStock);
-        System.out.println(ps);
         assertEquals("1", ps.getMarketCap());
 
         Mockito.when(mockedStats.getMarketCap()).thenReturn(new BigDecimal("999999"));
         ps = ParcelableStock.from(mockedStock);
-        System.out.println(ps);
-        assertEquals("999999", ps.getMarketCap());
+        assertFalse(ps.getMarketCap().contains("M"));
 
         Mockito.when(mockedStats.getMarketCap()).thenReturn(new BigDecimal("1000000"));
         ps = ParcelableStock.from(mockedStock);
-        System.out.println(ps);
-        assertEquals("1,00M", ps.getMarketCap());
+        assertTrue(ps.getMarketCap().contains("M"));
 
         Mockito.when(mockedStats.getMarketCap()).thenReturn(new BigDecimal("1560000"));
         ps = ParcelableStock.from(mockedStock);
-        System.out.println(ps);
-        assertEquals("1,56M", ps.getMarketCap());
+        assertTrue(ps.getMarketCap().contains("M"));
 
         Mockito.when(mockedStats.getMarketCap()).thenReturn(new BigDecimal("1999999"));
         ps = ParcelableStock.from(mockedStock);
-        System.out.println(ps);
-        assertEquals("1,99M", ps.getMarketCap());
+        assertTrue(ps.getMarketCap().contains("M"));
 
         Mockito.when(mockedStats.getMarketCap()).thenReturn(new BigDecimal("1000000000"));
         ps = ParcelableStock.from(mockedStock);
-        System.out.println(ps);
-        assertEquals("1,00B", ps.getMarketCap());
+        assertTrue(ps.getMarketCap().contains("B"));
 
         Mockito.when(mockedStats.getMarketCap()).thenReturn(new BigDecimal("1670000000"));
         ps = ParcelableStock.from(mockedStock);
-        System.out.println(ps);
-        assertEquals("1,67B", ps.getMarketCap());
+        assertTrue(ps.getMarketCap().contains("B"));
     }
 
-    private String replaceSeparatorCharacter(String string) {
-        return string.replace('.', ',');
+    private String replaceSeparatorCharacter(String string, char newSeparatorCharacter) {
+        if (newSeparatorCharacter == '.') {
+            if (!string.contains(String.valueOf(newSeparatorCharacter))) {
+                return string.replace(',', newSeparatorCharacter);
+            }
+        } else { // ','
+            if (!string.contains(String.valueOf(newSeparatorCharacter))) {
+                return string.replace('.', newSeparatorCharacter);
+            }
+        }
+        
+        return string;
     }
 }
