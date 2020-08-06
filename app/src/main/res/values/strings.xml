@@ -20,6 +20,36 @@
     <string name="keyboard_7" translatable="false">7</string>
     <string name="keyboard_8" translatable="false">8</string>
     <string name="keyboard_9" translatable="false">9</string>
+
+    <string name="keyboard_a" translatable="false">A</string>
+    <string name="keyboard_b" translatable="false">B</string>
+    <string name="keyboard_c" translatable="false">C</string>
+    <string name="keyboard_d" translatable="false">D</string>
+    <string name="keyboard_e" translatable="false">E</string>
+    <string name="keyboard_f" translatable="false">F</string>
+    <string name="keyboard_g" translatable="false">G</string>
+    <string name="keyboard_h" translatable="false">H</string>
+    <string name="keyboard_i" translatable="false">I</string>
+    <string name="keyboard_j" translatable="false">J</string>
+    <string name="keyboard_k" translatable="false">K</string>
+    <string name="keyboard_l" translatable="false">L</string>
+    <string name="keyboard_m" translatable="false">M</string>
+    <string name="keyboard_n" translatable="false">N</string>
+    <string name="keyboard_o" translatable="false">O</string>
+    <string name="keyboard_p" translatable="false">P</string>
+    <string name="keyboard_q" translatable="false">Q</string>
+    <string name="keyboard_r" translatable="false">R</string>
+    <string name="keyboard_s" translatable="false">S</string>
+    <string name="keyboard_t" translatable="false">T</string>
+    <string name="keyboard_u" translatable="false">U</string>
+    <string name="keyboard_v" translatable="false">V</string>
+    <string name="keyboard_w" translatable="false">W</string>
+    <string name="keyboard_x" translatable="false">X</string>
+    <string name="keyboard_y" translatable="false">Y</string>
+    <string name="keyboard_z" translatable="false">Z</string>
+
+    <string name="keyboard_dot" translatable="false">.</string>
+    <string name="keyboard_dash" translatable="false">-</string>
     <string name="keyboard_separator" translatable="false">:</string>
 
     <!-- other -->

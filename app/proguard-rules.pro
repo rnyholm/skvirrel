@@ -21,4 +21,4 @@
 #-renamesourcefileattribute SourceFile
 
 # Enumerations must be kept
--keepclassmembers enum ax.stardust.skvirrel.** { *; }
+-keepclassmembers enum ax.stardust.skvirrel.* { *; }

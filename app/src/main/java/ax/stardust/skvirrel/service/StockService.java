@@ -10,6 +10,8 @@ import androidx.annotation.Nullable;
 import java.io.IOException;
 import java.util.Objects;
 
+import ax.stardust.skvirrel.parcelable.ParcelableStock;
+import ax.stardust.skvirrel.service.ServiceParams.Operation;
 import yahoofinance.Stock;
 import yahoofinance.YahooFinance;
 
@@ -17,10 +19,10 @@ import yahoofinance.YahooFinance;
  * Service for communicating with Yahoo Finance API.
  */
 public class StockService extends IntentService {
-    private static final String LOG_TAG = StockService.class.getSimpleName();
+    private static final String TAG = StockService.class.getSimpleName();
 
     public StockService() {
-        super(LOG_TAG);
+        super(TAG);
     }
 
     @Override
@@ -31,30 +33,43 @@ public class StockService extends IntentService {
                 Intent result = new Intent();
                 try {
                     try {
-                        if (ServiceParams.Operation.GET_COMPANY_NAME.get().equals(intent.getStringExtra(ServiceParams.STOCK_SERVICE))) {
-                            Stock stock = YahooFinance.get(Objects.requireNonNull(intent.getStringExtra(ServiceParams.RequestExtra.SYMBOL.get())));
-                            Log.d(LOG_TAG, "onHandleIntent(...) ->  Successfully fetched stock -> " + stock.getName());
+                        Operation operation = Operation.from(intent.getStringExtra(ServiceParams.STOCK_SERVICE));
+                        Stock stock;
+                        switch (operation) {
+                            case GET_COMPANY_NAME:
+                                stock = YahooFinance.get(Objects.requireNonNull(intent.getStringExtra(ServiceParams.RequestExtra.SYMBOL.get())));
+                                Log.d(TAG, "onHandleIntent(...) ->  Successfully fetched stock -> " + stock.getName());
 
-                            result.putExtra(ServiceParams.ResultExtra.COMPANY_NAME.get(), stock.getName());
-                            reply.send(this, ServiceParams.ResultCode.SUCCESS.getCode(), result);
-                        } else {
-                            Log.e(LOG_TAG, "onHandleIntent(...) -> Unsupported operation for request");
-                            result.putExtra(ServiceParams.ERROR_SITUATION, "Unsupported operation -> " + intent.getStringExtra(ServiceParams.STOCK_SERVICE));
-                            reply.send(this, ServiceParams.ResultCode.ERROR.getCode(), result);
+                                result.putExtra(ServiceParams.ResultExtra.COMPANY_NAME.get(), stock.getName());
+                                reply.send(this, ServiceParams.ResultCode.SUCCESS.getCode(), result);
+
+                                break;
+                            case GET_STOCK_INFO:
+                                stock = YahooFinance.get(Objects.requireNonNull(intent.getStringExtra(ServiceParams.RequestExtra.SYMBOL.get())));
+                                Log.d(TAG, "onHandleIntent(...) ->  Successfully fetched stock -> " + stock.getName());
+
+                                result.putExtra(ServiceParams.ResultExtra.STOCK_INFO.get(), ParcelableStock.from(stock));
+                                reply.send(this, ServiceParams.ResultCode.SUCCESS.getCode(), result);
+
+                                break;
+                            default:
+                                Log.e(TAG, "onHandleIntent(...) -> Unsupported operation for request");
+                                result.putExtra(ServiceParams.ERROR_SITUATION, "Unsupported operation -> " + intent.getStringExtra(ServiceParams.STOCK_SERVICE));
+                                reply.send(this, ServiceParams.ResultCode.ERROR.getCode(), result);
                         }
                     } catch (IOException e) {
-                        Log.e(LOG_TAG, "onHandleIntent(...) -> Something went wrong invoking YahooFinanceAPI", e);
+                        Log.e(TAG, "onHandleIntent(...) -> Something went wrong invoking YahooFinanceAPI", e);
                         result.putExtra(ServiceParams.ERROR_SITUATION, "Something went wrong invoking YahooFinanceAPI");
                         reply.send(this, ServiceParams.ResultCode.ERROR.getCode(), result);
                     }
                 } catch (PendingIntent.CanceledException e) {
-                    Log.i(LOG_TAG, "Reply cancelled", e);
+                    Log.i(TAG, "Reply cancelled", e);
                 }
             } else {
-                Log.e(LOG_TAG, "onHandleIntent(...) -> No PendingIntent was passed in with intent");
+                Log.e(TAG, "onHandleIntent(...) -> No PendingIntent was passed in with intent");
             }
         } else {
-            Log.e(LOG_TAG, "onHandleIntent(...) -> invoked with null intent");
+            Log.e(TAG, "onHandleIntent(...) -> invoked with null intent");
         }
     }
 }

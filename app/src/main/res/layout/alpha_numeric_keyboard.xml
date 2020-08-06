@@ -1,0 +1,551 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/alphanumeric_keyboard_gl"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_horizontal">
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_1"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_1"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_2"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_2"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_1"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_3"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_3"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_2"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_4"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_4"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_3"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_5"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_5"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_4"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_6"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_6"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_5"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_7"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_7"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_6"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_8"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_8"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_7"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_9"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_9"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_8"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_0"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_0"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_9"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_q"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_q"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/alphanumeric_keyboard_button_1" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_w"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_w"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_q"
+        app:layout_constraintTop_toBottomOf="@id/alphanumeric_keyboard_button_2" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_e"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_e"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_w"
+        app:layout_constraintTop_toBottomOf="@id/alphanumeric_keyboard_button_3" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_r"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_r"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_e"
+        app:layout_constraintTop_toBottomOf="@id/alphanumeric_keyboard_button_4" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_t"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_t"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_r"
+        app:layout_constraintTop_toBottomOf="@id/alphanumeric_keyboard_button_5" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_y"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_y"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_t"
+        app:layout_constraintTop_toBottomOf="@id/alphanumeric_keyboard_button_6" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_u"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_u"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_y"
+        app:layout_constraintTop_toBottomOf="@id/alphanumeric_keyboard_button_7" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_i"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_i"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_u"
+        app:layout_constraintTop_toBottomOf="@id/alphanumeric_keyboard_button_8" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_o"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_o"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_i"
+        app:layout_constraintTop_toBottomOf="@id/alphanumeric_keyboard_button_9" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_p"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_p"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_o"
+        app:layout_constraintTop_toBottomOf="@id/alphanumeric_keyboard_button_0" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_a"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_a"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/alphanumeric_keyboard_button_q" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_s"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_s"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_a"
+        app:layout_constraintTop_toBottomOf="@id/alphanumeric_keyboard_button_w" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_d"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_d"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_s"
+        app:layout_constraintTop_toBottomOf="@id/alphanumeric_keyboard_button_e" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_f"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_f"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_d"
+        app:layout_constraintTop_toBottomOf="@id/alphanumeric_keyboard_button_r" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_g"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_g"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_f"
+        app:layout_constraintTop_toBottomOf="@id/alphanumeric_keyboard_button_t" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_h"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_h"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_g"
+        app:layout_constraintTop_toBottomOf="@id/alphanumeric_keyboard_button_y" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_j"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_j"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_h"
+        app:layout_constraintTop_toBottomOf="@id/alphanumeric_keyboard_button_u" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_k"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_k"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_j"
+        app:layout_constraintTop_toBottomOf="@id/alphanumeric_keyboard_button_i" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_l"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_l"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_k"
+        app:layout_constraintTop_toBottomOf="@id/alphanumeric_keyboard_button_o" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_z"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_z"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/alphanumeric_keyboard_button_a" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_x"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_x"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_z"
+        app:layout_constraintTop_toBottomOf="@id/alphanumeric_keyboard_button_a" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_c"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_c"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_x"
+        app:layout_constraintTop_toBottomOf="@id/alphanumeric_keyboard_button_s" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_v"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_v"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_c"
+        app:layout_constraintTop_toBottomOf="@id/alphanumeric_keyboard_button_d" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_b"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_b"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_v"
+        app:layout_constraintTop_toBottomOf="@id/alphanumeric_keyboard_button_f" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_n"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_n"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_b"
+        app:layout_constraintTop_toBottomOf="@id/alphanumeric_keyboard_button_g" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_m"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_m"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_n"
+        app:layout_constraintTop_toBottomOf="@id/alphanumeric_keyboard_button_h" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_dot"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_dot"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_m"
+        app:layout_constraintTop_toBottomOf="@id/alphanumeric_keyboard_button_j" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_dash"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/alphanumeric_keyboard_button_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/keyboard_dash"
+        android:textColor="@color/colorButtonText"
+        android:textSize="20sp"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_dot"
+        app:layout_constraintTop_toBottomOf="@id/alphanumeric_keyboard_button_k" />
+
+    <Button
+        android:id="@+id/alphanumeric_keyboard_button_del"
+        style="@style/Widget.AppCompat.Button.Borderless.Colored"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/keyboard_button_backspace_selector"
+        app:layout_constraintStart_toEndOf="@id/alphanumeric_keyboard_button_dash"
+        app:layout_constraintTop_toBottomOf="@id/alphanumeric_keyboard_button_l" />
+</androidx.constraintlayout.widget.ConstraintLayout>

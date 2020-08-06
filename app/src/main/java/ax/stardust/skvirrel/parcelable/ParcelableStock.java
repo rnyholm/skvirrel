@@ -198,7 +198,7 @@ public class ParcelableStock implements Parcelable {
         if (calendar == null) {
             return NOT_AVAILABLE;
         }
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM. yyyy", Locale.getDefault());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
         return dateFormat.format(calendar.getTime());
     }
 

@@ -26,7 +26,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(MockitoJUnitRunner.class)
 public class ParcelableStockTest {
     private static final DecimalFormat VOLUME_FORMAT = new DecimalFormat("###,###,###");
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd MMM. yyyy", Locale.getDefault());
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
     private static final String DIVIDEND_FORMAT = "%s (%s%%)";
 
     private static final String NAME = "Mocked test company Inc.";

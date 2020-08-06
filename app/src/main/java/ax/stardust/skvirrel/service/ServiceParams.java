@@ -14,7 +14,20 @@ public class ServiceParams {
      */
     public enum Operation {
         GET_COMPANY_NAME,
-        GET_STOCK_INFO;
+        GET_STOCK_INFO,
+        UNSUPPORTED;
+
+        public static Operation from(String string) {
+            if (GET_COMPANY_NAME.get().equals(string)) {
+                return GET_COMPANY_NAME;
+            }
+
+            if (GET_STOCK_INFO.get().equals(string)) {
+                return GET_STOCK_INFO;
+            }
+
+            return UNSUPPORTED;
+        }
 
         public String get() {
             return this.name().toLowerCase();
@@ -36,7 +49,8 @@ public class ServiceParams {
      * Valid codes for the different requests.
      */
     public enum RequestCode {
-        GET_COMPANY_NAME(0);
+        GET_COMPANY_NAME(0),
+        GET_STOCK_INFO(1);
 
         private final int code;
 
