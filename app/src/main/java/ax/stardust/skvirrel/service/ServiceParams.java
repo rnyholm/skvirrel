@@ -8,96 +8,46 @@ public class ServiceParams {
     public static final String STOCK_SERVICE = "stock_service";
     public static final String PENDING_RESULT = "pending_result";
     public static final String ERROR_SITUATION = "error_situation";
+    public static final String STOCK_FRAGMENT_TAG = "stock_fragment_tag";
 
     /**
      * Valid service operations.
      */
-    public enum Operation {
-        GET_COMPANY_NAME,
-        GET_STOCK_INFO,
-        UNSUPPORTED;
-
-        public static Operation from(String string) {
-            if (GET_COMPANY_NAME.get().equals(string)) {
-                return GET_COMPANY_NAME;
-            }
-
-            if (GET_STOCK_INFO.get().equals(string)) {
-                return GET_STOCK_INFO;
-            }
-
-            return UNSUPPORTED;
-        }
-
-        public String get() {
-            return this.name().toLowerCase();
-        }
+    public static final class Operation {
+        public static final String GET_COMPANY_NAME = "get_company_name";
+        public static final String GET_STOCK_INFO = "get_stock_info";
+        public static final String UNSUPPORTED = "unsupported";
     }
 
     /**
      * Valid types of data to pass in on a service request.
      */
-    public enum RequestExtra {
-        SYMBOL;
-
-        public String get() {
-            return this.name().toLowerCase();
-        }
+    public static final class RequestExtra {
+        public static final String SYMBOL = "symbol";
     }
 
     /**
      * Valid codes for the different requests.
      */
-    public enum RequestCode {
-        GET_COMPANY_NAME(0),
-        GET_STOCK_INFO(1);
-
-        private final int code;
-
-        RequestCode(int code) {
-            this.code = code;
-        }
-
-        public int getCode() {
-            return code;
-        }
-
-        public String get() {
-            return this.name().toLowerCase();
-        }
+    public static final class RequestCode {
+        public static final int GET_COMPANY_NAME = 0;
+        public static final int GET_STOCK_INFO = 1;
     }
 
     /**
      * Valid types of data to pass in on a service response.
      */
-    public enum ResultExtra {
-        COMPANY_NAME,
-        STOCK_INFO;
-
-        public String get() {
-            return this.name().toLowerCase();
-        }
+    public static final class ResultExtra {
+        public static final String COMPANY_NAME = "company_name";
+        public static final String STOCK_INFO = "stock_info";
     }
 
     /**
      * Valid codes for the different responses.
      */
-    public enum ResultCode {
-        SUCCESS(0),
-        ERROR(-1);
-
-        private final int code;
-
-        ResultCode(int code) {
-            this.code = code;
-        }
-
-        public int getCode() {
-            return code;
-        }
-
-        public String get() {
-            return this.name().toLowerCase();
-        }
+    public static final class ResultCode {
+        public static final int SUCCESS = 0;
+        public static final int COMMON_ERROR = -1;
+        public static final int STOCK_NOT_FOUND_ERROR = -2;
     }
 }

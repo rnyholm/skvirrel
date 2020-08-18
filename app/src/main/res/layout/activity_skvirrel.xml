@@ -14,7 +14,7 @@
         android:fillViewport="true">
 
         <LinearLayout
-            android:id="@+id/stocks_ll"
+            android:id="@+id/stock_fragment_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clickable="true"
@@ -27,15 +27,16 @@
             android:paddingEnd="7dp"
             android:paddingBottom="7dp">
 
-            <include layout="@layout/stock_content_card"/>
+<!--            <include layout="@layout/stock_content_card"/>-->
 
-            <TextView
-                android:id="@+id/debug_stock_info_tv"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/montserrat"
-                android:text="@string/debug_stock_info"
-                android:textSize="14sp" />
+<!--            <TextView-->
+<!--                android:id="@+id/debug_stock_info_tv"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_gravity="bottom"-->
+<!--                android:fontFamily="@font/montserrat"-->
+<!--                android:text="@string/debug_stock_info"-->
+<!--                android:textSize="14sp" />-->
 
         </LinearLayout>
 
