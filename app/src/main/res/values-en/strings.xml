@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="company_name">Enter a stock symbol</string>
+    <string name="company_name">Enter a stock symbol...</string>
     <string name="poll_stock">Poll stock</string>
+    <string name="add_stock_monitoring">Add stock monitoring</string>
 </resources>

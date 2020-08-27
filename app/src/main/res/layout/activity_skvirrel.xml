@@ -14,7 +14,7 @@
         android:fillViewport="true">
 
         <LinearLayout
-            android:id="@+id/stock_fragment_container"
+            android:id="@+id/stock_monitoring_ll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clickable="true"
@@ -27,9 +27,37 @@
             android:paddingEnd="7dp"
             android:paddingBottom="7dp">
 
-<!--            <include layout="@layout/stock_content_card"/>-->
+            <LinearLayout
+                android:id="@+id/stock_fragment_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-<!--            <TextView-->
+<!--                <include layout="@layout/stock_content_card" />-->
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/add_stock_monitoring_rl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/add_stock_monitoring_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button_selector"
+                    android:fontFamily="@font/montserrat"
+
+                    android:paddingLeft="25dp"
+                    android:paddingRight="25dp"
+                    android:text="@string/add_stock_monitoring"
+                    android:textAllCaps="false"
+                    android:textColor="@color/colorButtonText" />
+            </RelativeLayout>
+
+            <!--            <TextView-->
 <!--                android:id="@+id/debug_stock_info_tv"-->
 <!--                android:layout_width="match_parent"-->
 <!--                android:layout_height="wrap_content"-->

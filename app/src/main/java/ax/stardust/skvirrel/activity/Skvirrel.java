@@ -3,6 +3,7 @@ package ax.stardust.skvirrel.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,7 +22,7 @@ public class Skvirrel extends AppCompatActivity {
     private FragmentManager fragmentManager;
     private FragmentTransaction fragmentTransaction;
 
-    private StockFragment stockFragment;
+    private Button addStockMonitoringButton;
 
     private AlphanumericKeyboard alphanumericKeyboard;
 
@@ -32,11 +33,7 @@ public class Skvirrel extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_skvirrel);
         findViews();
-
-        stockFragment = new StockFragment(this, alphanumericKeyboard);
-        fragmentManager = getSupportFragmentManager();
-        fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.add(R.id.stock_fragment_container, stockFragment, "12345").commit(); // TODO: set correct fragment tag
+        setListeners();
     }
 
     @Override
@@ -50,8 +47,18 @@ public class Skvirrel extends AppCompatActivity {
     }
 
     private void findViews() {
+        addStockMonitoringButton = findViewById(R.id.add_stock_monitoring_btn);
         alphanumericKeyboard = findViewById(R.id.alphanumeric_keyboard);
         versionNameTextView = findViewById(R.id.version_name_tv);
+    }
+
+    private void setListeners() {
+        addStockMonitoringButton.setOnClickListener(view -> {
+            StockFragment stockFragment = new StockFragment(this, alphanumericKeyboard);
+            fragmentManager = getSupportFragmentManager();
+            fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.add(R.id.stock_fragment_container, stockFragment, "12345").commit(); // TODO: set correct fragment tag
+        });
     }
 
     @Override

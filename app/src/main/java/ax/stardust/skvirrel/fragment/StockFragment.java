@@ -95,7 +95,7 @@ public class StockFragment extends Fragment {
             }
         });
 
-        pollStockButton.setOnClickListener(v -> {
+        pollStockButton.setOnClickListener(view -> {
             PendingIntent pendingResult = activity.createPendingResult(ServiceParams.RequestCode.GET_STOCK_INFO, new Intent(), 0);
             Intent intent = new Intent(activity, StockService.class);
             intent.putExtra(ServiceParams.STOCK_SERVICE, ServiceParams.Operation.GET_STOCK_INFO);
