@@ -7,9 +7,10 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.IOException;
 import java.util.Objects;
-import java.util.regex.Pattern;
 
 import ax.stardust.skvirrel.exception.StockNotFoundException;
 import ax.stardust.skvirrel.parcelable.ParcelableStock;
@@ -30,10 +31,8 @@ public class StockService extends IntentService {
     }
 
     private void validateStock(Stock stock) throws StockNotFoundException {
-        Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?");
-        if (stock == null || !stock.isValid()
-                || pattern.matcher(stock.getName()).matches()) { // name of stock cannot contain
-            throw new StockNotFoundException();                  // only digits
+        if (stock == null || !stock.isValid() || StringUtils.isNumeric(stock.getName())) {
+            throw new StockNotFoundException();
         }
     }
 

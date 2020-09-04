@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 
+import org.apache.commons.lang3.StringUtils;
+
 import ax.stardust.skvirrel.component.widget.KeyboardlessEditText;
 
 public class KeyboardHandler implements View.OnFocusChangeListener, View.OnTouchListener {
@@ -24,7 +26,7 @@ public class KeyboardHandler implements View.OnFocusChangeListener, View.OnTouch
                 Editable editable = keyboardlessEditText.getText();
                 InputConnection inputConnection = view.onCreateInputConnection(new EditorInfo());
                 this.skvirrelKeyboard.show();
-                this.skvirrelKeyboard.enableDeleteButton(editable != null && !editable.toString().isEmpty());
+                this.skvirrelKeyboard.enableDeleteButton(editable != null && StringUtils.isNotEmpty(editable.toString()));
                 this.skvirrelKeyboard.setInputConnection(inputConnection);
             } else {
                 this.skvirrelKeyboard.delayedHide();
@@ -41,7 +43,7 @@ public class KeyboardHandler implements View.OnFocusChangeListener, View.OnTouch
                 Editable editable = keyboardlessEditText.getText();
                 InputConnection inputConnection = view.onCreateInputConnection(new EditorInfo());
                 this.skvirrelKeyboard.show();
-                this.skvirrelKeyboard.enableDeleteButton(editable != null && !editable.toString().isEmpty());
+                this.skvirrelKeyboard.enableDeleteButton(editable != null && StringUtils.isNotEmpty(editable.toString()));
                 this.skvirrelKeyboard.setInputConnection(inputConnection);
             }
         }

@@ -5,6 +5,8 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -151,7 +153,7 @@ public class ParcelableStock implements Parcelable {
     }
 
     private static String getString(String string) {
-        if (string == null || string.isEmpty()) {
+        if (StringUtils.isEmpty(string)) {
             return NOT_AVAILABLE;
         }
         return string;

@@ -11,13 +11,20 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import ax.stardust.skvirrel.R;
 import ax.stardust.skvirrel.component.keyboard.AlphanumericKeyboard;
 import ax.stardust.skvirrel.fragment.StockFragment;
+import ax.stardust.skvirrel.persistence.DatabaseManager;
+import ax.stardust.skvirrel.pojo.StockMonitoring;
 import ax.stardust.skvirrel.service.ServiceParams;
 
 public class Skvirrel extends AppCompatActivity {
     private static final String TAG = Skvirrel.class.getSimpleName();
+
+    private DatabaseManager databaseManager;
 
     private FragmentManager fragmentManager;
     private FragmentTransaction fragmentTransaction;
@@ -28,11 +35,15 @@ public class Skvirrel extends AppCompatActivity {
 
     private TextView versionNameTextView;
 
+    private List<StockMonitoring> stockMonitorings = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_skvirrel);
         findViews();
+        addStockFragments();
         setListeners();
     }
 
@@ -54,11 +65,31 @@ public class Skvirrel extends AppCompatActivity {
 
     private void setListeners() {
         addStockMonitoringButton.setOnClickListener(view -> {
-            StockFragment stockFragment = new StockFragment(this, alphanumericKeyboard);
-            fragmentManager = getSupportFragmentManager();
-            fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.add(R.id.stock_fragment_container, stockFragment, "12345").commit(); // TODO: set correct fragment tag
+            // create a new stock monitoring, store it to db, local list and
+            // update ui with a new stock fragment
+            StockMonitoring stockMonitoring = getDatabaseManager().insert(new StockMonitoring());
+            stockMonitorings.add(stockMonitoring);
+            addStockFragment(stockMonitoring);
         });
+    }
+
+    private void addStockFragments() {
+        stockMonitorings = getDatabaseManager().fetchAll();
+        stockMonitorings.forEach(this::addStockFragment);
+    }
+
+    private void addStockFragment(StockMonitoring stockMonitoring) {
+        StockFragment stockFragment = new StockFragment(this, stockMonitoring, alphanumericKeyboard);
+        fragmentManager = getSupportFragmentManager();
+        fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.add(R.id.stock_fragment_container, stockFragment, String.valueOf(stockMonitoring.getId())).commit();
+    }
+
+    private DatabaseManager getDatabaseManager() {
+        if (databaseManager == null) {
+            databaseManager = new DatabaseManager(this);
+        }
+        return databaseManager;
     }
 
     @Override

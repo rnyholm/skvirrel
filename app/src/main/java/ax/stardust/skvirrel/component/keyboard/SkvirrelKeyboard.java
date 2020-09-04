@@ -10,6 +10,8 @@ import android.view.inputmethod.InputConnection;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import org.apache.commons.lang3.StringUtils;
+
 import ax.stardust.skvirrel.R;
 
 public abstract class SkvirrelKeyboard extends LinearLayout implements View.OnClickListener, View.OnLongClickListener {
@@ -131,7 +133,7 @@ public abstract class SkvirrelKeyboard extends LinearLayout implements View.OnCl
      */
     private void actionDelete() {
         CharSequence selectedText = inputConnection.getSelectedText(0);
-        if (TextUtils.isEmpty(selectedText)) {
+        if (StringUtils.isEmpty(selectedText)) {
             inputConnection.deleteSurroundingText(1, 0);
         } else {
             inputConnection.commitText("", 1);
