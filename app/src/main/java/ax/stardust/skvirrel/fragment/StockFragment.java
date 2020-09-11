@@ -25,7 +25,7 @@ import ax.stardust.skvirrel.component.keyboard.AlphanumericKeyboard;
 import ax.stardust.skvirrel.component.keyboard.KeyboardHandler;
 import ax.stardust.skvirrel.component.widget.KeyboardlessEditText;
 import ax.stardust.skvirrel.persistence.DatabaseManager;
-import ax.stardust.skvirrel.pojo.StockMonitoring;
+import ax.stardust.skvirrel.entity.StockMonitoring;
 import ax.stardust.skvirrel.service.ServiceParams;
 import ax.stardust.skvirrel.service.StockService;
 

@@ -9,7 +9,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import ax.stardust.skvirrel.exception.StockMonitoringNotFound;
-import ax.stardust.skvirrel.pojo.StockMonitoring;
+import ax.stardust.skvirrel.entity.StockMonitoring;
 
 /**
  * Manager responsible for database handling.

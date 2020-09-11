@@ -1,4 +1,4 @@
-package ax.stardust.skvirrel.pojo;
+package ax.stardust.skvirrel.entity;
 
 /**
  * Class containing the different information needed for proper stock monitoring
