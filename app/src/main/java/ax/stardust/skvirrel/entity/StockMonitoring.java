@@ -1,5 +1,7 @@
 package ax.stardust.skvirrel.entity;
 
+import java.util.Objects;
+
 /**
  * Class containing the different information needed for proper stock monitoring
  */
@@ -76,5 +78,24 @@ public class StockMonitoring {
 
     public void setNotified(boolean notified) {
         this.notified = notified;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        StockMonitoring that = (StockMonitoring) o;
+        return id == that.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

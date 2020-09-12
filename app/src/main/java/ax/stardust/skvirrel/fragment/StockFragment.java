@@ -16,34 +16,38 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 
 import org.apache.commons.lang3.StringUtils;
 
 import ax.stardust.skvirrel.R;
+import ax.stardust.skvirrel.activity.Skvirrel;
 import ax.stardust.skvirrel.component.keyboard.AlphanumericKeyboard;
 import ax.stardust.skvirrel.component.keyboard.KeyboardHandler;
 import ax.stardust.skvirrel.component.widget.KeyboardlessEditText;
-import ax.stardust.skvirrel.persistence.DatabaseManager;
 import ax.stardust.skvirrel.entity.StockMonitoring;
+import ax.stardust.skvirrel.persistence.DatabaseManager;
 import ax.stardust.skvirrel.service.ServiceParams;
 import ax.stardust.skvirrel.service.StockService;
 
 public class StockFragment extends Fragment {
     private static final String TAG = StockFragment.class.getSimpleName();
 
-    private DatabaseManager databaseManager;
-
     // parent of fragment
-    private FragmentActivity activity;
+    private Skvirrel activity;
     private StockMonitoring stockMonitoring;
     private AlphanumericKeyboard alphanumericKeyboard;
 
+    private DatabaseManager databaseManager;
+
     private TextView companyTextView;
-    private Button pollStockButton;
+
     private KeyboardlessEditText symbolEditText;
 
-    public StockFragment(FragmentActivity activity, StockMonitoring stockMonitoring, AlphanumericKeyboard alphanumericKeyboard) {
+    private Button pollStockButton;
+    private Button resetNotificationButton;
+    private Button removeStockMonitoringButton;
+
+    public StockFragment(final Skvirrel activity, final StockMonitoring stockMonitoring, final AlphanumericKeyboard alphanumericKeyboard) {
         if (activity == null || stockMonitoring == null || alphanumericKeyboard == null) {
             String errorMessage = "Cannot instantiate fragment with null activity, stockMonitoring or alphanumeric keyboard";
             Log.e(TAG, "StockFragment(...) -> " + errorMessage);
@@ -67,8 +71,10 @@ public class StockFragment extends Fragment {
 
     private void findViews(View view) {
         companyTextView = view.findViewById(R.id.company_tv);
-        pollStockButton = view.findViewById(R.id.poll_stock_btn);
         symbolEditText = view.findViewById(R.id.symbol_et);
+        pollStockButton = view.findViewById(R.id.poll_stock_btn);
+        resetNotificationButton = view.findViewById(R.id.reset_notification_btn);
+        removeStockMonitoringButton = view.findViewById(R.id.remove_stock_monitoring_btn);
     }
 
     private void setStockInfo() {
@@ -93,7 +99,7 @@ public class StockFragment extends Fragment {
                     companyTextView.setText(R.string.company_name);
                 } else {
                     PendingIntent pendingResult = activity.createPendingResult(ServiceParams.RequestCode.GET_COMPANY_NAME, new Intent(), 0);
-                    Intent intent = new Intent(getActivity(), StockService.class);
+                    Intent intent = new Intent(activity, StockService.class);
                     intent.putExtra(ServiceParams.STOCK_SERVICE, ServiceParams.Operation.GET_COMPANY_NAME);
                     intent.putExtra(ServiceParams.RequestExtra.SYMBOL, getSymbol());
                     intent.putExtra(ServiceParams.PENDING_RESULT, pendingResult);
@@ -123,6 +129,13 @@ public class StockFragment extends Fragment {
             intent.putExtra(ServiceParams.STOCK_FRAGMENT_TAG, getTag());
             activity.startService(intent);
         });
+
+        resetNotificationButton.setOnClickListener(view -> {
+            // TODO: implement me :)
+            Toast.makeText(activity, "Reset notification button pressed", Toast.LENGTH_LONG).show();
+        });
+
+        removeStockMonitoringButton.setOnClickListener(view -> activity.removeStockMonitoringAndFragment(stockMonitoring));
     }
 
     private String getSymbol() {
@@ -135,7 +148,7 @@ public class StockFragment extends Fragment {
         return "";
     }
 
-    private void setCompanyAndSymbolWidgets(int resultCode, Intent data) {
+    private void setCompanyAndSymbolWidgets(final int resultCode, final Intent data) {
         String companyName = "";
 
         if (resultCode == ServiceParams.ResultCode.SUCCESS) {

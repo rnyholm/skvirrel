@@ -47,7 +47,7 @@
                     android:id="@+id/add_stock_monitoring_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/button_selector"
+                    android:background="@drawable/button_black_selector"
                     android:fontFamily="@font/montserrat"
 
                     android:paddingLeft="25dp"

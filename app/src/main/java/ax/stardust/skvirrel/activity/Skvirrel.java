@@ -2,6 +2,7 @@ package ax.stardust.skvirrel.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -79,10 +80,11 @@ public class Skvirrel extends AppCompatActivity {
     }
 
     private void addStockFragment(StockMonitoring stockMonitoring) {
-        StockFragment stockFragment = new StockFragment(this, stockMonitoring, alphanumericKeyboard);
+        final StockFragment stockFragment = new StockFragment(this, stockMonitoring, alphanumericKeyboard);
         fragmentManager = getSupportFragmentManager();
         fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.add(R.id.stock_fragment_container, stockFragment, String.valueOf(stockMonitoring.getId())).commit();
+        fragmentTransaction.commit();
     }
 
     private DatabaseManager getDatabaseManager() {
@@ -92,10 +94,28 @@ public class Skvirrel extends AppCompatActivity {
         return databaseManager;
     }
 
+    public void removeStockMonitoringAndFragment(StockMonitoring stockMonitoring) {
+        fragmentManager = getSupportFragmentManager();
+
+        final Fragment fragment = fragmentManager.findFragmentByTag(String.valueOf(stockMonitoring.getId()));
+        if (fragment != null) {
+            fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.remove(fragment);
+            fragmentTransaction.commit();
+        } else {
+            Log.e(TAG, "removeStockMonitoringAndFragment(...) -> No fragment found with tag -> " + stockMonitoring.getId());
+        }
+
+        getDatabaseManager().delete(stockMonitoring.getId());
+        stockMonitorings.remove(stockMonitoring);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // figure out what fragment is responsible for intent and let it handle result
-        Fragment callingFragment = fragmentManager.findFragmentByTag(data.getStringExtra(ServiceParams.STOCK_FRAGMENT_TAG));
+        fragmentManager = getSupportFragmentManager();
+
+        final Fragment callingFragment = fragmentManager.findFragmentByTag(data.getStringExtra(ServiceParams.STOCK_FRAGMENT_TAG));
         if (callingFragment != null) {
             callingFragment.onActivityResult(requestCode, resultCode, data);
         }
