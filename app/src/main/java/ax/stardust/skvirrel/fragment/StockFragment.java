@@ -47,6 +47,13 @@ public class StockFragment extends Fragment {
     private Button resetNotificationButton;
     private Button removeStockMonitoringButton;
 
+    /**
+     * Creates a new instance of {@link StockFragment}
+     *
+     * @param activity             parent of this fragment
+     * @param stockMonitoring      stock monitoring belonging to this fragment
+     * @param alphanumericKeyboard alpha numeric keyboard of the application
+     */
     public StockFragment(final Skvirrel activity, final StockMonitoring stockMonitoring, final AlphanumericKeyboard alphanumericKeyboard) {
         if (activity == null || stockMonitoring == null || alphanumericKeyboard == null) {
             String errorMessage = "Cannot instantiate fragment with null activity, stockMonitoring or alphanumeric keyboard";
@@ -64,7 +71,7 @@ public class StockFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.stock_content_card, container, false);
         findViews(view);
-        setStockInfo();
+        updateStockInfo();
         setListeners();
         return view;
     }
@@ -77,10 +84,9 @@ public class StockFragment extends Fragment {
         removeStockMonitoringButton = view.findViewById(R.id.remove_stock_monitoring_btn);
     }
 
-    private void setStockInfo() {
-        final String companyName = stockMonitoring.getCompanyName();
-        companyTextView.setText(StringUtils.isNotEmpty(companyName) ? companyName : activity.getString(R.string.company_name));
-        symbolEditText.setText(stockMonitoring.getSymbol());
+    private void updateStockInfo() {
+        updateCompanyWidget(stockMonitoring);
+        updateSymbolWidget(stockMonitoring, true);
     }
 
     private void setListeners() {
@@ -138,32 +144,6 @@ public class StockFragment extends Fragment {
         removeStockMonitoringButton.setOnClickListener(view -> activity.removeStockMonitoringAndFragment(stockMonitoring));
     }
 
-    private String getSymbol() {
-        if (symbolEditText != null) {
-            if (symbolEditText.getText() != null) {
-                return symbolEditText.getText().toString();
-            }
-        }
-
-        return "";
-    }
-
-    private void setCompanyAndSymbolWidgets(final int resultCode, final Intent data) {
-        String companyName = "";
-
-        if (resultCode == ServiceParams.ResultCode.SUCCESS) {
-            companyName = data.getStringExtra(ServiceParams.ResultExtra.COMPANY_NAME);
-            companyTextView.setText(companyName);
-            symbolEditText.setBackgroundResource(R.drawable.input_default);
-        } else if (resultCode == ServiceParams.ResultCode.STOCK_NOT_FOUND_ERROR) {
-            companyTextView.setText(R.string.company_name);
-            symbolEditText.setBackgroundResource(R.drawable.input_error);
-        }
-
-        stockMonitoring.setCompanyName(companyName);
-        getDatabaseManager().update(stockMonitoring);
-    }
-
     private DatabaseManager getDatabaseManager() {
         if (databaseManager == null) {
             databaseManager = new DatabaseManager(activity);
@@ -171,12 +151,58 @@ public class StockFragment extends Fragment {
         return databaseManager;
     }
 
+    private String getSymbol() {
+        if (symbolEditText != null) {
+            if (symbolEditText.getText() != null) {
+                return symbolEditText.getText().toString();
+            }
+        }
+        return "";
+    }
+
+    private void updateStockMonitoringAndSetStockInfo(final int resultCode, final Intent data) {
+        // resolve the company name
+        String companyName = "";
+        if (resultCode == ServiceParams.ResultCode.SUCCESS) {
+            companyName = data.getStringExtra(ServiceParams.ResultExtra.COMPANY_NAME);
+        }
+
+        // update it in db
+        stockMonitoring.setCompanyName(companyName);
+        stockMonitoring = getDatabaseManager().update(stockMonitoring);
+
+        // and update the ui accordingly
+        updateCompanyWidget(stockMonitoring);
+        updateSymbolWidget(stockMonitoring, false);
+    }
+
+    private void updateCompanyWidget(final StockMonitoring stockMonitoring) {
+        final String companyName = stockMonitoring.getCompanyName();
+        companyTextView.setText(StringUtils.isNotEmpty(companyName) ? companyName : activity.getString(R.string.company_name));
+    }
+
+    private void updateSymbolWidget(final StockMonitoring stockMonitoring, final boolean alsoSetSymbol) {
+        final String companyName = stockMonitoring.getCompanyName();
+        final String symbol = stockMonitoring.getSymbol();
+
+        if (alsoSetSymbol) {
+            symbolEditText.setText(symbol);
+        }
+
+        if (StringUtils.isNotEmpty(companyName) ||
+                (StringUtils.isEmpty(companyName) && StringUtils.isEmpty(symbol))) {
+            symbolEditText.setBackgroundResource(R.drawable.input_default);
+        } else {
+            symbolEditText.setBackgroundResource(R.drawable.input_error);
+        }
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != ServiceParams.ResultCode.COMMON_ERROR) {
             switch (requestCode) {
                 case ServiceParams.RequestCode.GET_COMPANY_NAME:
-                    setCompanyAndSymbolWidgets(resultCode, data);
+                    updateStockMonitoringAndSetStockInfo(resultCode, data);
                     break;
                 case ServiceParams.RequestCode.GET_STOCK_INFO:
                     break;

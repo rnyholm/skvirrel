@@ -83,7 +83,7 @@ public class Skvirrel extends AppCompatActivity {
         final StockFragment stockFragment = new StockFragment(this, stockMonitoring, alphanumericKeyboard);
         fragmentManager = getSupportFragmentManager();
         fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.add(R.id.stock_fragment_container, stockFragment, String.valueOf(stockMonitoring.getId())).commit();
+        fragmentTransaction.add(R.id.stock_fragment_container, stockFragment, String.valueOf(stockMonitoring.getId()));
         fragmentTransaction.commit();
     }
 

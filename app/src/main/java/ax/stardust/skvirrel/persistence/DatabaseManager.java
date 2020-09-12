@@ -124,8 +124,8 @@ public class DatabaseManager {
         });
     }
 
-    private ContentValues getContentValues(StockMonitoring stockMonitoring) {
-        ContentValues contentValues = new ContentValues();
+    private ContentValues getContentValues(final StockMonitoring stockMonitoring) {
+        final ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseHelper.SYMBOL, stockMonitoring.getSymbol());
         contentValues.put(DatabaseHelper.COMPANY_NAME, stockMonitoring.getCompanyName());
         contentValues.put(DatabaseHelper.MONITORING_OPTIONS, stockMonitoring.getMonitoringOptions());
@@ -135,8 +135,8 @@ public class DatabaseManager {
         return contentValues;
     }
 
-    private StockMonitoring getStockMonitoring(Cursor cursor) {
-        StockMonitoring stockMonitoring = new StockMonitoring(cursor.getInt(cursor.getColumnIndex(DatabaseHelper.ID)));
+    private StockMonitoring getStockMonitoring(final Cursor cursor) {
+        final StockMonitoring stockMonitoring = new StockMonitoring(cursor.getInt(cursor.getColumnIndex(DatabaseHelper.ID)));
         stockMonitoring.setSymbol(cursor.getString(cursor.getColumnIndex(DatabaseHelper.SYMBOL)));
         stockMonitoring.setCompanyName(cursor.getString(cursor.getColumnIndex(DatabaseHelper.COMPANY_NAME)));
         stockMonitoring.setMonitoringOptions(cursor.getString(cursor.getColumnIndex(DatabaseHelper.MONITORING_OPTIONS)));
