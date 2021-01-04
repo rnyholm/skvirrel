@@ -2,7 +2,6 @@ package ax.stardust.skvirrel.component.keyboard;
 
 import android.content.Context;
 import android.os.Handler;
-import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.SparseArray;
 import android.view.View;

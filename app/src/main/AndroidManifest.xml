@@ -4,6 +4,7 @@
     package="ax.stardust.skvirrel">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:icon="@mipmap/ic_launcher"
@@ -11,6 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
+        android:name=".application.SkvirrelApplication"
         tools:ignore="AllowBackup">
 
         <activity
@@ -42,7 +44,27 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".service.StockService" android:exported="false"/>
+        <service android:name=".service.StockService"
+            android:label="Yahoo Finance communication service"
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
+s
+        <service android:name=".service.MonitoringJobService"
+            android:label="Stock monitoring job service"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <receiver android:name=".receiver.OnBootReceiver" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".receiver.MonitoringReceiver" >
+            <intent-filter>
+                <action android:name="ax.stardust.skvirrel.STOCK_INFOS_FETCHED" />
+            </intent-filter>
+        </receiver>
+
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />

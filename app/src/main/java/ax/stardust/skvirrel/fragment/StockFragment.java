@@ -26,6 +26,7 @@ import ax.stardust.skvirrel.component.keyboard.KeyboardHandler;
 import ax.stardust.skvirrel.component.widget.KeyboardlessEditText;
 import ax.stardust.skvirrel.entity.StockMonitoring;
 import ax.stardust.skvirrel.persistence.DatabaseManager;
+import ax.stardust.skvirrel.schedule.MonitoringScheduler;
 import ax.stardust.skvirrel.service.ServiceParams;
 import ax.stardust.skvirrel.service.StockService;
 
@@ -42,6 +43,7 @@ public class StockFragment extends Fragment {
     private TextView companyTextView;
 
     private KeyboardlessEditText symbolEditText;
+    private KeyboardlessEditText priceEditText;
 
     private Button pollStockButton;
     private Button resetNotificationButton;
@@ -79,6 +81,7 @@ public class StockFragment extends Fragment {
     private void findViews(View view) {
         companyTextView = view.findViewById(R.id.company_tv);
         symbolEditText = view.findViewById(R.id.symbol_et);
+        priceEditText = view.findViewById(R.id.price_et);
         pollStockButton = view.findViewById(R.id.poll_stock_btn);
         resetNotificationButton = view.findViewById(R.id.reset_notification_btn);
         removeStockMonitoringButton = view.findViewById(R.id.remove_stock_monitoring_btn);
@@ -87,6 +90,7 @@ public class StockFragment extends Fragment {
     private void updateStockInfo() {
         updateCompanyWidget(stockMonitoring);
         updateSymbolWidget(stockMonitoring, true);
+        updateMonitoringOptionsWidgets(stockMonitoring);
     }
 
     private void setListeners() {
@@ -110,7 +114,8 @@ public class StockFragment extends Fragment {
                     intent.putExtra(ServiceParams.RequestExtra.SYMBOL, getSymbol());
                     intent.putExtra(ServiceParams.PENDING_RESULT, pendingResult);
                     intent.putExtra(ServiceParams.STOCK_FRAGMENT_TAG, getTag());
-                    activity.startService(intent);
+                    StockService.enqueueWork(activity, intent);
+//                    activity.startService(intent);
                 }
 
                 // TODO: check enable delete button that it's not set within keyboard handler
@@ -126,6 +131,40 @@ public class StockFragment extends Fragment {
             }
         });
 
+        priceEditText.setOnFocusChangeListener(new KeyboardHandler(alphanumericKeyboard));
+        priceEditText.setOnTouchListener(new KeyboardHandler(alphanumericKeyboard));
+        priceEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                // do nothing..
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                String priceText = charSequence.toString();
+                if (StringUtils.isNotEmpty(priceText)) {
+                    try {
+                        final double price = Double.parseDouble(priceText);
+                        priceEditText.setBackgroundResource(R.drawable.input_default);
+                        stockMonitoring.getMonitoringOptions().setPrice(price);
+                        getDatabaseManager().update(stockMonitoring);
+                    } catch (NumberFormatException e) {
+                        priceEditText.setBackgroundResource(R.drawable.input_error);
+                    }
+                } else {
+                    priceEditText.setBackgroundResource(R.drawable.input_error);
+                }
+
+                // TODO: check enable delete button that it's not set within keyboard handler
+                alphanumericKeyboard.enableDeleteButton(StringUtils.isNotEmpty(priceText));
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                // do nothing..
+            }
+        });
+
         pollStockButton.setOnClickListener(view -> {
             PendingIntent pendingResult = activity.createPendingResult(ServiceParams.RequestCode.GET_STOCK_INFO, new Intent(), 0);
             Intent intent = new Intent(activity, StockService.class);
@@ -133,11 +172,13 @@ public class StockFragment extends Fragment {
             intent.putExtra(ServiceParams.RequestExtra.SYMBOL, getSymbol());
             intent.putExtra(ServiceParams.PENDING_RESULT, pendingResult);
             intent.putExtra(ServiceParams.STOCK_FRAGMENT_TAG, getTag());
-            activity.startService(intent);
+            StockService.enqueueWork(activity, intent);
+//            activity.startService(intent);
         });
 
         resetNotificationButton.setOnClickListener(view -> {
             // TODO: implement me :)
+            MonitoringScheduler.scheduleJob(activity);
             Toast.makeText(activity, "Reset notification button pressed", Toast.LENGTH_LONG).show();
         });
 
@@ -194,6 +235,13 @@ public class StockFragment extends Fragment {
             symbolEditText.setBackgroundResource(R.drawable.input_default);
         } else {
             symbolEditText.setBackgroundResource(R.drawable.input_error);
+        }
+    }
+
+    private void updateMonitoringOptionsWidgets(final StockMonitoring stockMonitoring) {
+        final StockMonitoring.MonitoringOptions monitoringOptions = stockMonitoring.getMonitoringOptions();
+        if (monitoringOptions.getPrice() > 0) {
+            priceEditText.setText(String.valueOf(monitoringOptions.getPrice()));
         }
     }
 

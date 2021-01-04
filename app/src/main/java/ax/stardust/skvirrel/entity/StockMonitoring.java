@@ -3,7 +3,7 @@ package ax.stardust.skvirrel.entity;
 import java.util.Objects;
 
 /**
- * Class containing the different information needed for proper stock monitoring
+ * Class containing the different information needed for proper stock monitoring.
  */
 public class StockMonitoring {
 
@@ -12,7 +12,8 @@ public class StockMonitoring {
 
     private String symbol;
     private String companyName;
-    private String monitoringOptions;
+
+    private MonitoringOptions monitoringOptions;
 
     private boolean notified;
 
@@ -20,7 +21,7 @@ public class StockMonitoring {
      * Creates a new stock monitoring
      */
     public StockMonitoring() {
-        // just empty
+        monitoringOptions = new MonitoringOptions();
     }
 
     /**
@@ -29,6 +30,7 @@ public class StockMonitoring {
      * @param id id of stock monitoring
      */
     public StockMonitoring(long id) {
+        this();
         this.id = id;
     }
 
@@ -64,11 +66,11 @@ public class StockMonitoring {
         this.companyName = companyName;
     }
 
-    public String getMonitoringOptions() {
+    public MonitoringOptions getMonitoringOptions() {
         return monitoringOptions;
     }
 
-    public void setMonitoringOptions(String monitoringOptions) {
+    public void setMonitoringOptions(MonitoringOptions monitoringOptions) {
         this.monitoringOptions = monitoringOptions;
     }
 
@@ -97,5 +99,20 @@ public class StockMonitoring {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    /**
+     * Class containing the different options or key values to trigger on
+     */
+    public static class MonitoringOptions {
+        private double price;
+
+        public double getPrice() {
+            return price;
+        }
+
+        public void setPrice(double price) {
+            this.price = price;
+        }
     }
 }

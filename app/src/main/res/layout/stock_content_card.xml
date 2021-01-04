@@ -11,56 +11,6 @@
     android:paddingEnd="6dp"
     android:paddingBottom="8dp">
 
-    <Button
-        android:id="@+id/poll_stock_btn"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="7dp"
-        android:background="@drawable/button_black_selector"
-        android:fontFamily="@font/montserrat"
-        android:text="@string/poll_stock"
-        android:textAllCaps="false"
-        android:textColor="@color/colorButtonText"
-        app:layout_constraintBottom_toBottomOf="@id/symbol_et"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/symbol_et"
-        app:layout_constraintTop_toBottomOf="@id/company_tv" />
-
-    <Button
-        android:id="@+id/reset_notification_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="7dp"
-        android:background="@drawable/button_black_selector"
-        android:enabled="false"
-        android:fontFamily="@font/montserrat"
-        android:paddingLeft="25dp"
-        android:paddingRight="25dp"
-        android:text="@string/reset_notification"
-        android:textAllCaps="false"
-        android:textColor="@color/colorButtonText"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/symbol_et" />
-
-    <Button
-        android:id="@+id/remove_stock_monitoring_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="7dp"
-        android:background="@drawable/button_red_selector"
-        android:fontFamily="@font/montserrat"
-        android:paddingLeft="25dp"
-        android:paddingRight="25dp"
-        android:text="@string/remove_stock_monitoring"
-        android:textAllCaps="false"
-        android:textColor="@color/colorButtonText"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/reset_notification_btn" />
-
     <TextView
         android:id="@+id/company_tv"
         android:layout_width="0dp"
@@ -93,5 +43,86 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/company_tv" />
 
+    <Button
+        android:id="@+id/poll_stock_btn"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="7dp"
+        android:background="@drawable/button_black_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/poll_stock"
+        android:textAllCaps="false"
+        android:textColor="@color/colorButtonText"
+        app:layout_constraintBottom_toBottomOf="@id/symbol_et"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/symbol_et"
+        app:layout_constraintTop_toBottomOf="@id/company_tv" />
+
+    <TextView
+        android:id="@+id/price_crossing_tv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="2dp"
+        android:fontFamily="@font/open_sans"
+        android:text="@string/price_crossing"
+        android:textColor="@color/colorHeadingText"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBaseline_toBaselineOf="@+id/price_et"
+        app:layout_constraintTop_toBottomOf="@id/symbol_et"/>
+
+    <ax.stardust.skvirrel.component.widget.KeyboardlessEditText
+        android:id="@+id/price_et"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="7dp"
+        android:layout_marginLeft="10dp"
+        android:background="@drawable/input_default"
+        android:ems="10"
+        android:fontFamily="@font/open_sans"
+        android:hint="@string/default_price"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:textAlignment="center"
+        android:textColor="@color/colorInputText"
+        android:textCursorDrawable="@drawable/input_cursor_default"
+        app:layout_constraintStart_toEndOf="@+id/price_crossing_tv"
+        app:layout_constraintTop_toBottomOf="@+id/symbol_et" />
+
+    <Button
+        android:id="@+id/reset_notification_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="7dp"
+        android:background="@drawable/button_black_selector"
+        android:enabled="true"
+        android:fontFamily="@font/montserrat"
+        android:paddingLeft="25dp"
+        android:paddingRight="25dp"
+        android:text="@string/reset_notification"
+        android:textAllCaps="false"
+        android:textColor="@color/colorButtonText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/price_et" />
+
+    <Button
+        android:id="@+id/remove_stock_monitoring_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="7dp"
+        android:background="@drawable/button_red_selector"
+        android:fontFamily="@font/montserrat"
+        android:paddingLeft="25dp"
+        android:paddingRight="25dp"
+        android:text="@string/remove_stock_monitoring"
+        android:textAllCaps="false"
+        android:textColor="@color/colorButtonText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/reset_notification_btn" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,12 +7,20 @@
     <string name="company_name">Enter a stock symbol…</string>
     <string name="hint_symbol" translatable="false">Symbol</string>
     <string name="default_symbol" translatable="false">Eg. NVDA</string>
+    <string name="price_crossing">Price crossing:</string>
+    <string name="default_price" translatable="false">0.00</string>
     <string name="poll_stock">Poll stock</string>
     <string name="reset_notification">Reset notification</string>
     <string name="remove_stock_monitoring">Remove stock monitoring</string>
 
     <!-- other stock related texts -->
     <string name="add_stock_monitoring">Add stock monitoring</string>
+
+    <!-- notifications -->
+    <string name="notification_channel_name">Stock monitorings</string>
+    <string name="notification_channel_description">Let skvirrel notify upon triggering of stock monitorings</string>
+    <string name="notification_title">Monitoring triggered for %s</string>
+    <string name="notification_text">Price crossing %s</string>
 
     <!-- keyboard -->
     <string name="keyboard_0" translatable="false">0</string>

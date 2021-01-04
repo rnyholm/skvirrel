@@ -4,12 +4,15 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import ax.stardust.skvirrel.exception.StockMonitoringNotFound;
 import ax.stardust.skvirrel.entity.StockMonitoring;
+import ax.stardust.skvirrel.exception.StockMonitoringNotFound;
 
 /**
  * Manager responsible for database handling.
@@ -17,6 +20,7 @@ import ax.stardust.skvirrel.entity.StockMonitoring;
 public class DatabaseManager {
 
     private final Context context;
+    private final Gson gson;
 
     /**
      * Creates a new database manager with given context
@@ -25,6 +29,7 @@ public class DatabaseManager {
      */
     public DatabaseManager(Context context) {
         this.context = context;
+        gson = new Gson();
     }
 
     /**
@@ -33,11 +38,11 @@ public class DatabaseManager {
      * @param stockMonitoring stock monitoring to be inserted
      * @return inserted stock monitoring with the newly created id after insertion
      */
-    public StockMonitoring insert(final StockMonitoring stockMonitoring) {
-        final WrappedDatabaseResult result = new WrappedDatabaseResult();
+    public StockMonitoring insert(StockMonitoring stockMonitoring) {
+        WrappedDatabaseResult result = new WrappedDatabaseResult();
 
         TransactionHandler.runInTransaction(context, database -> {
-            final long id = database.insert(DatabaseHelper.TABLE_NAME, null, getContentValues(stockMonitoring));
+            long id = database.insert(DatabaseHelper.TABLE_NAME, null, getContentValues(stockMonitoring));
             result.setResult(id);
         });
 
@@ -51,7 +56,7 @@ public class DatabaseManager {
      * @param stockMonitoring stock monitoring to be updated
      * @return updated stock monitoring
      */
-    public StockMonitoring update(final StockMonitoring stockMonitoring) {
+    public StockMonitoring update(StockMonitoring stockMonitoring) {
         TransactionHandler.runInTransaction(context, database -> {
             // ignore result on update, it's always 0
             database.update(DatabaseHelper.TABLE_NAME, getContentValues(stockMonitoring),
@@ -68,11 +73,11 @@ public class DatabaseManager {
      * @return found stock monitoring
      * @throws StockMonitoringNotFound is thrown if stock monitoring isn't found on given id
      */
-    public StockMonitoring fetch(final long id) throws StockMonitoringNotFound {
-        final WrappedDatabaseResult result = new WrappedDatabaseResult();
+    public StockMonitoring fetch(long id) throws StockMonitoringNotFound {
+        WrappedDatabaseResult result = new WrappedDatabaseResult();
 
         TransactionHandler.runInTransaction(context, database -> {
-            final Cursor cursor = database.rawQuery(DatabaseHelper.SELECT_MONITORING_BY_ID, new String[]{String.valueOf(id)});
+            Cursor cursor = database.rawQuery(DatabaseHelper.SELECT_MONITORING_BY_ID, new String[]{String.valueOf(id)});
             if (cursor != null) {
                 cursor.moveToFirst();
                 result.setResult(getStockMonitoring(cursor));
@@ -93,10 +98,10 @@ public class DatabaseManager {
      * @return list of all stock monitorings existing in database
      */
     public List<StockMonitoring> fetchAll() {
-        final List<StockMonitoring> stockMonitorings = new ArrayList<>();
+        List<StockMonitoring> stockMonitorings = new ArrayList<>();
 
         TransactionHandler.runInTransaction(context, database -> {
-            final Cursor cursor = database.rawQuery(DatabaseHelper.SELECT_ALL, null);
+            Cursor cursor = database.rawQuery(DatabaseHelper.SELECT_ALL, null);
             if (cursor != null) {
                 cursor.moveToFirst();
 
@@ -113,44 +118,55 @@ public class DatabaseManager {
     }
 
     /**
+     * Fetch all symbols of stock monitoring that exists in database
+     *
+     * @return array list of symbols
+     */
+    public ArrayList<String> fetchAllSymbols() {
+        return fetchAll().stream()
+                .map(StockMonitoring::getSymbol)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    /**
      * Deletes stock monitoring with given id
      *
      * @param id id of stock monitoring to be deleted
      */
-    public void delete(final long id) {
+    public void delete(long id) {
         TransactionHandler.runInTransaction(context, database -> {
             // returns rows affected by operation, for now we ignore it
             database.delete(DatabaseHelper.TABLE_NAME, DatabaseHelper.ID + " = ?", new String[]{String.valueOf(id)});
         });
     }
 
-    private ContentValues getContentValues(final StockMonitoring stockMonitoring) {
-        final ContentValues contentValues = new ContentValues();
+    private ContentValues getContentValues(StockMonitoring stockMonitoring) {
+        ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseHelper.SYMBOL, stockMonitoring.getSymbol());
         contentValues.put(DatabaseHelper.COMPANY_NAME, stockMonitoring.getCompanyName());
-        contentValues.put(DatabaseHelper.MONITORING_OPTIONS, stockMonitoring.getMonitoringOptions());
+        contentValues.put(DatabaseHelper.MONITORING_OPTIONS, gson.toJson(stockMonitoring.getMonitoringOptions()));
         contentValues.put(DatabaseHelper.NOTIFIED, boolToInt(stockMonitoring.isNotified()));
         contentValues.put(DatabaseHelper.SORTING_ORDER, stockMonitoring.getSortingOrder());
 
         return contentValues;
     }
 
-    private StockMonitoring getStockMonitoring(final Cursor cursor) {
-        final StockMonitoring stockMonitoring = new StockMonitoring(cursor.getInt(cursor.getColumnIndex(DatabaseHelper.ID)));
+    private StockMonitoring getStockMonitoring(Cursor cursor) {
+        StockMonitoring stockMonitoring = new StockMonitoring(cursor.getInt(cursor.getColumnIndex(DatabaseHelper.ID)));
         stockMonitoring.setSymbol(cursor.getString(cursor.getColumnIndex(DatabaseHelper.SYMBOL)));
         stockMonitoring.setCompanyName(cursor.getString(cursor.getColumnIndex(DatabaseHelper.COMPANY_NAME)));
-        stockMonitoring.setMonitoringOptions(cursor.getString(cursor.getColumnIndex(DatabaseHelper.MONITORING_OPTIONS)));
+        stockMonitoring.setMonitoringOptions(gson.fromJson(cursor.getString(cursor.getColumnIndex(DatabaseHelper.MONITORING_OPTIONS)), StockMonitoring.MonitoringOptions.class));
         stockMonitoring.setNotified(intToBoolean(cursor.getInt(cursor.getColumnIndex(DatabaseHelper.NOTIFIED))));
         stockMonitoring.setSortingOrder(cursor.getInt(cursor.getColumnIndex(DatabaseHelper.SORTING_ORDER)));
 
         return stockMonitoring;
     }
 
-    private int boolToInt(final boolean b) {
+    private int boolToInt(boolean b) {
         return b ? 1 : 0;
     }
 
-    private boolean intToBoolean(final int i) {
+    private boolean intToBoolean(int i) {
         return i == 1;
     }
 
@@ -168,17 +184,17 @@ public class DatabaseManager {
         public WrappedDatabaseResult() {
         }
 
-        public void setResult(final long l) {
+        public void setResult(long l) {
             checkIfUnsetOrThrow();
             this.l = l;
         }
 
-        public void setResult(final int i) {
+        public void setResult(int i) {
             checkIfUnsetOrThrow();
             this.i = i;
         }
 
-        public void setResult(final StockMonitoring stockMonitoring) {
+        public void setResult(StockMonitoring stockMonitoring) {
             checkIfUnsetOrThrow();
             this.stockMonitoring = stockMonitoring;
         }

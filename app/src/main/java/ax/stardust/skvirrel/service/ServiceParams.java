@@ -5,6 +5,9 @@ package ax.stardust.skvirrel.service;
  * within the application.
  */
 public class ServiceParams {
+    public static final int MONITORING_JOB_SERVICE_ID = 0;
+    public static final int STOCK_SERVICE_ID = 1;
+
     public static final String STOCK_SERVICE = "stock_service";
     public static final String PENDING_RESULT = "pending_result";
     public static final String ERROR_SITUATION = "error_situation";
@@ -16,6 +19,7 @@ public class ServiceParams {
     public static final class Operation {
         public static final String GET_COMPANY_NAME = "get_company_name";
         public static final String GET_STOCK_INFO = "get_stock_info";
+        public static final String GET_STOCK_INFOS = "get_stock_infos";
         public static final String UNSUPPORTED = "unsupported";
     }
 
@@ -24,6 +28,7 @@ public class ServiceParams {
      */
     public static final class RequestExtra {
         public static final String SYMBOL = "symbol";
+        public static final String SYMBOLS = "symbols";
     }
 
     /**
@@ -40,6 +45,7 @@ public class ServiceParams {
     public static final class ResultExtra {
         public static final String COMPANY_NAME = "company_name";
         public static final String STOCK_INFO = "stock_info";
+        public static final String STOCK_INFOS = "stock_infos";
     }
 
     /**

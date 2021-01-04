@@ -15,6 +15,7 @@ public class TransactionHandler {
      * @param context     context for which a database connection is opened
      * @param transaction transaction to be executed
      */
+    @SuppressWarnings("TryFinallyCanBeTryWithResources")
     public static void runInTransaction(final Context context, final Transaction transaction) {
         SQLiteDatabase database = open(context);
         try {
