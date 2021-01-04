@@ -47,7 +47,7 @@
         <service android:name=".service.StockService"
             android:label="Yahoo Finance communication service"
             android:permission="android.permission.BIND_JOB_SERVICE"/>
-s
+
         <service android:name=".service.MonitoringJobService"
             android:label="Stock monitoring job service"
             android:permission="android.permission.BIND_JOB_SERVICE" />
