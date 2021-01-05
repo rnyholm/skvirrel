@@ -20,7 +20,6 @@ public class ServiceParams {
         public static final String GET_COMPANY_NAME = "get_company_name";
         public static final String GET_STOCK_INFO = "get_stock_info";
         public static final String GET_STOCK_INFOS = "get_stock_infos";
-        public static final String UNSUPPORTED = "unsupported";
     }
 
     /**

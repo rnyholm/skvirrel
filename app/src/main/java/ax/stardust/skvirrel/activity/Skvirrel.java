@@ -2,7 +2,6 @@ package ax.stardust.skvirrel.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -17,13 +16,13 @@ import java.util.List;
 
 import ax.stardust.skvirrel.R;
 import ax.stardust.skvirrel.component.keyboard.AlphanumericKeyboard;
+import ax.stardust.skvirrel.entity.StockMonitoring;
 import ax.stardust.skvirrel.fragment.StockFragment;
 import ax.stardust.skvirrel.persistence.DatabaseManager;
-import ax.stardust.skvirrel.entity.StockMonitoring;
 import ax.stardust.skvirrel.service.ServiceParams;
+import timber.log.Timber;
 
 public class Skvirrel extends AppCompatActivity {
-    private static final String TAG = Skvirrel.class.getSimpleName();
 
     private DatabaseManager databaseManager;
 
@@ -103,7 +102,7 @@ public class Skvirrel extends AppCompatActivity {
             fragmentTransaction.remove(fragment);
             fragmentTransaction.commit();
         } else {
-            Log.e(TAG, "removeStockMonitoringAndFragment(...) -> No fragment found with tag -> " + stockMonitoring.getId());
+            Timber.e("removeStockMonitoringAndFragment: No fragment found with tag: %s", stockMonitoring.getId());
         }
 
         getDatabaseManager().delete(stockMonitoring.getId());

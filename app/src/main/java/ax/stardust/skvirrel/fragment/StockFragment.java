@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,9 +28,9 @@ import ax.stardust.skvirrel.persistence.DatabaseManager;
 import ax.stardust.skvirrel.schedule.MonitoringScheduler;
 import ax.stardust.skvirrel.service.ServiceParams;
 import ax.stardust.skvirrel.service.StockService;
+import timber.log.Timber;
 
 public class StockFragment extends Fragment {
-    private static final String TAG = StockFragment.class.getSimpleName();
 
     // parent of fragment
     private Skvirrel activity;
@@ -59,8 +58,9 @@ public class StockFragment extends Fragment {
     public StockFragment(final Skvirrel activity, final StockMonitoring stockMonitoring, final AlphanumericKeyboard alphanumericKeyboard) {
         if (activity == null || stockMonitoring == null || alphanumericKeyboard == null) {
             String errorMessage = "Cannot instantiate fragment with null activity, stockMonitoring or alphanumeric keyboard";
-            Log.e(TAG, "StockFragment(...) -> " + errorMessage);
-            throw new IllegalArgumentException(errorMessage);
+            IllegalArgumentException exception = new IllegalArgumentException(errorMessage);
+            Timber.e(exception, "StockFragment: Unable to instantiate StockFragment");
+            throw exception;
         }
 
         this.activity = activity;
@@ -255,7 +255,7 @@ public class StockFragment extends Fragment {
                 case ServiceParams.RequestCode.GET_STOCK_INFO:
                     break;
                 default:
-                    Log.e(TAG, "onActivityResult(...) -> Unsupported request code -> " + requestCode);
+                    Timber.e("onActivityResult: Unsupported request code: %s", requestCode);
             }
         } else { // common error
             Toast.makeText(activity, data.getStringExtra(ServiceParams.ERROR_SITUATION), Toast.LENGTH_LONG).show();

@@ -7,6 +7,7 @@ import android.content.Intent;
 
 import ax.stardust.skvirrel.persistence.DatabaseManager;
 import ax.stardust.skvirrel.schedule.MonitoringScheduler;
+import timber.log.Timber;
 
 /**
  * Job service responsible for kicking the actual monitoring to life.
@@ -42,6 +43,7 @@ public class MonitoringJobService extends JobService {
     public boolean onStopJob(JobParameters jobParameters) {
         // system decides to stop execution before job finished, just log it and return false,
         // or in other words, more or less ignore this...
+        Timber.d("onStopJob: System decided to stop job before application manage to do it");
         return false;
     }
 
@@ -63,7 +65,7 @@ public class MonitoringJobService extends JobService {
 
     /**
      * Handler class for this job service. In other words a singleton which makes it easy to handle
-     * the monitoring job service instance within handler in a static way
+     * the monitoring job service instance within handler in a static way.
      */
     public static class Handler {
         private static final Handler INSTANCE = new Handler();

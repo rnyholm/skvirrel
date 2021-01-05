@@ -5,7 +5,6 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.text.InputType;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -17,6 +16,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.function.Function;
+
+import timber.log.Timber;
 
 /**
  * EditText which suppresses IME show up and is bound to a specific input and validator-function for validating input of this EditText.
@@ -154,15 +155,14 @@ public class KeyboardlessEditText extends AppCompatEditText {
      */
     @SuppressWarnings("SameParameterValue")
     private static void invokeMethod(Object receiver, Object... args) {
-        final String LOG_TAG = KeyboardlessEditText.class.getSimpleName();
         try {
             Objects.requireNonNull(KeyboardlessEditText.SHOW_SOFT_INPUT_ON_FOCUS).invoke(receiver, args);
         } catch (IllegalArgumentException e) {
-            Log.e(LOG_TAG, "Safe invoke fail - Invalid args", e);
+            Timber.e(e, "invokeMethod: Safe invoke fail - Invalid args");
         } catch (IllegalAccessException e) {
-            Log.e(LOG_TAG, "Safe invoke fail - Invalid access", e);
+            Timber.e(e, "invokeMethod: Safe invoke fail - Invalid access");
         } catch (InvocationTargetException e) {
-            Log.e(LOG_TAG, "Safe invoke fail - Invalid target", e);
+            Timber.e(e, "invokeMethod: Safe invoke fail - Invalid target");
         }
     }
 }

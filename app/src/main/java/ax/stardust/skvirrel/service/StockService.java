@@ -3,7 +3,6 @@ package ax.stardust.skvirrel.service;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.JobIntentService;
@@ -17,18 +16,18 @@ import java.util.Objects;
 import ax.stardust.skvirrel.exception.StockNotFoundException;
 import ax.stardust.skvirrel.parcelable.ParcelableStock;
 import ax.stardust.skvirrel.receiver.MonitoringReceiver;
+import timber.log.Timber;
 import yahoofinance.Stock;
 import yahoofinance.YahooFinance;
 
 import static ax.stardust.skvirrel.service.ServiceParams.Operation.GET_COMPANY_NAME;
-import static ax.stardust.skvirrel.service.ServiceParams.Operation.GET_STOCK_INFOS;
 import static ax.stardust.skvirrel.service.ServiceParams.Operation.GET_STOCK_INFO;
+import static ax.stardust.skvirrel.service.ServiceParams.Operation.GET_STOCK_INFOS;
 
 /**
  * Service for communicating with Yahoo Finance API.
  */
 public class StockService extends JobIntentService {
-    private static final String TAG = StockService.class.getSimpleName();
 
     public static void enqueueWork(Context context, Intent intent) {
         enqueueWork(context, StockService.class, ServiceParams.STOCK_SERVICE_ID, intent);
@@ -58,7 +57,7 @@ public class StockService extends JobIntentService {
                                     stock = YahooFinance.get(Objects.requireNonNull(intent.getStringExtra(ServiceParams.RequestExtra.SYMBOL)));
                                     validateStock(stock);
 
-                                    Log.d(TAG, "onHandleWork: Successfully fetched stock -> " + stock.getName());
+                                    Timber.d("onHandleWork: Successfully fetched stock: %s", stock.getName());
 
                                     result.putExtra(ServiceParams.ResultExtra.COMPANY_NAME, stock.getName());
                                     reply.send(this, ServiceParams.ResultCode.SUCCESS, result);
@@ -68,7 +67,7 @@ public class StockService extends JobIntentService {
                                     stock = YahooFinance.get(Objects.requireNonNull(intent.getStringExtra(ServiceParams.RequestExtra.SYMBOL)));
                                     validateStock(stock);
 
-                                    Log.d(TAG, "onHandleWork: Successfully fetched stock -> " + stock.getName());
+                                    Timber.d("onHandleWork: Successfully fetched stock: %s", stock.getName());
 
                                     result.putExtra(ServiceParams.ResultExtra.STOCK_INFO, ParcelableStock.from(stock));
                                     reply.send(this, ServiceParams.ResultCode.SUCCESS, result);
@@ -85,11 +84,9 @@ public class StockService extends JobIntentService {
                                                 validateStock(s);
                                                 parcelableStocks.add(ParcelableStock.from(s));
                                             } catch (Exception e) {
-                                                Log.e(TAG, "onHandleWork: Something went wrong while fetching stock info for symbol -> " + symbol, e);
+                                                Timber.e(e, "onHandleWork: Something went wrong while fetching stock info for symbol: %s", symbol);
                                             }
                                         });
-                                    } else {
-                                        Log.d(TAG, "onHandleWork: Unable to fetch several stock info's as no symbols was provided");
                                     }
 
                                     // send broadcast
@@ -103,30 +100,33 @@ public class StockService extends JobIntentService {
 
                                     break;
                                 default:
-                                    Log.e(TAG, "onHandleWork: Unsupported operation for request");
-                                    result.putExtra(ServiceParams.ERROR_SITUATION, "Unsupported operation -> " + intent.getStringExtra(ServiceParams.STOCK_SERVICE));
+                                    String errorMessage = String.format("Unsupported operation: %s", intent.getStringExtra(ServiceParams.STOCK_SERVICE));
+                                    Timber.e("onHandleWork: %s", errorMessage);
+                                    result.putExtra(ServiceParams.ERROR_SITUATION, errorMessage);
                                     reply.send(this, ServiceParams.ResultCode.COMMON_ERROR, result);
                             }
                         } catch (StockNotFoundException e) {
-                            Log.e(TAG, "onHandleWork: Stock was not found at Yahoo Finance", e);
-                            result.putExtra(ServiceParams.ERROR_SITUATION, "Stock was not found at Yahoo Finance");
+                            String errorMessage = "Stock was not found at Yahoo Finance";
+                            Timber.e(e, "onHandleWork: %s", errorMessage);
+                            result.putExtra(ServiceParams.ERROR_SITUATION, errorMessage);
                             reply.send(this, ServiceParams.ResultCode.STOCK_NOT_FOUND_ERROR, result);
                         } catch (IOException e) {
-                            Log.e(TAG, "onHandleWork: Something went wrong invoking YahooFinanceAPI", e);
-                            result.putExtra(ServiceParams.ERROR_SITUATION, "Something went wrong invoking YahooFinanceAPI");
+                            String errorMessage = "Something went wrong invoking YahooFinanceAPI";
+                            Timber.e(e, "onHandleWork: %s", errorMessage);
+                            result.putExtra(ServiceParams.ERROR_SITUATION, errorMessage);
                             reply.send(this, ServiceParams.ResultCode.COMMON_ERROR, result);
                         }
                     } catch (PendingIntent.CanceledException e) {
-                        Log.i(TAG, "onHandleWork: Reply cancelled", e);
+                        Timber.w(e, "onHandleWork: Reply cancelled");
                     }
                 } else {
-                    Log.e(TAG, "onHandleWork: No PendingResult was passed in with intent");
+                    Timber.e("onHandleWork: No PendingResult was passed in with intent");
                 }
             } else {
-                Log.e(TAG, "onHandleWork: No stock service operation was passed in with intent");
+                Timber.e("onHandleWork: No stock service operation was passed in with intent");
             }
         } else {
-            Log.e(TAG, "onHandleWork: invoked with null intent");
+            Timber.e("onHandleWork: Invoked with null intent");
         }
     }
 

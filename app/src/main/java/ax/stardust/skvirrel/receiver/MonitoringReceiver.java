@@ -4,7 +4,6 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -22,9 +21,9 @@ import ax.stardust.skvirrel.entity.StockMonitoring;
 import ax.stardust.skvirrel.parcelable.ParcelableStock;
 import ax.stardust.skvirrel.persistence.DatabaseManager;
 import ax.stardust.skvirrel.service.ServiceParams;
+import timber.log.Timber;
 
 public class MonitoringReceiver extends BroadcastReceiver {
-    private static final String TAG = MonitoringReceiver.class.getSimpleName();
 
     public static final String STOCK_INFOS_FETCHED = "ax.stardust.skvirrel.STOCK_INFOS_FETCHED";
 
@@ -41,8 +40,7 @@ public class MonitoringReceiver extends BroadcastReceiver {
         String collect = Objects.requireNonNull(parcelableStocks).stream().map(ParcelableStock::getName).collect(Collectors.joining(", "));
         sb.append(collect).append("\n");
 
-        String log = sb.toString();
-        Log.d(TAG, log);
+        Timber.d(sb.toString());
 
         List<StockMonitoring> stockMonitorings = getDatabaseManager(context).fetchAll();
         parcelableStocks.forEach(parcelableStock -> {
@@ -70,13 +68,6 @@ public class MonitoringReceiver extends BroadcastReceiver {
                 NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
                 notificationManager.notify((int) triggeredStockMonitoring.getId(), builder.build());
             }
-        });
-
-        getDatabaseManager(context).fetchAll().forEach(stockMonitoring -> {
-            Optional<ParcelableStock> optional = parcelableStocks.stream()
-                    .filter(parcelableStock -> stockMonitoring.getSymbol().equals(parcelableStock.getSymbol()))
-                    .filter(parcelableStock -> Double.parseDouble(parcelableStock.getPrice()) <= stockMonitoring.getMonitoringOptions().getPrice())
-                    .findFirst();
         });
     }
 
