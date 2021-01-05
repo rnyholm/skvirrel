@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import ax.stardust.skvirrel.BuildConfig;
 import ax.stardust.skvirrel.R;
+import ax.stardust.skvirrel.schedule.MonitoringScheduler;
 import timber.log.Timber;
 
 /**
@@ -29,14 +30,16 @@ public class SkvirrelApplication extends Application {
         // very, very important to call on create
         super.onCreate();
 
-        createNotificationChannel();
-
         // plant a debug log tree if not production
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());
         } else {
             Timber.plant(new ProductionTree());
         }
+
+        createNotificationChannel();
+
+        MonitoringScheduler.scheduleJob(this);
     }
 
     private void createNotificationChannel() {
