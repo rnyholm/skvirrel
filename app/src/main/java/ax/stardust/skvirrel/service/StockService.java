@@ -131,8 +131,8 @@ public class StockService extends JobIntentService {
     }
 
     private void validateStock(Stock stock) throws StockNotFoundException {
-        if (stock == null || !stock.isValid() || StringUtils.isNumeric(stock.getName())) {
-            throw new StockNotFoundException();
+        if (stock == null || StringUtils.isBlank(stock.getName()) || StringUtils.isNumeric(stock.getName())) {
+            throw new StockNotFoundException(stock);
         }
     }
 }

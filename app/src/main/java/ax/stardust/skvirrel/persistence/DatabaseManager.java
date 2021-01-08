@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import ax.stardust.skvirrel.entity.StockMonitoring;
-import ax.stardust.skvirrel.exception.StockMonitoringNotFound;
+import ax.stardust.skvirrel.exception.StockMonitoringNotFoundException;
 
 /**
  * Manager responsible for database handling.
@@ -71,9 +71,9 @@ public class DatabaseManager {
      *
      * @param id id for stock monitoring to fetched
      * @return found stock monitoring
-     * @throws StockMonitoringNotFound is thrown if stock monitoring isn't found on given id
+     * @throws StockMonitoringNotFoundException is thrown if stock monitoring isn't found on given id
      */
-    public StockMonitoring fetch(long id) throws StockMonitoringNotFound {
+    public StockMonitoring fetch(long id) throws StockMonitoringNotFoundException {
         WrappedDatabaseResult result = new WrappedDatabaseResult();
 
         TransactionHandler.runInTransaction(context, database -> {
@@ -86,7 +86,7 @@ public class DatabaseManager {
         });
 
         if (result.getStockMonitoring() == null) {
-            throw new StockMonitoringNotFound("No stock monitoring found in database with id: " + id);
+            throw new StockMonitoringNotFoundException(id);
         }
 
         return result.getStockMonitoring();

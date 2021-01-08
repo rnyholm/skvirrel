@@ -1,4 +1,4 @@
-package ax.stardust.skvirrel;
+package ax.stardust.skvirrel.parcelable;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -13,7 +13,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
-import ax.stardust.skvirrel.parcelable.ParcelableStock;
 import yahoofinance.Stock;
 import yahoofinance.quotes.stock.StockDividend;
 import yahoofinance.quotes.stock.StockQuote;
@@ -203,7 +202,7 @@ public class ParcelableStockTest {
             if (!string.contains(String.valueOf(newSeparatorCharacter))) {
                 return string.replace(',', newSeparatorCharacter);
             }
-        } else { // ','
+        } else {
             if (!string.contains(String.valueOf(newSeparatorCharacter))) {
                 return string.replace('.', newSeparatorCharacter);
             }
