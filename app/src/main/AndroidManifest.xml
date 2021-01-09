@@ -59,11 +59,7 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".receiver.MonitoringReceiver" >
-            <intent-filter>
-                <action android:name="ax.stardust.skvirrel.STOCK_INFOS_FETCHED" />
-            </intent-filter>
-        </receiver>
+        <receiver android:name=".receiver.MonitoringReceiver" />
 
         <meta-data
             android:name="preloaded_fonts"
