@@ -9,14 +9,13 @@ import static org.junit.Assert.assertNotNull;
 
 @RunWith(JUnit4.class)
 public class StockMonitoringNotFoundExceptionTest {
+    private static final long ID = 18363490;
 
     @Test(expected = StockMonitoringNotFoundException.class)
     public void testStockMonitoringNotFoundException() throws StockMonitoringNotFoundException {
-        long id = 18363490;
-
-        StockMonitoringNotFoundException exception = new StockMonitoringNotFoundException(id);
+        StockMonitoringNotFoundException exception = new StockMonitoringNotFoundException(ID);
         assertNotNull(exception);
-        assertEquals("No stock monitoring found in database with id: 18363490", exception.getMessage());
+        assertEquals(String.format("No stock monitoring found in database with id: %s", ID), exception.getMessage());
 
         throw exception;
     }

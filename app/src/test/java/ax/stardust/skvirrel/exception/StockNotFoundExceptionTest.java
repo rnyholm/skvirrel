@@ -11,6 +11,8 @@ import static org.junit.Assert.assertNotNull;
 
 @RunWith(JUnit4.class)
 public class StockNotFoundExceptionTest {
+    private static final String SYMBOL = "JU7";
+    private static final String NAME = "82763";
 
     @Test(expected = StockNotFoundException.class)
     public void testStockNotFoundException() throws StockNotFoundException {
@@ -27,12 +29,12 @@ public class StockNotFoundExceptionTest {
         exception = new StockNotFoundException(stock);
         assertNotFoundException(exception);
 
-        stock = new Stock("JU7");
-        stock.setName("82763");
+        stock = new Stock(SYMBOL);
+        stock.setName(NAME);
 
         exception = new StockNotFoundException(stock);
         assertNotNull(exception);
-        assertEquals("Stock with symbol: JU7 is not valid", exception.getMessage());
+        assertEquals(String.format("Stock with symbol: %s is not valid", SYMBOL), exception.getMessage());
 
         throw exception;
     }

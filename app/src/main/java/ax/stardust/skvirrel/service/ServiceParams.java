@@ -1,8 +1,7 @@
 package ax.stardust.skvirrel.service;
 
 /**
- * Utility class containing parameters and constants used for all service calls
- * within the application.
+ * Parameters and constants used for all service calls within the application.
  */
 public class ServiceParams {
     public static final int MONITORING_JOB_SERVICE_ID = 0;

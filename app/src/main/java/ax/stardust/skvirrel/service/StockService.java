@@ -4,16 +4,16 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 
-import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
 import androidx.core.app.JobIntentService;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Objects;
 
 import ax.stardust.skvirrel.exception.StockNotFoundException;
+import ax.stardust.skvirrel.exception.StockServiceException;
 import ax.stardust.skvirrel.parcelable.ParcelableStock;
 import ax.stardust.skvirrel.receiver.MonitoringReceiver;
 import timber.log.Timber;
@@ -29,105 +29,121 @@ import static ax.stardust.skvirrel.service.ServiceParams.Operation.GET_STOCK_INF
  */
 public class StockService extends JobIntentService {
 
+    /**
+     * Enqueues the work for this service for given context and intent
+     *
+     * @param context context of work
+     * @param intent  intent of work
+     */
     public static void enqueueWork(Context context, Intent intent) {
         enqueueWork(context, StockService.class, ServiceParams.STOCK_SERVICE_ID, intent);
     }
 
     @Override
-    protected void onHandleWork(@Nullable Intent intent) {
-        if (intent != null) {
-            PendingIntent reply = intent.getParcelableExtra(ServiceParams.PENDING_RESULT);
-            String operation = intent.getStringExtra(ServiceParams.STOCK_SERVICE);
+    protected void onHandleWork(@NonNull Intent intent) {
+        String operation = intent.getStringExtra(ServiceParams.STOCK_SERVICE);
+        PendingIntent reply = intent.getParcelableExtra(ServiceParams.PENDING_RESULT);
 
-            if (operation != null) {
-                // for all operations except get several stock info's we need to have a reply
-                if (reply != null || GET_STOCK_INFOS.equals(operation)) {
-                    Intent result = new Intent();
-
-                    // set fragment tag if possible
-                    if (intent.hasExtra(ServiceParams.STOCK_FRAGMENT_TAG)) {
-                        result.putExtra(ServiceParams.STOCK_FRAGMENT_TAG, intent.getStringExtra(ServiceParams.STOCK_FRAGMENT_TAG));
-                    }
-
-                    try {
-                        try {
-                            Stock stock;
-                            switch (operation) {
-                                case GET_COMPANY_NAME:
-                                    stock = YahooFinance.get(Objects.requireNonNull(intent.getStringExtra(ServiceParams.RequestExtra.SYMBOL)));
-                                    validateStock(stock);
-
-                                    Timber.d("onHandleWork: Successfully fetched stock: %s", stock.getName());
-
-                                    result.putExtra(ServiceParams.ResultExtra.COMPANY_NAME, stock.getName());
-                                    reply.send(this, ServiceParams.ResultCode.SUCCESS, result);
-
-                                    break;
-                                case GET_STOCK_INFO:
-                                    stock = YahooFinance.get(Objects.requireNonNull(intent.getStringExtra(ServiceParams.RequestExtra.SYMBOL)));
-                                    validateStock(stock);
-
-                                    Timber.d("onHandleWork: Successfully fetched stock: %s", stock.getName());
-
-                                    result.putExtra(ServiceParams.ResultExtra.STOCK_INFO, ParcelableStock.from(stock));
-                                    reply.send(this, ServiceParams.ResultCode.SUCCESS, result);
-
-                                    break;
-                                case GET_STOCK_INFOS:
-                                    ArrayList<String> symbols = intent.getStringArrayListExtra(ServiceParams.RequestExtra.SYMBOLS);
-                                    ArrayList<ParcelableStock> parcelableStocks = new ArrayList<>();
-
-                                    if (symbols != null) {
-                                        symbols.forEach(symbol -> {
-                                            try {
-                                                Stock s = YahooFinance.get(Objects.requireNonNull(symbol));
-                                                validateStock(s);
-                                                parcelableStocks.add(ParcelableStock.from(s));
-                                            } catch (Exception e) {
-                                                Timber.e(e, "onHandleWork: Something went wrong while fetching stock info for symbol: %s", symbol);
-                                            }
-                                        });
-                                    }
-
-                                    // send broadcast
-                                    final Intent receiverIntent = new Intent(this, MonitoringReceiver.class);
-                                    receiverIntent.setAction(MonitoringReceiver.STOCK_INFOS_FETCHED);
-                                    receiverIntent.putParcelableArrayListExtra(ServiceParams.ResultExtra.STOCK_INFOS, parcelableStocks);
-                                    sendBroadcast(receiverIntent);
-
-                                    // at last notify the job service that job has finished
-                                    MonitoringJobService.Handler.getInstance().notifyJobFinished();
-
-                                    break;
-                                default:
-                                    String errorMessage = String.format("Unsupported operation: %s", intent.getStringExtra(ServiceParams.STOCK_SERVICE));
-                                    Timber.e("onHandleWork: %s", errorMessage);
-                                    result.putExtra(ServiceParams.ERROR_SITUATION, errorMessage);
-                                    reply.send(this, ServiceParams.ResultCode.COMMON_ERROR, result);
-                            }
-                        } catch (StockNotFoundException e) {
-                            String errorMessage = "Stock was not found at Yahoo Finance";
-                            Timber.e(e, "onHandleWork: %s", errorMessage);
-                            result.putExtra(ServiceParams.ERROR_SITUATION, errorMessage);
-                            reply.send(this, ServiceParams.ResultCode.STOCK_NOT_FOUND_ERROR, result);
-                        } catch (IOException e) {
-                            String errorMessage = "Something went wrong invoking YahooFinanceAPI";
-                            Timber.e(e, "onHandleWork: %s", errorMessage);
-                            result.putExtra(ServiceParams.ERROR_SITUATION, errorMessage);
-                            reply.send(this, ServiceParams.ResultCode.COMMON_ERROR, result);
-                        }
-                    } catch (PendingIntent.CanceledException e) {
-                        Timber.w(e, "onHandleWork: Reply cancelled");
-                    }
-                } else {
-                    Timber.e("onHandleWork: No PendingResult was passed in with intent");
-                }
-            } else {
-                Timber.e("onHandleWork: No stock service operation was passed in with intent");
-            }
-        } else {
-            Timber.e("onHandleWork: Invoked with null intent");
+        // mandatory to pass an operation with the intent
+        if (operation == null) {
+            StockServiceException stockServiceException = new StockServiceException("No stock service operation was passed in with intent");
+            Timber.e(stockServiceException);
+            throw stockServiceException;
         }
+
+        // intent for result
+        Intent result = new Intent();
+
+        // set fragment tag if possible
+        if (intent.hasExtra(ServiceParams.STOCK_FRAGMENT_TAG)) {
+            result.putExtra(ServiceParams.STOCK_FRAGMENT_TAG, intent.getStringExtra(ServiceParams.STOCK_FRAGMENT_TAG));
+        }
+
+        // the meat
+        try {
+            Stock stock;
+            switch (operation) {
+                case GET_COMPANY_NAME:
+                    stock = YahooFinance.get(Objects.requireNonNull(intent.getStringExtra(ServiceParams.RequestExtra.SYMBOL)));
+                    validateStock(stock);
+
+                    result.putExtra(ServiceParams.ResultExtra.COMPANY_NAME, stock.getName());
+                    sendReply(reply, ServiceParams.ResultCode.SUCCESS, result);
+
+                    Timber.d("onHandleWork: Successfully fetched stock: %s", stock.getName());
+
+                    break;
+                case GET_STOCK_INFO:
+                    stock = YahooFinance.get(Objects.requireNonNull(intent.getStringExtra(ServiceParams.RequestExtra.SYMBOL)));
+                    validateStock(stock);
+
+                    result.putExtra(ServiceParams.ResultExtra.STOCK_INFO, ParcelableStock.from(stock));
+                    sendReply(reply, ServiceParams.ResultCode.SUCCESS, result);
+
+                    Timber.d("onHandleWork: Successfully fetched stock: %s", stock.getName());
+
+                    break;
+                case GET_STOCK_INFOS:
+                    ArrayList<String> symbols = intent.getStringArrayListExtra(ServiceParams.RequestExtra.SYMBOLS);
+                    ArrayList<ParcelableStock> parcelableStocks = new ArrayList<>();
+
+                    if (symbols != null) {
+                        symbols.forEach(symbol -> {
+                            try {
+                                Stock s = YahooFinance.get(Objects.requireNonNull(symbol));
+                                validateStock(s);
+                                parcelableStocks.add(ParcelableStock.from(s));
+                            } catch (Exception e) {
+                                Timber.e(e, "onHandleWork: Something went wrong while fetching stock info for symbol: %s", symbol);
+                            }
+                        });
+                    }
+
+                    // at last send broadcast and notify the job service that job has finished
+                    sendBroadcast(parcelableStocks);
+                    MonitoringJobService.Handler.getInstance().notifyJobFinished();
+
+                    Timber.d("onHandleWork: Successfully fetched stocks: %s", StringUtils.joinWith(", ", symbols));
+
+                    break;
+                default:
+                    String errorMessage = String.format("Unsupported operation: %s", intent.getStringExtra(ServiceParams.STOCK_SERVICE));
+                    Timber.e("onHandleWork: %s", errorMessage);
+                    result.putExtra(ServiceParams.ERROR_SITUATION, errorMessage);
+                    sendReply(reply, ServiceParams.ResultCode.COMMON_ERROR, result);
+            }
+        } catch (Exception e) {
+            // resolve both error message and result code
+            String errorMessage = e instanceof StockNotFoundException ? "Stock was not found at Yahoo Finance"
+                    : "Something went wrong invoking YahooFinanceAPI";
+            int resultCode = e instanceof StockNotFoundException ? ServiceParams.ResultCode.STOCK_NOT_FOUND_ERROR
+                    : ServiceParams.ResultCode.COMMON_ERROR;
+
+            result.putExtra(ServiceParams.ERROR_SITUATION, errorMessage);
+            sendReply(reply, resultCode, result);
+
+            Timber.e(e, "onHandleWork: %s", errorMessage);
+        }
+    }
+
+    private void sendReply(PendingIntent reply, int resultCode, Intent result) {
+        // caller of service is responsible for getting a reply or not, pass in a pending intent for
+        // reply with the intent if caller is expected to get a result back
+        if (reply != null && result != null) {
+            try {
+                reply.send(this, resultCode, result);
+            } catch (PendingIntent.CanceledException e) {
+                Timber.e(e, "onHandleWork: Something unexpected happened while sending reply");
+            }
+        }
+    }
+
+    private void sendBroadcast(ArrayList<ParcelableStock> parcelableStocks) {
+        final Intent receiverIntent = new Intent(this, MonitoringReceiver.class);
+        receiverIntent.setAction(MonitoringReceiver.STOCK_INFOS_FETCHED);
+        receiverIntent.putParcelableArrayListExtra(ServiceParams.ResultExtra.STOCK_INFOS, parcelableStocks);
+
+        sendBroadcast(receiverIntent);
     }
 
     private void validateStock(Stock stock) throws StockNotFoundException {
