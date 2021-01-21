@@ -32,7 +32,8 @@ public class MonitoringJobService extends JobService {
         final Context context = getApplicationContext();
         Intent intent = new Intent(context, StockService.class);
         intent.putExtra(ServiceParams.STOCK_SERVICE, ServiceParams.Operation.GET_STOCK_INFOS);
-        intent.putStringArrayListExtra(ServiceParams.RequestExtra.SYMBOLS, getDatabaseManager().fetchAllSymbols());
+        intent.putStringArrayListExtra(ServiceParams.RequestExtra.TICKERS,
+                getDatabaseManager().fetchAllTickersForMonitoring());
 
         StockService.enqueueWork(context, intent);
 
@@ -68,6 +69,7 @@ public class MonitoringJobService extends JobService {
      * the monitoring job service instance within handler in a static way.
      */
     public static class Handler {
+
         private static final Handler INSTANCE = new Handler();
 
         private MonitoringJobService monitoringJobService;

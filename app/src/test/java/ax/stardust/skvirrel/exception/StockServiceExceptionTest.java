@@ -10,6 +10,7 @@ import static org.junit.Assert.assertNull;
 
 @RunWith(JUnit4.class)
 public class StockServiceExceptionTest {
+
     private static final String REASON = "Missing operation";
 
     @Test(expected = StockServiceException.class)

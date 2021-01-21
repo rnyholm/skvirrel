@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="default_tickers">
+        <item>EPD</item>
+        <item>ABBV</item>
+        <item>XOM</item>
+        <item>FBIO</item>
+        <item>LPCN</item>
+        <item>SJR</item>
+        <item>T</item>
+        <item>MMM</item>
+        <item>GAIN</item>
+        <item>LTC</item>
+        <item>NDA-FI.HE</item>
+        <item>FORTUM.HE</item>
+        <item>HM-B.ST</item>
+        <item>PFE.ST</item>
+        <item>GSK</item>
+    </string-array>
+</resources>

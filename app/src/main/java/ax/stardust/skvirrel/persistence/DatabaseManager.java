@@ -5,14 +5,17 @@ import android.content.Context;
 import android.database.Cursor;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import ax.stardust.skvirrel.entity.StockMonitoring;
 import ax.stardust.skvirrel.exception.StockMonitoringNotFoundException;
+import ax.stardust.skvirrel.monitoring.AbstractMonitoring;
+import ax.stardust.skvirrel.monitoring.StockMonitoring;
+import ax.stardust.skvirrel.persistence.gson.AbstractMonitoringJsonAdapter;
 
 /**
  * Manager responsible for database handling.
@@ -29,7 +32,9 @@ public class DatabaseManager {
      */
     public DatabaseManager(Context context) {
         this.context = context;
-        gson = new Gson();
+        gson = new GsonBuilder()
+                .registerTypeAdapter(AbstractMonitoring.class, new AbstractMonitoringJsonAdapter())
+                .create();
     }
 
     /**
@@ -79,8 +84,9 @@ public class DatabaseManager {
         TransactionHandler.runInTransaction(context, database -> {
             Cursor cursor = database.rawQuery(DatabaseHelper.SELECT_MONITORING_BY_ID, new String[]{String.valueOf(id)});
             if (cursor != null) {
-                cursor.moveToFirst();
-                result.setResult(getStockMonitoring(cursor));
+                if (cursor.moveToFirst()) {
+                    result.setResult(getStockMonitoring(cursor));
+                }
                 cursor.close();
             }
         });
@@ -103,10 +109,10 @@ public class DatabaseManager {
         TransactionHandler.runInTransaction(context, database -> {
             Cursor cursor = database.rawQuery(DatabaseHelper.SELECT_ALL, null);
             if (cursor != null) {
-                cursor.moveToFirst();
-
-                while (cursor.moveToNext()) {
-                    stockMonitorings.add(getStockMonitoring(cursor));
+                if (cursor.moveToFirst()) {
+                    do {
+                        stockMonitorings.add(getStockMonitoring(cursor));
+                    } while (cursor.moveToNext());
                 }
 
                 cursor.close();
@@ -118,13 +124,26 @@ public class DatabaseManager {
     }
 
     /**
-     * Fetch all symbols of stock monitoring that exists in database
+     * Fetch all stock monitorings that should be monitored
      *
-     * @return array list of symbols
+     * @return list of stock monitorings that should be monitored
      */
-    public ArrayList<String> fetchAllSymbols() {
+    public List<StockMonitoring> fetchAllForMonitoring() {
         return fetchAll().stream()
-                .map(StockMonitoring::getSymbol)
+                .filter(StockMonitoring::hasValidDataForMonitoring)
+                .filter(StockMonitoring::shouldBeMonitored)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Fetch all tickers for stock monitorings that should be monitored
+     *
+     * @return array list of tickers that should be monitored
+     */
+    public ArrayList<String> fetchAllTickersForMonitoring() {
+        return fetchAllForMonitoring().stream()
+                .map(StockMonitoring::getTicker)
+                .distinct()
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
@@ -142,10 +161,10 @@ public class DatabaseManager {
 
     private ContentValues getContentValues(StockMonitoring stockMonitoring) {
         ContentValues contentValues = new ContentValues();
-        contentValues.put(DatabaseHelper.SYMBOL, stockMonitoring.getSymbol());
+        contentValues.put(DatabaseHelper.TICKER, stockMonitoring.getTicker());
         contentValues.put(DatabaseHelper.COMPANY_NAME, stockMonitoring.getCompanyName());
         contentValues.put(DatabaseHelper.MONITORING_OPTIONS, gson.toJson(stockMonitoring.getMonitoringOptions()));
-        contentValues.put(DatabaseHelper.NOTIFIED, boolToInt(stockMonitoring.isNotified()));
+        contentValues.put(DatabaseHelper.VIEW_STATE, stockMonitoring.getViewState().name());
         contentValues.put(DatabaseHelper.SORTING_ORDER, stockMonitoring.getSortingOrder());
 
         return contentValues;
@@ -153,27 +172,30 @@ public class DatabaseManager {
 
     private StockMonitoring getStockMonitoring(Cursor cursor) {
         StockMonitoring stockMonitoring = new StockMonitoring(cursor.getInt(cursor.getColumnIndex(DatabaseHelper.ID)));
-        stockMonitoring.setSymbol(cursor.getString(cursor.getColumnIndex(DatabaseHelper.SYMBOL)));
+        stockMonitoring.setTicker(cursor.getString(cursor.getColumnIndex(DatabaseHelper.TICKER)));
         stockMonitoring.setCompanyName(cursor.getString(cursor.getColumnIndex(DatabaseHelper.COMPANY_NAME)));
-        stockMonitoring.setMonitoringOptions(gson.fromJson(cursor.getString(cursor.getColumnIndex(DatabaseHelper.MONITORING_OPTIONS)), StockMonitoring.MonitoringOptions.class));
-        stockMonitoring.setNotified(intToBoolean(cursor.getInt(cursor.getColumnIndex(DatabaseHelper.NOTIFIED))));
+        stockMonitoring.setViewState(StockMonitoring.ViewState.valueOf(cursor.getString(cursor.getColumnIndex(DatabaseHelper.VIEW_STATE))));
         stockMonitoring.setSortingOrder(cursor.getInt(cursor.getColumnIndex(DatabaseHelper.SORTING_ORDER)));
 
+        // special handling for monitoring options as the specific monitorings within it should
+        // hold a reference to the stock monitoring that owns it, and this reference is not
+        // serializable which means we must set it manual
+        StockMonitoring.MonitoringOptions monitoringOptions = gson.fromJson(
+                cursor.getString(cursor.getColumnIndex(DatabaseHelper.MONITORING_OPTIONS)),
+                StockMonitoring.MonitoringOptions.class);
+        monitoringOptions.setStockMonitoring(stockMonitoring);
+
+        // at last set monitoring options to stock monitoring
+        stockMonitoring.setMonitoringOptions(monitoringOptions);
+
         return stockMonitoring;
-    }
-
-    private int boolToInt(boolean b) {
-        return b ? 1 : 0;
-    }
-
-    private boolean intToBoolean(int i) {
-        return i == 1;
     }
 
     /**
      * Simple wrapper for database results.
      */
     private static class WrappedDatabaseResult {
+
         private long l = -1;
         private int i = -1;
         private StockMonitoring stockMonitoring = null;

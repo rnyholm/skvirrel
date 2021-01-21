@@ -24,12 +24,13 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ParcelableStockTest {
+
     private static final DecimalFormat VOLUME_FORMAT = new DecimalFormat("###,###,###");
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
     private static final String DIVIDEND_FORMAT = "%s (%s%%)";
 
     private static final String NAME = "Mocked test company Inc.";
-    private static final String SYMBOL = "TEST";
+    private static final String TICKER = "TEST";
     private static final String STOCK_EXCHANGE = "NasdaqGS";
     private static final String CURRENCY = "USD";
     private static final String PRICE_STR = "77.43";
@@ -99,7 +100,7 @@ public class ParcelableStockTest {
         Mockito.when(mockedStats.getEarningsAnnouncement()).thenReturn(EARNINGS);
 
         Mockito.when(mockedStock.getName()).thenReturn(NAME);
-        Mockito.when(mockedStock.getSymbol()).thenReturn(SYMBOL);
+        Mockito.when(mockedStock.getSymbol()).thenReturn(TICKER);
         Mockito.when(mockedStock.getStockExchange()).thenReturn(STOCK_EXCHANGE);
         Mockito.when(mockedStock.getCurrency()).thenReturn(CURRENCY);
         Mockito.when(mockedStock.getCurrency()).thenReturn(CURRENCY);
@@ -126,7 +127,7 @@ public class ParcelableStockTest {
         char separatorCharacter = ps.getPrice().contains(".") ? '.' : ',';
 
         assertEquals(NAME, ps.getName());
-        assertEquals(SYMBOL, ps.getSymbol());
+        assertEquals(TICKER, ps.getTicker());
         assertEquals(STOCK_EXCHANGE, ps.getStockExchange());
         assertEquals(CURRENCY, ps.getCurrency());
         assertEquals(replaceSeparatorCharacter(PRICE_STR, separatorCharacter), ps.getPrice());
@@ -207,7 +208,7 @@ public class ParcelableStockTest {
                 return string.replace('.', newSeparatorCharacter);
             }
         }
-        
+
         return string;
     }
 }

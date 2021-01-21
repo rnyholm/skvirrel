@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,18 +20,28 @@ import androidx.fragment.app.Fragment;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.SplittableRandom;
+
 import ax.stardust.skvirrel.R;
 import ax.stardust.skvirrel.activity.Skvirrel;
 import ax.stardust.skvirrel.component.keyboard.AlphanumericKeyboard;
 import ax.stardust.skvirrel.component.keyboard.KeyboardHandler;
+import ax.stardust.skvirrel.component.watcher.ReferencedRadioGroupWatcher;
+import ax.stardust.skvirrel.component.watcher.ReferencedTextWatcher;
 import ax.stardust.skvirrel.component.widget.KeyboardlessEditText;
-import ax.stardust.skvirrel.entity.StockMonitoring;
+import ax.stardust.skvirrel.monitoring.AbstractMonitoring;
+import ax.stardust.skvirrel.monitoring.Criteria;
+import ax.stardust.skvirrel.monitoring.PriceMonitoring;
+import ax.stardust.skvirrel.monitoring.RsiMonitoring;
+import ax.stardust.skvirrel.monitoring.StockMonitoring;
 import ax.stardust.skvirrel.persistence.DatabaseManager;
-import ax.stardust.skvirrel.schedule.MonitoringScheduler;
 import ax.stardust.skvirrel.service.ServiceParams;
 import ax.stardust.skvirrel.service.StockService;
 import timber.log.Timber;
 
+/**
+ * Fragment holding ui and data behind it for a stock monitoring.
+ */
 public class StockFragment extends Fragment {
 
     // parent of fragment
@@ -40,13 +52,23 @@ public class StockFragment extends Fragment {
     private DatabaseManager databaseManager;
 
     private TextView companyTextView;
+    private TextView monitoringStatusTextView;
 
-    private KeyboardlessEditText symbolEditText;
+    private KeyboardlessEditText tickerEditText;
     private KeyboardlessEditText priceEditText;
+    private KeyboardlessEditText rsiEditText;
 
-    private Button pollStockButton;
+    private Button viewStockInfoButton;
     private Button resetNotificationButton;
     private Button removeStockMonitoringButton;
+
+    private RadioGroup priceRadioGroup;
+    private RadioGroup rsiRadioGroup;
+
+    private RadioButton priceBelowRadioButton;
+    private RadioButton priceAboveRadioButton;
+    private RadioButton rsiBelowRadioButton;
+    private RadioButton rsiAboveRadioButton;
 
     /**
      * Creates a new instance of {@link StockFragment}
@@ -55,7 +77,7 @@ public class StockFragment extends Fragment {
      * @param stockMonitoring      stock monitoring belonging to this fragment
      * @param alphanumericKeyboard alpha numeric keyboard of the application
      */
-    public StockFragment(final Skvirrel activity, final StockMonitoring stockMonitoring, final AlphanumericKeyboard alphanumericKeyboard) {
+    public StockFragment(Skvirrel activity, StockMonitoring stockMonitoring, AlphanumericKeyboard alphanumericKeyboard) {
         if (activity == null || stockMonitoring == null || alphanumericKeyboard == null) {
             String errorMessage = "Cannot instantiate fragment with null activity, stockMonitoring or alphanumeric keyboard";
             IllegalArgumentException exception = new IllegalArgumentException(errorMessage);
@@ -71,32 +93,54 @@ public class StockFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.stock_content_card, container, false);
+        View view = inflater.inflate(R.layout.stock_fragment, container, false);
         findViews(view);
-        updateStockInfo();
+        setDefaultValues();
+        updateWidgets();
         setListeners();
         return view;
     }
 
     private void findViews(View view) {
         companyTextView = view.findViewById(R.id.company_tv);
-        symbolEditText = view.findViewById(R.id.symbol_et);
+        monitoringStatusTextView = view.findViewById(R.id.monitoring_status_tv);
+
+        tickerEditText = view.findViewById(R.id.ticker_et);
         priceEditText = view.findViewById(R.id.price_et);
-        pollStockButton = view.findViewById(R.id.poll_stock_btn);
+        rsiEditText = view.findViewById(R.id.rsi_et);
+
+        viewStockInfoButton = view.findViewById(R.id.view_stock_info_btn);
         resetNotificationButton = view.findViewById(R.id.reset_notification_btn);
         removeStockMonitoringButton = view.findViewById(R.id.remove_stock_monitoring_btn);
+
+        priceRadioGroup = view.findViewById(R.id.price_rg);
+        rsiRadioGroup = view.findViewById(R.id.rsi_rg);
+
+        priceBelowRadioButton = view.findViewById(R.id.price_below_rb);
+        priceAboveRadioButton = view.findViewById(R.id.price_above_rb);
+        rsiAboveRadioButton = view.findViewById(R.id.rsi_above_rb);
+        rsiBelowRadioButton = view.findViewById(R.id.rsi_below_rb);
     }
 
-    private void updateStockInfo() {
+    private void setDefaultValues() {
+        // set random ticker as hint
+        String[] stringArray = getResources().getStringArray(R.array.default_tickers);
+        tickerEditText.setHint(stringArray[new SplittableRandom().nextInt(0, 14)]);
+    }
+
+    private void updateWidgets() {
         updateCompanyWidget(stockMonitoring);
-        updateSymbolWidget(stockMonitoring, true);
+        updateTickerWidget(stockMonitoring, true);
+        updateMonitoringStatusWidget();
         updateMonitoringOptionsWidgets(stockMonitoring);
+        updateNotifiedWidgets();
     }
 
     private void setListeners() {
-        symbolEditText.setOnFocusChangeListener(new KeyboardHandler(alphanumericKeyboard));
-        symbolEditText.setOnTouchListener(new KeyboardHandler(alphanumericKeyboard));
-        symbolEditText.addTextChangedListener(new TextWatcher() {
+        tickerEditText.setOnFocusChangeListener(new KeyboardHandler(alphanumericKeyboard));
+        tickerEditText.setOnTouchListener(new KeyboardHandler(alphanumericKeyboard));
+        tickerEditText.addTextChangedListener(new TextWatcher() {
+
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 // do nothing..
@@ -104,25 +148,36 @@ public class StockFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                String inputText = charSequence.toString();
-                if (StringUtils.isEmpty(inputText)) {
-                    companyTextView.setText(R.string.company_name);
-                } else {
+                String input = charSequence.toString();
+                if (StringUtils.isNotEmpty(input)) {
                     PendingIntent pendingResult = activity.createPendingResult(ServiceParams.RequestCode.GET_COMPANY_NAME, new Intent(), 0);
                     Intent intent = new Intent(activity, StockService.class);
                     intent.putExtra(ServiceParams.STOCK_SERVICE, ServiceParams.Operation.GET_COMPANY_NAME);
-                    intent.putExtra(ServiceParams.RequestExtra.SYMBOL, getSymbol());
+                    intent.putExtra(ServiceParams.RequestExtra.TICKER, input);
                     intent.putExtra(ServiceParams.PENDING_RESULT, pendingResult);
                     intent.putExtra(ServiceParams.STOCK_FRAGMENT_TAG, getTag());
                     StockService.enqueueWork(activity, intent);
-//                    activity.startService(intent);
+                } else {
+                    // empty value is okay so set company name to empty as the given ticker was empty,
+                    // set default company name text and set input field border color to default
+                    stockMonitoring.setCompanyName("");
+                    companyTextView.setText(R.string.enter_ticker_hint);
+                    tickerEditText.setBackgroundResource(R.drawable.input_default);
                 }
 
-                // TODO: check enable delete button that it's not set within keyboard handler
-                alphanumericKeyboard.enableDeleteButton(StringUtils.isNotEmpty(inputText));
+                // enable/disable delete button
+                alphanumericKeyboard.enableDeleteButton(StringUtils.isNotEmpty(input));
 
-                stockMonitoring.setSymbol(getSymbol());
+                // do always save ticker to database as we at this point don't know whether or not
+                // the given ticker was correct
+                stockMonitoring.setTicker(input);
                 getDatabaseManager().update(stockMonitoring);
+
+                // if input was empty we need to also update monitoring status as no intents are
+                // sent during these cases and the usual way of updating this is not triggered
+                if (StringUtils.isEmpty(input)) {
+                    updateMonitoringStatusWidget();
+                }
             }
 
             @Override
@@ -130,59 +185,97 @@ public class StockFragment extends Fragment {
                 // do nothing..
             }
         });
+
+        PriceMonitoring priceMonitoring = stockMonitoring.getMonitoringOptions().getPriceMonitoring();
+        RsiMonitoring rsiMonitoring = stockMonitoring.getMonitoringOptions().getRsiMonitoring();
+
+        priceRadioGroup.setOnCheckedChangeListener(new ReferencedRadioGroupWatcher(this, priceBelowRadioButton, priceAboveRadioButton, priceMonitoring));
 
         priceEditText.setOnFocusChangeListener(new KeyboardHandler(alphanumericKeyboard));
         priceEditText.setOnTouchListener(new KeyboardHandler(alphanumericKeyboard));
-        priceEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                // do nothing..
-            }
+        priceEditText.addTextChangedListener(new ReferencedTextWatcher(this, priceEditText, alphanumericKeyboard, priceMonitoring));
 
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                String priceText = charSequence.toString();
-                if (StringUtils.isNotEmpty(priceText)) {
-                    try {
-                        final double price = Double.parseDouble(priceText);
-                        priceEditText.setBackgroundResource(R.drawable.input_default);
-                        stockMonitoring.getMonitoringOptions().setPrice(price);
-                        getDatabaseManager().update(stockMonitoring);
-                    } catch (NumberFormatException e) {
-                        priceEditText.setBackgroundResource(R.drawable.input_error);
-                    }
-                } else {
-                    priceEditText.setBackgroundResource(R.drawable.input_error);
-                }
+        rsiRadioGroup.setOnCheckedChangeListener(new ReferencedRadioGroupWatcher(this, rsiBelowRadioButton, rsiAboveRadioButton, rsiMonitoring));
 
-                // TODO: check enable delete button that it's not set within keyboard handler
-                alphanumericKeyboard.enableDeleteButton(StringUtils.isNotEmpty(priceText));
-            }
+        rsiEditText.setOnFocusChangeListener(new KeyboardHandler(alphanumericKeyboard));
+        rsiEditText.setOnTouchListener(new KeyboardHandler(alphanumericKeyboard));
+        rsiEditText.addTextChangedListener(new ReferencedTextWatcher(this, rsiEditText, alphanumericKeyboard, rsiMonitoring));
 
-            @Override
-            public void afterTextChanged(Editable editable) {
-                // do nothing..
-            }
-        });
-
-        pollStockButton.setOnClickListener(view -> {
+        viewStockInfoButton.setOnClickListener(view -> {
             PendingIntent pendingResult = activity.createPendingResult(ServiceParams.RequestCode.GET_STOCK_INFO, new Intent(), 0);
             Intent intent = new Intent(activity, StockService.class);
             intent.putExtra(ServiceParams.STOCK_SERVICE, ServiceParams.Operation.GET_STOCK_INFO);
-            intent.putExtra(ServiceParams.RequestExtra.SYMBOL, getSymbol());
+            intent.putExtra(ServiceParams.RequestExtra.TICKER, stockMonitoring.getTicker());
             intent.putExtra(ServiceParams.PENDING_RESULT, pendingResult);
             intent.putExtra(ServiceParams.STOCK_FRAGMENT_TAG, getTag());
             StockService.enqueueWork(activity, intent);
-//            activity.startService(intent);
         });
 
         resetNotificationButton.setOnClickListener(view -> {
-            // TODO: implement me :)
-            MonitoringScheduler.scheduleJob(activity);
-            Toast.makeText(activity, "Reset notification button pressed", Toast.LENGTH_LONG).show();
+            stockMonitoring.resetNotified();
+            getDatabaseManager().update(stockMonitoring);
+            updateNotifiedWidgets();
         });
 
         removeStockMonitoringButton.setOnClickListener(view -> activity.removeStockMonitoringAndFragment(stockMonitoring));
+    }
+
+    private void updateCompanyWidget(StockMonitoring stockMonitoring) {
+        String companyName = stockMonitoring.getCompanyName();
+        companyTextView.setText(StringUtils.isNotEmpty(companyName) ? companyName
+                : activity.getString(R.string.enter_ticker_hint));
+    }
+
+    private void updateTickerWidget(StockMonitoring stockMonitoring, boolean setTicker) {
+        String companyName = stockMonitoring.getCompanyName();
+        String ticker = stockMonitoring.getTicker();
+
+        if (setTicker) {
+            tickerEditText.setText(ticker);
+        }
+
+        // set background to ticker input field, company name is kind of the way we recognize
+        // if the given ticker was successfully found at yahoo finance as it's only set then
+        if (stockMonitoring.hasValidTicker() ||
+                (StringUtils.isEmpty(companyName) && StringUtils.isEmpty(ticker))) { // no input os also fine
+            tickerEditText.setBackgroundResource(R.drawable.input_default);
+        } else {
+            tickerEditText.setBackgroundResource(R.drawable.input_error);
+        }
+    }
+
+    private void updateMonitoringOptionsWidgets(StockMonitoring stockMonitoring) {
+        StockMonitoring.MonitoringOptions monitoringOptions = stockMonitoring.getMonitoringOptions();
+        PriceMonitoring priceMonitoring = monitoringOptions.getPriceMonitoring();
+        RsiMonitoring rsiMonitoring = monitoringOptions.getRsiMonitoring();
+
+        if (priceMonitoring.getComparator().equals(Criteria.Comparator.BELOW)) {
+            priceBelowRadioButton.setChecked(true);
+            priceAboveRadioButton.setChecked(false);
+        } else {
+            priceBelowRadioButton.setChecked(false);
+            priceAboveRadioButton.setChecked(true);
+        }
+
+        if (priceMonitoring.getPrice() > 0) {
+            priceEditText.setText(String.valueOf(priceMonitoring.getPrice()));
+        }
+
+        if (rsiMonitoring.getComparator().equals(Criteria.Comparator.BELOW)) {
+            rsiBelowRadioButton.setChecked(true);
+            rsiAboveRadioButton.setChecked(false);
+        } else {
+            rsiBelowRadioButton.setChecked(false);
+            rsiAboveRadioButton.setChecked(true);
+        }
+
+        if (rsiMonitoring.getRsi() > 0) {
+            rsiEditText.setText(String.valueOf(rsiMonitoring.getRsi()));
+        }
+    }
+
+    private void updateNotifiedWidgets() {
+        resetNotificationButton.setEnabled(stockMonitoring.isNotified());
     }
 
     private DatabaseManager getDatabaseManager() {
@@ -192,57 +285,41 @@ public class StockFragment extends Fragment {
         return databaseManager;
     }
 
-    private String getSymbol() {
-        if (symbolEditText != null) {
-            if (symbolEditText.getText() != null) {
-                return symbolEditText.getText().toString();
+    /**
+     * To get parent activity of this fragment
+     *
+     * @return parent activity of this fragment
+     */
+    public Skvirrel getParent() {
+        return activity;
+    }
+
+    /**
+     * To update monitoring status widgets within this fragment
+     */
+    public void updateMonitoringStatusWidget() {
+        // set default monitoring status
+        String monitoringStatus = getString(R.string.monitoring_status_default);
+
+        // figure out the actual monitoring status
+        if (stockMonitoring.hasValidDataForMonitoring()) {
+            if (stockMonitoring.isNotified()) {
+                monitoringStatus = String.format(getString(R.string.monitoring_status_notified),
+                        AbstractMonitoring.getJoinedTranslatedMonitoringNames(activity, stockMonitoring.getNotifiedMonitorings()));
+            } else {
+                monitoringStatus = String.format(getString(R.string.monitoring_status_ok),
+                        AbstractMonitoring.getJoinedTranslatedMonitoringNames(activity, stockMonitoring.getValidMonitorings()));
+            }
+        } else {
+            if (!stockMonitoring.hasValidTicker() && stockMonitoring.hasAnyValidMonitoring()) {
+                monitoringStatus = getString(R.string.monitoring_status_missing_ticker);
+            } else if (stockMonitoring.hasValidTicker() && !stockMonitoring.hasAnyValidMonitoring()) {
+                monitoringStatus = getString(R.string.monitoring_status_missing_monitoring_options);
             }
         }
-        return "";
-    }
 
-    private void updateStockMonitoringAndSetStockInfo(final int resultCode, final Intent data) {
-        // resolve the company name
-        String companyName = "";
-        if (resultCode == ServiceParams.ResultCode.SUCCESS) {
-            companyName = data.getStringExtra(ServiceParams.ResultExtra.COMPANY_NAME);
-        }
-
-        // update it in db
-        stockMonitoring.setCompanyName(companyName);
-        stockMonitoring = getDatabaseManager().update(stockMonitoring);
-
-        // and update the ui accordingly
-        updateCompanyWidget(stockMonitoring);
-        updateSymbolWidget(stockMonitoring, false);
-    }
-
-    private void updateCompanyWidget(final StockMonitoring stockMonitoring) {
-        final String companyName = stockMonitoring.getCompanyName();
-        companyTextView.setText(StringUtils.isNotEmpty(companyName) ? companyName : activity.getString(R.string.company_name));
-    }
-
-    private void updateSymbolWidget(final StockMonitoring stockMonitoring, final boolean alsoSetSymbol) {
-        final String companyName = stockMonitoring.getCompanyName();
-        final String symbol = stockMonitoring.getSymbol();
-
-        if (alsoSetSymbol) {
-            symbolEditText.setText(symbol);
-        }
-
-        if (StringUtils.isNotEmpty(companyName) ||
-                (StringUtils.isEmpty(companyName) && StringUtils.isEmpty(symbol))) {
-            symbolEditText.setBackgroundResource(R.drawable.input_default);
-        } else {
-            symbolEditText.setBackgroundResource(R.drawable.input_error);
-        }
-    }
-
-    private void updateMonitoringOptionsWidgets(final StockMonitoring stockMonitoring) {
-        final StockMonitoring.MonitoringOptions monitoringOptions = stockMonitoring.getMonitoringOptions();
-        if (monitoringOptions.getPrice() > 0) {
-            priceEditText.setText(String.valueOf(monitoringOptions.getPrice()));
-        }
+        // finally set monitoring status text
+        monitoringStatusTextView.setText(monitoringStatus);
     }
 
     @Override
@@ -250,7 +327,21 @@ public class StockFragment extends Fragment {
         if (resultCode != ServiceParams.ResultCode.COMMON_ERROR) {
             switch (requestCode) {
                 case ServiceParams.RequestCode.GET_COMPANY_NAME:
-                    updateStockMonitoringAndSetStockInfo(resultCode, data);
+                    // resolve the company name
+                    String companyName = "";
+                    if (resultCode == ServiceParams.ResultCode.SUCCESS) {
+                        companyName = data.getStringExtra(ServiceParams.ResultExtra.COMPANY_NAME);
+                    }
+
+                    // update it in db
+                    stockMonitoring.setCompanyName(companyName);
+                    stockMonitoring = getDatabaseManager().update(stockMonitoring);
+
+                    // and update the ui accordingly
+                    updateCompanyWidget(stockMonitoring);
+                    updateTickerWidget(stockMonitoring, false);
+                    updateMonitoringStatusWidget();
+
                     break;
                 case ServiceParams.RequestCode.GET_STOCK_INFO:
                     break;

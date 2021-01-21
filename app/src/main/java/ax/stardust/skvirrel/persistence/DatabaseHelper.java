@@ -16,20 +16,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // table specific data
     public static final String TABLE_NAME = "StockMonitoring";
     public static final String ID = "id";
-    public static final String SYMBOL = "Symbol";
+    public static final String TICKER = "Ticker";
     public static final String COMPANY_NAME = "CompanyName";
     public static final String MONITORING_OPTIONS = "MonitoringOptions";
-    public static final String NOTIFIED = "Notified";
+    public static final String VIEW_STATE = "ViewState";
     public static final String SORTING_ORDER = "SortingOrder";
 
     // queries
     private static final String CREATE_TABLE = "CREATE TABLE "
             + TABLE_NAME + "("
             + ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-            + SYMBOL + " TEXT, "
+            + TICKER + " TEXT, "
             + COMPANY_NAME + " TEXT, "
             + MONITORING_OPTIONS + " TEXT, "
-            + NOTIFIED + " INTEGER DEFAULT 0, "
+            + VIEW_STATE + " TEXT, "
             + SORTING_ORDER + " INTEGER DEFAULT 0);";
 
     public static final String SELECT_ALL = "SELECT * FROM " + TABLE_NAME;

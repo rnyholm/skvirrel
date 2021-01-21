@@ -16,7 +16,7 @@ import java.util.List;
 
 import ax.stardust.skvirrel.R;
 import ax.stardust.skvirrel.component.keyboard.AlphanumericKeyboard;
-import ax.stardust.skvirrel.entity.StockMonitoring;
+import ax.stardust.skvirrel.monitoring.StockMonitoring;
 import ax.stardust.skvirrel.fragment.StockFragment;
 import ax.stardust.skvirrel.persistence.DatabaseManager;
 import ax.stardust.skvirrel.service.ServiceParams;

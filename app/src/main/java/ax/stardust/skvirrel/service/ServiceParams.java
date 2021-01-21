@@ -4,6 +4,7 @@ package ax.stardust.skvirrel.service;
  * Parameters and constants used for all service calls within the application.
  */
 public class ServiceParams {
+
     public static final int MONITORING_JOB_SERVICE_ID = 0;
     public static final int STOCK_SERVICE_ID = 1;
 
@@ -25,8 +26,8 @@ public class ServiceParams {
      * Valid types of data to pass in on a service request.
      */
     public static final class RequestExtra {
-        public static final String SYMBOL = "symbol";
-        public static final String SYMBOLS = "symbols";
+        public static final String TICKER = "ticker";
+        public static final String TICKERS = "tickers";
     }
 
     /**

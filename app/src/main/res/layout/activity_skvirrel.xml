@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--suppress AndroidDomInspection -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/skvirrel_ll"
@@ -33,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-<!--                <include layout="@layout/stock_content_card" />-->
+<!--                <include layout="@layout/stock_fragment" />-->
             </LinearLayout>
 
             <RelativeLayout
@@ -46,7 +47,7 @@
                 <Button
                     android:id="@+id/add_stock_monitoring_btn"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="30dp"
                     android:background="@drawable/button_black_selector"
                     android:fontFamily="@font/montserrat"
 

@@ -17,7 +17,7 @@ public class StockNotFoundException extends Exception {
      * @param stock stock for exception
      */
     public StockNotFoundException(@Nullable Stock stock) {
-        super(stock == null || StringUtils.isBlank(stock.getName()) ? "Stock simply not found"
-                : String.format("Stock with symbol: %s is not valid", stock.getSymbol()));
+        super(stock == null || StringUtils.isEmpty(stock.getName()) ? "Stock simply not found"
+                : String.format("Stock with ticker: %s is not valid", stock.getSymbol()));
     }
 }

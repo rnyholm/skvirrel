@@ -23,6 +23,7 @@ import yahoofinance.quotes.stock.StockStats;
  * A lighter and parcelable version of the {@link yahoofinance.Stock} class.
  */
 public class ParcelableStock implements Parcelable {
+
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#0.00");
     private static final DecimalFormat MARKET_CAP_BILLION_FORMAT = new DecimalFormat("###.00B");
     private static final DecimalFormat MARKET_CAP_MILLION_FORMAT = new DecimalFormat("###.00M");
@@ -34,7 +35,7 @@ public class ParcelableStock implements Parcelable {
 
     private static final String NOT_AVAILABLE = "N/A";
 
-    private String symbol;
+    private String ticker;
     private String name;
     private String stockExchange;
     private String currency;
@@ -60,7 +61,7 @@ public class ParcelableStock implements Parcelable {
     }
 
     protected ParcelableStock(Parcel in) {
-        symbol = in.readString();
+        ticker = in.readString();
         name = in.readString();
         stockExchange = in.readString();
         currency = in.readString();
@@ -82,12 +83,18 @@ public class ParcelableStock implements Parcelable {
         dividend = in.readString();
     }
 
+    /**
+     * Creates a parcelable stock from given {@link yahoofinance.Stock}
+     *
+     * @param stock yahoo stock from which parcelable stock is
+     * @return parcelable stock
+     */
     public static ParcelableStock from(Stock stock) {
         StockQuote quote = stock.getQuote();
         StockStats stats = stock.getStats();
 
         ParcelableStock parcelableStock = new ParcelableStock();
-        parcelableStock.setSymbol(getString(stock.getSymbol()));
+        parcelableStock.setTicker(getString(stock.getSymbol()));
         parcelableStock.setName(getString(stock.getName()));
         parcelableStock.setStockExchange(getString(stock.getStockExchange()));
         parcelableStock.setCurrency(getString(stock.getCurrency()));
@@ -125,7 +132,7 @@ public class ParcelableStock implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(symbol);
+        parcel.writeString(ticker);
         parcel.writeString(name);
         parcel.writeString(stockExchange);
         parcel.writeString(currency);
@@ -204,12 +211,12 @@ public class ParcelableStock implements Parcelable {
         return dateFormat.format(calendar.getTime());
     }
 
-    public String getSymbol() {
-        return symbol;
+    public String getTicker() {
+        return ticker;
     }
 
-    public void setSymbol(String symbol) {
-        this.symbol = symbol;
+    public void setTicker(String ticker) {
+        this.ticker = ticker;
     }
 
     public String getName() {
@@ -368,7 +375,7 @@ public class ParcelableStock implements Parcelable {
     @NonNull
     public String toString() {
         return "ParcelableStock {" +
-                "\n\tsymbol='" + symbol + '\'' +
+                "\n\tticker='" + ticker + '\'' +
                 "\n\tname='" + name + '\'' +
                 "\n\tstockExchange='" + stockExchange + '\'' +
                 "\n\tcurrency='" + currency + '\'' +

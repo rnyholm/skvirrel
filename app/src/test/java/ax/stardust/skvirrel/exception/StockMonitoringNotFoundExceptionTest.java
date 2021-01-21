@@ -9,6 +9,7 @@ import static org.junit.Assert.assertNotNull;
 
 @RunWith(JUnit4.class)
 public class StockMonitoringNotFoundExceptionTest {
+
     private static final long ID = 18363490;
 
     @Test(expected = StockMonitoringNotFoundException.class)

@@ -64,7 +64,7 @@ public class StockService extends JobIntentService {
             Stock stock;
             switch (operation) {
                 case GET_COMPANY_NAME:
-                    stock = YahooFinance.get(Objects.requireNonNull(intent.getStringExtra(ServiceParams.RequestExtra.SYMBOL)));
+                    stock = YahooFinance.get(Objects.requireNonNull(intent.getStringExtra(ServiceParams.RequestExtra.TICKER)));
                     validateStock(stock);
 
                     result.putExtra(ServiceParams.ResultExtra.COMPANY_NAME, stock.getName());
@@ -74,7 +74,7 @@ public class StockService extends JobIntentService {
 
                     break;
                 case GET_STOCK_INFO:
-                    stock = YahooFinance.get(Objects.requireNonNull(intent.getStringExtra(ServiceParams.RequestExtra.SYMBOL)));
+                    stock = YahooFinance.get(Objects.requireNonNull(intent.getStringExtra(ServiceParams.RequestExtra.TICKER)));
                     validateStock(stock);
 
                     result.putExtra(ServiceParams.ResultExtra.STOCK_INFO, ParcelableStock.from(stock));
@@ -84,17 +84,17 @@ public class StockService extends JobIntentService {
 
                     break;
                 case GET_STOCK_INFOS:
-                    ArrayList<String> symbols = intent.getStringArrayListExtra(ServiceParams.RequestExtra.SYMBOLS);
+                    ArrayList<String> tickers = intent.getStringArrayListExtra(ServiceParams.RequestExtra.TICKERS);
                     ArrayList<ParcelableStock> parcelableStocks = new ArrayList<>();
 
-                    if (symbols != null) {
-                        symbols.forEach(symbol -> {
+                    if (tickers != null) {
+                        tickers.forEach(ticker -> {
                             try {
-                                Stock s = YahooFinance.get(Objects.requireNonNull(symbol));
+                                Stock s = YahooFinance.get(Objects.requireNonNull(ticker));
                                 validateStock(s);
                                 parcelableStocks.add(ParcelableStock.from(s));
                             } catch (Exception e) {
-                                Timber.e(e, "onHandleWork: Something went wrong while fetching stock info for symbol: %s", symbol);
+                                Timber.e(e, "onHandleWork: Something went wrong while fetching stock info for ticker: %s", ticker);
                             }
                         });
                     }
@@ -103,7 +103,7 @@ public class StockService extends JobIntentService {
                     sendBroadcast(parcelableStocks);
                     MonitoringJobService.Handler.getInstance().notifyJobFinished();
 
-                    Timber.d("onHandleWork: Successfully fetched stocks: %s", StringUtils.joinWith(", ", symbols));
+                    Timber.d("onHandleWork: Successfully fetched stocks: %s", StringUtils.joinWith(", ", tickers));
 
                     break;
                 default:
@@ -147,7 +147,7 @@ public class StockService extends JobIntentService {
     }
 
     private void validateStock(Stock stock) throws StockNotFoundException {
-        if (stock == null || StringUtils.isBlank(stock.getName()) || StringUtils.isNumeric(stock.getName())) {
+        if (stock == null || StringUtils.isEmpty(stock.getName()) || StringUtils.isNumeric(stock.getName())) {
             throw new StockNotFoundException(stock);
         }
     }

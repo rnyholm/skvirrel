@@ -1,15 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="company_name">Enter a stock symbol…</string>
-    <string name="poll_stock">Poll stock</string>
+    <string name="enter_ticker_hint">Enter a ticker..</string>
+    <string name="view_stock_info">View stock info</string>
     <string name="add_stock_monitoring">Add stock monitoring</string>
     <string name="remove_stock_monitoring">Remove stock monitoring</string>
     <string name="reset_notification">Reset notification</string>
-    <string name="price_crossing">Price crossing:</string>
+    <string name="price">Price</string>
 
     <!-- notifications -->
     <string name="notification_channel_name">Stock monitorings</string>
     <string name="notification_channel_description">Let skvirrel notify upon triggering of stock monitorings</string>
-    <string name="notification_title">Monitoring triggered for %s</string>
-    <string name="notification_text">Price crossing %s</string>
+    <string name="notification_title">Stock monitoring triggered for %s</string>
+    <string name="monitoring_options">Monitoring options</string>
+    <string name="below">Below</string>
+    <string name="above">Above</string>
+    <string name="monitoring_status_default">Enter a ticker above and some monitoring options below to start monitoring.</string>
+    <string name="monitoring_status_missing_monitoring_options">Enter some monitoring options below to start monitoring.</string>
+    <string name="monitoring_status_ok">Monitoring active for %s.</string>
+    <string name="monitoring_status_notified">Monitoring notified for %s. Reset notification to activate monitoring again.</string>
+    <string name="and">and</string>
+    <string name="monitoring_status_missing_ticker">Enter a ticker above to start monitoring.</string>
 </resources>
