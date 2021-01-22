@@ -1,5 +1,6 @@
 package ax.stardust.skvirrel.persistence;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -12,10 +13,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import ax.stardust.skvirrel.exception.StockMonitoringNotFoundException;
 import ax.stardust.skvirrel.monitoring.AbstractMonitoring;
 import ax.stardust.skvirrel.monitoring.StockMonitoring;
 import ax.stardust.skvirrel.persistence.gson.AbstractMonitoringJsonAdapter;
+import timber.log.Timber;
 
 /**
  * Manager responsible for database handling.
@@ -44,14 +45,15 @@ public class DatabaseManager {
      * @return inserted stock monitoring with the newly created id after insertion
      */
     public StockMonitoring insert(StockMonitoring stockMonitoring) {
-        WrappedDatabaseResult result = new WrappedDatabaseResult();
-
         TransactionHandler.runInTransaction(context, database -> {
             long id = database.insert(DatabaseHelper.TABLE_NAME, null, getContentValues(stockMonitoring));
-            result.setResult(id);
+            stockMonitoring.setId(id);
+
+            Timber.d("Stock monitoring with id: %s and ticker: %s inserted",
+                    stockMonitoring.getId(),
+                    stockMonitoring.getTicker());
         });
 
-        stockMonitoring.setId(result.getLong());
         return stockMonitoring;
     }
 
@@ -66,36 +68,13 @@ public class DatabaseManager {
             // ignore result on update, it's always 0
             database.update(DatabaseHelper.TABLE_NAME, getContentValues(stockMonitoring),
                     DatabaseHelper.ID + " = ?", new String[]{String.valueOf(stockMonitoring.getId())});
+
+            Timber.d("Stock monitoring with id: %s and ticker: %s updated",
+                    stockMonitoring.getId(),
+                    stockMonitoring.getTicker());
         });
 
         return stockMonitoring;
-    }
-
-    /**
-     * Fetching stock monitoring on id
-     *
-     * @param id id for stock monitoring to fetched
-     * @return found stock monitoring
-     * @throws StockMonitoringNotFoundException is thrown if stock monitoring isn't found on given id
-     */
-    public StockMonitoring fetch(long id) throws StockMonitoringNotFoundException {
-        WrappedDatabaseResult result = new WrappedDatabaseResult();
-
-        TransactionHandler.runInTransaction(context, database -> {
-            Cursor cursor = database.rawQuery(DatabaseHelper.SELECT_MONITORING_BY_ID, new String[]{String.valueOf(id)});
-            if (cursor != null) {
-                if (cursor.moveToFirst()) {
-                    result.setResult(getStockMonitoring(cursor));
-                }
-                cursor.close();
-            }
-        });
-
-        if (result.getStockMonitoring() == null) {
-            throw new StockMonitoringNotFoundException(id);
-        }
-
-        return result.getStockMonitoring();
     }
 
     /**
@@ -103,6 +82,7 @@ public class DatabaseManager {
      *
      * @return list of all stock monitorings existing in database
      */
+    @SuppressLint("StringFormatInTimber")
     public List<StockMonitoring> fetchAll() {
         List<StockMonitoring> stockMonitorings = new ArrayList<>();
 
@@ -118,6 +98,11 @@ public class DatabaseManager {
                 cursor.close();
                 stockMonitorings.sort(Comparator.comparing(StockMonitoring::getSortingOrder));
             }
+
+            Timber.d("Stock monitorings fetched with id's and tickers: %s",
+                    stockMonitorings.stream()
+                            .map(sm -> String.format("%s(%s)", sm.getId(), sm.getTicker()))
+                            .collect(Collectors.joining(", ")));
         });
 
         return stockMonitorings;
@@ -156,6 +141,8 @@ public class DatabaseManager {
         TransactionHandler.runInTransaction(context, database -> {
             // returns rows affected by operation, for now we ignore it
             database.delete(DatabaseHelper.TABLE_NAME, DatabaseHelper.ID + " = ?", new String[]{String.valueOf(id)});
+
+            Timber.d("Stock monitoring with id: %s deleted", id);
         });
     }
 
@@ -189,64 +176,5 @@ public class DatabaseManager {
         stockMonitoring.setMonitoringOptions(monitoringOptions);
 
         return stockMonitoring;
-    }
-
-    /**
-     * Simple wrapper for database results.
-     */
-    private static class WrappedDatabaseResult {
-
-        private long l = -1;
-        private int i = -1;
-        private StockMonitoring stockMonitoring = null;
-
-        /**
-         * Creates a new wrapped database result
-         */
-        public WrappedDatabaseResult() {
-        }
-
-        public void setResult(long l) {
-            checkIfUnsetOrThrow();
-            this.l = l;
-        }
-
-        public void setResult(int i) {
-            checkIfUnsetOrThrow();
-            this.i = i;
-        }
-
-        public void setResult(StockMonitoring stockMonitoring) {
-            checkIfUnsetOrThrow();
-            this.stockMonitoring = stockMonitoring;
-        }
-
-        public long getLong() {
-            if (l == -1) {
-                throw new IllegalStateException(Long.class.getSimpleName() + " for " + WrappedDatabaseResult.class.getSimpleName() + " is not set");
-            }
-            return l;
-        }
-
-        public int getInt() {
-            if (i == -1) {
-                throw new IllegalStateException(Integer.class.getSimpleName() + " for " + WrappedDatabaseResult.class.getSimpleName() + " is not set");
-            }
-            return i;
-        }
-
-        public StockMonitoring getStockMonitoring() {
-            if (stockMonitoring == null) {
-                throw new IllegalStateException(StockMonitoring.class.getSimpleName() + " for " + WrappedDatabaseResult.class.getSimpleName() + " is not set");
-            }
-            return stockMonitoring;
-        }
-
-        private void checkIfUnsetOrThrow() {
-            // check if some field is already set
-            if (l != -1 || i != -1 || stockMonitoring != null) {
-                throw new IllegalStateException(WrappedDatabaseResult.class.getSimpleName() + " is already set");
-            }
-        }
     }
 }
