@@ -26,6 +26,7 @@ import ax.stardust.skvirrel.R;
 import ax.stardust.skvirrel.activity.Skvirrel;
 import ax.stardust.skvirrel.component.keyboard.AlphanumericKeyboard;
 import ax.stardust.skvirrel.component.keyboard.KeyboardHandler;
+import ax.stardust.skvirrel.component.keyboard.NumericKeyboard;
 import ax.stardust.skvirrel.component.watcher.ReferencedRadioGroupWatcher;
 import ax.stardust.skvirrel.component.watcher.ReferencedTextWatcher;
 import ax.stardust.skvirrel.component.widget.KeyboardlessEditText;
@@ -45,10 +46,11 @@ import timber.log.Timber;
 public class StockFragment extends Fragment {
 
     // parent of fragment
-    private Skvirrel activity;
-    private StockMonitoring stockMonitoring;
-    private AlphanumericKeyboard alphanumericKeyboard;
+    private final Skvirrel activity;
+    private final AlphanumericKeyboard alphanumericKeyboard;
+    private final NumericKeyboard numericKeyboard;
 
+    private StockMonitoring stockMonitoring;
     private DatabaseManager databaseManager;
 
     private TextView companyTextView;
@@ -76,10 +78,13 @@ public class StockFragment extends Fragment {
      * @param activity             parent of this fragment
      * @param stockMonitoring      stock monitoring belonging to this fragment
      * @param alphanumericKeyboard alpha numeric keyboard of the application
+     * @param numericKeyboard      numeric keyboard of the application
      */
-    public StockFragment(Skvirrel activity, StockMonitoring stockMonitoring, AlphanumericKeyboard alphanumericKeyboard) {
-        if (activity == null || stockMonitoring == null || alphanumericKeyboard == null) {
-            String errorMessage = "Cannot instantiate fragment with null activity, stockMonitoring or alphanumeric keyboard";
+    public StockFragment(Skvirrel activity, StockMonitoring stockMonitoring,
+                         AlphanumericKeyboard alphanumericKeyboard, NumericKeyboard numericKeyboard) {
+        if (activity == null || stockMonitoring == null
+                || alphanumericKeyboard == null || numericKeyboard == null) {
+            String errorMessage = "Cannot instantiate fragment with null activity, stockMonitoring, alphanumeric or numeric keyboard";
             IllegalArgumentException exception = new IllegalArgumentException(errorMessage);
             Timber.e(exception, "StockFragment: Unable to instantiate StockFragment");
             throw exception;
@@ -88,6 +93,7 @@ public class StockFragment extends Fragment {
         this.activity = activity;
         this.stockMonitoring = stockMonitoring;
         this.alphanumericKeyboard = alphanumericKeyboard;
+        this.numericKeyboard = numericKeyboard;
     }
 
     @Nullable
@@ -191,15 +197,15 @@ public class StockFragment extends Fragment {
 
         priceRadioGroup.setOnCheckedChangeListener(new ReferencedRadioGroupWatcher(this, priceBelowRadioButton, priceAboveRadioButton, priceMonitoring));
 
-        priceEditText.setOnFocusChangeListener(new KeyboardHandler(alphanumericKeyboard));
-        priceEditText.setOnTouchListener(new KeyboardHandler(alphanumericKeyboard));
-        priceEditText.addTextChangedListener(new ReferencedTextWatcher(this, priceEditText, alphanumericKeyboard, priceMonitoring));
+        priceEditText.setOnFocusChangeListener(new KeyboardHandler(numericKeyboard));
+        priceEditText.setOnTouchListener(new KeyboardHandler(numericKeyboard));
+        priceEditText.addTextChangedListener(new ReferencedTextWatcher(this, priceEditText, numericKeyboard, priceMonitoring));
 
         rsiRadioGroup.setOnCheckedChangeListener(new ReferencedRadioGroupWatcher(this, rsiBelowRadioButton, rsiAboveRadioButton, rsiMonitoring));
 
-        rsiEditText.setOnFocusChangeListener(new KeyboardHandler(alphanumericKeyboard));
-        rsiEditText.setOnTouchListener(new KeyboardHandler(alphanumericKeyboard));
-        rsiEditText.addTextChangedListener(new ReferencedTextWatcher(this, rsiEditText, alphanumericKeyboard, rsiMonitoring));
+        rsiEditText.setOnFocusChangeListener(new KeyboardHandler(numericKeyboard));
+        rsiEditText.setOnTouchListener(new KeyboardHandler(numericKeyboard));
+        rsiEditText.addTextChangedListener(new ReferencedTextWatcher(this, rsiEditText, numericKeyboard, rsiMonitoring));
 
         viewStockInfoButton.setOnClickListener(view -> {
             PendingIntent pendingResult = activity.createPendingResult(ServiceParams.RequestCode.GET_STOCK_INFO, new Intent(), 0);

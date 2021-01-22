@@ -7,41 +7,62 @@ import android.widget.Button;
 
 import ax.stardust.skvirrel.R;
 
+/**
+ * Numeric keyboard implementation of the skvirrel keyboard.
+ */
 public class NumericKeyboard extends SkvirrelKeyboard {
     // the only difference from a skvirrel "base" keyboard :(
-    private Button buttonSeparator;
+    private Button buttonDot;
 
+    /**
+     * Creates a new instance of numeric keyboard with given context
+     *
+     * @param context context for keyboard
+     */
     public NumericKeyboard(Context context) {
         super(context);
     }
 
+    /**
+     * Creates a new instance of numeric keyboard with given context and attribute set
+     *
+     * @param context context for keyboard
+     * @param attrs   attribute set for keyboard
+     */
     public NumericKeyboard(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
+    /**
+     * Creates a new instance of numeric keyboard with given context, attribute set and style attribute
+     *
+     * @param context      context for keyboard
+     * @param attrs        attribute set for keyboard
+     * @param defStyleAttr style attribute
+     */
     public NumericKeyboard(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
     @Override
     protected void inflateLayout(Context context) {
-        LayoutInflater.from(context).inflate(R.layout.skvirrel_keyboard, this, true);
+        LayoutInflater.from(context).inflate(R.layout.numeric_keyboard, this, true);
     }
 
     @Override
     protected void findViews() {
-        button0 = findViewById(R.id.button_0);
-        button1 = findViewById(R.id.button_1);
-        button2 = findViewById(R.id.button_2);
-        button3 = findViewById(R.id.button_3);
-        button4 = findViewById(R.id.button_4);
-        button5 = findViewById(R.id.button_5);
-        button6 = findViewById(R.id.button_6);
-        button7 = findViewById(R.id.button_7);
-        button8 = findViewById(R.id.button_8);
-        button9 = findViewById(R.id.button_9);
-        buttonSeparator = findViewById(R.id.button_separator);
-        buttonDelete = findViewById(R.id.button_del);
+        button0 = findViewById(R.id.numeric_keyboard_button_0);
+        button1 = findViewById(R.id.numeric_keyboard_button_1);
+        button2 = findViewById(R.id.numeric_keyboard_button_2);
+        button3 = findViewById(R.id.numeric_keyboard_button_3);
+        button4 = findViewById(R.id.numeric_keyboard_button_4);
+        button5 = findViewById(R.id.numeric_keyboard_button_5);
+        button6 = findViewById(R.id.numeric_keyboard_button_6);
+        button7 = findViewById(R.id.numeric_keyboard_button_7);
+        button8 = findViewById(R.id.numeric_keyboard_button_8);
+        button9 = findViewById(R.id.numeric_keyboard_button_9);
+        buttonDot = findViewById(R.id.numeric_keyboard_button_dot);
+        buttonDelete = findViewById(R.id.numeric_keyboard_button_del);
     }
 
     @Override
@@ -56,7 +77,7 @@ public class NumericKeyboard extends SkvirrelKeyboard {
         button7.setOnClickListener(this);
         button8.setOnClickListener(this);
         button9.setOnClickListener(this);
-        buttonSeparator.setOnClickListener(this);
+        buttonDot.setOnClickListener(this);
         // delete button needs this many listeners in order to handle long press delete
         buttonDelete.setOnClickListener(this);
         buttonDelete.setOnLongClickListener(this);
@@ -64,16 +85,16 @@ public class NumericKeyboard extends SkvirrelKeyboard {
 
     @Override
     protected void setKeyValues() {
-        keyValues.put(R.id.button_0, "0");
-        keyValues.put(R.id.button_1, "1");
-        keyValues.put(R.id.button_2, "2");
-        keyValues.put(R.id.button_3, "3");
-        keyValues.put(R.id.button_4, "4");
-        keyValues.put(R.id.button_5, "5");
-        keyValues.put(R.id.button_6, "6");
-        keyValues.put(R.id.button_7, "7");
-        keyValues.put(R.id.button_8, "8");
-        keyValues.put(R.id.button_9, "9");
-        keyValues.put(R.id.button_separator, ":");
+        keyValues.put(R.id.numeric_keyboard_button_0, "0");
+        keyValues.put(R.id.numeric_keyboard_button_1, "1");
+        keyValues.put(R.id.numeric_keyboard_button_2, "2");
+        keyValues.put(R.id.numeric_keyboard_button_3, "3");
+        keyValues.put(R.id.numeric_keyboard_button_4, "4");
+        keyValues.put(R.id.numeric_keyboard_button_5, "5");
+        keyValues.put(R.id.numeric_keyboard_button_6, "6");
+        keyValues.put(R.id.numeric_keyboard_button_7, "7");
+        keyValues.put(R.id.numeric_keyboard_button_8, "8");
+        keyValues.put(R.id.numeric_keyboard_button_9, "9");
+        keyValues.put(R.id.numeric_keyboard_button_dot, ".");
     }
 }

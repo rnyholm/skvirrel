@@ -7,6 +7,9 @@ import android.widget.Button;
 
 import ax.stardust.skvirrel.R;
 
+/**
+ * Alphanumeric keyboard implementation of the skvirrel keyboard.
+ */
 public class AlphanumericKeyboard extends SkvirrelKeyboard {
     private Button buttonA;
     private Button buttonB;
@@ -37,14 +40,32 @@ public class AlphanumericKeyboard extends SkvirrelKeyboard {
     private Button buttonDot;
     private Button buttonDash;
 
+    /**
+     * Creates a new instance of alphanumeric keyboard with given context
+     *
+     * @param context context for keyboard
+     */
     public AlphanumericKeyboard(Context context) {
         super(context);
     }
 
+    /**
+     * Creates a new instance of alphanumeric keyboard with given context and attribute set
+     *
+     * @param context context for keyboard
+     * @param attrs   attribute set for keyboard
+     */
     public AlphanumericKeyboard(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
+    /**
+     * Creates a new instance of alphanumeric keyboard with given context, attribute set and style attribute
+     *
+     * @param context      context for keyboard
+     * @param attrs        attribute set for keyboard
+     * @param defStyleAttr style attribute
+     */
     public AlphanumericKeyboard(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }

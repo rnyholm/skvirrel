@@ -16,8 +16,9 @@ import java.util.List;
 
 import ax.stardust.skvirrel.R;
 import ax.stardust.skvirrel.component.keyboard.AlphanumericKeyboard;
-import ax.stardust.skvirrel.monitoring.StockMonitoring;
+import ax.stardust.skvirrel.component.keyboard.NumericKeyboard;
 import ax.stardust.skvirrel.fragment.StockFragment;
+import ax.stardust.skvirrel.monitoring.StockMonitoring;
 import ax.stardust.skvirrel.persistence.DatabaseManager;
 import ax.stardust.skvirrel.service.ServiceParams;
 import timber.log.Timber;
@@ -32,6 +33,7 @@ public class Skvirrel extends AppCompatActivity {
     private Button addStockMonitoringButton;
 
     private AlphanumericKeyboard alphanumericKeyboard;
+    private NumericKeyboard numericKeyboard;
 
     private TextView versionNameTextView;
 
@@ -49,7 +51,8 @@ public class Skvirrel extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (alphanumericKeyboard.getVisibility() == View.VISIBLE) {
+        if (alphanumericKeyboard.getVisibility() == View.VISIBLE
+                || numericKeyboard.getVisibility() == View.VISIBLE) {
             // hacky way to release focus from any edit text, by releasing it also the keyboard will be closed
             versionNameTextView.requestFocus();
         } else {
@@ -60,6 +63,7 @@ public class Skvirrel extends AppCompatActivity {
     private void findViews() {
         addStockMonitoringButton = findViewById(R.id.add_stock_monitoring_btn);
         alphanumericKeyboard = findViewById(R.id.alphanumeric_keyboard);
+        numericKeyboard = findViewById(R.id.numeric_keyboard);
         versionNameTextView = findViewById(R.id.version_name_tv);
     }
 
@@ -79,7 +83,7 @@ public class Skvirrel extends AppCompatActivity {
     }
 
     private void addStockFragment(StockMonitoring stockMonitoring) {
-        final StockFragment stockFragment = new StockFragment(this, stockMonitoring, alphanumericKeyboard);
+        final StockFragment stockFragment = new StockFragment(this, stockMonitoring, alphanumericKeyboard, numericKeyboard);
         fragmentManager = getSupportFragmentManager();
         fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.add(R.id.stock_fragment_container, stockFragment, String.valueOf(stockMonitoring.getId()));
@@ -111,12 +115,14 @@ public class Skvirrel extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // figure out what fragment is responsible for intent and let it handle result
-        fragmentManager = getSupportFragmentManager();
+        if (data != null) {
+            // figure out what fragment is responsible for intent and let it handle result
+            fragmentManager = getSupportFragmentManager();
 
-        final Fragment callingFragment = fragmentManager.findFragmentByTag(data.getStringExtra(ServiceParams.STOCK_FRAGMENT_TAG));
-        if (callingFragment != null) {
-            callingFragment.onActivityResult(requestCode, resultCode, data);
+            final Fragment callingFragment = fragmentManager.findFragmentByTag(data.getStringExtra(ServiceParams.STOCK_FRAGMENT_TAG));
+            if (callingFragment != null) {
+                callingFragment.onActivityResult(requestCode, resultCode, data);
+            }
         }
 
         super.onActivityResult(requestCode, resultCode, data);

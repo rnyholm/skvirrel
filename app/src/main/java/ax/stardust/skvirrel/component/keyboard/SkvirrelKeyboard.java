@@ -13,6 +13,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import ax.stardust.skvirrel.R;
 
+/**
+ * Custom implementation of a keyboard used within the application.
+ */
 public abstract class SkvirrelKeyboard extends LinearLayout implements View.OnClickListener, View.OnLongClickListener {
     private static final int HIDE_DELAY = 25;
     private static final int CONTINUOUS_DELETE_DELAY = 60;
@@ -31,6 +34,7 @@ public abstract class SkvirrelKeyboard extends LinearLayout implements View.OnCl
     protected Button buttonDelete;
 
     protected final SparseArray<String> keyValues = new SparseArray<>();
+
     private InputConnection inputConnection;
 
     private final Handler hideDelayHandler = new Handler();
@@ -43,14 +47,32 @@ public abstract class SkvirrelKeyboard extends LinearLayout implements View.OnCl
         }
     };
 
+    /**
+     * Creates a new instance of skvirrel keyboard with given context
+     *
+     * @param context context for keyboard
+     */
     public SkvirrelKeyboard(Context context) {
         this(context, null, 0);
     }
 
+    /**
+     * Creates a new instance of skvirrel keyboard with given context and attribute set
+     *
+     * @param context context for keyboard
+     * @param attrs   attribute set for keyboard
+     */
     public SkvirrelKeyboard(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
+    /**
+     * Creates a new instance of skvirrel keyboard with given context, attribute set and style attribute
+     *
+     * @param context      context for keyboard
+     * @param attrs        attribute set for keyboard
+     * @param defStyleAttr style attribute
+     */
     public SkvirrelKeyboard(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initialize(context);
@@ -63,12 +85,26 @@ public abstract class SkvirrelKeyboard extends LinearLayout implements View.OnCl
         setKeyValues();
     }
 
+    /**
+     * Inflates keyboard layout from context
+     *
+     * @param context context from which layout is inflated
+     */
     protected abstract void inflateLayout(Context context);
 
+    /**
+     * Find views needed for the keyboard
+     */
     protected abstract void findViews();
 
+    /**
+     * Set listeners needed for the keyboard
+     */
     protected abstract void setListeners();
 
+    /**
+     * Set keyboard key(button values)
+     */
     protected abstract void setKeyValues();
 
     @Override
@@ -96,27 +132,43 @@ public abstract class SkvirrelKeyboard extends LinearLayout implements View.OnCl
         }
     }
 
+    /**
+     * Sets input connection to this keyboard
+     *
+     * @param inputConnection input connection of this keyboard
+     */
     public void setInputConnection(InputConnection inputConnection) {
         this.inputConnection = inputConnection;
     }
 
+    /**
+     * Enables/disables delete button of this keyboard depending on parameter
+     *
+     * @param enable true if delete button should be enabled else false
+     */
     public void enableDeleteButton(boolean enable) {
         buttonDelete.setEnabled(enable);
         // Nothing more to delete in field
         continuousDeleteHandler.removeCallbacks(continuousDeleteAction);
     }
 
+    /**
+     * To make this keyboard visible
+     */
     public void show() {
         hideDelayHandler.removeCallbacksAndMessages(null);
         setVisibility(View.VISIBLE);
     }
 
+    /**
+     * To hide the keyboard with a small delay
+     */
     public void delayedHide() {
         hideDelayHandler.postDelayed(this::hide, HIDE_DELAY);
     }
 
     private boolean isDeleteButton(View view) {
-        return R.id.button_del == view.getId() ||
+        return R.id.numeric_keyboard_button_del == view.getId() ||
                 R.id.alphanumeric_keyboard_button_del == view.getId();
     }
 

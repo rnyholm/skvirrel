@@ -72,7 +72,6 @@
 
     <string name="keyboard_dot" translatable="false">.</string>
     <string name="keyboard_dash" translatable="false">-</string>
-    <string name="keyboard_separator" translatable="false">:</string>
 
     <!-- other -->
     <string name="filter_view_skvirrel" translatable="false">View skvirrel</string>
