@@ -23,6 +23,11 @@ android {
     }
 
     buildTypes {
+        debug {
+            debuggable true
+            minifyEnabled false
+            buildConfigField 'boolean', 'DEBUG', 'true'
+        }
         release {
             debuggable false
             minifyEnabled true

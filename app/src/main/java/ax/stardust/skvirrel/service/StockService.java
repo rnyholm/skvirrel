@@ -139,11 +139,14 @@ public class StockService extends JobIntentService {
     }
 
     private void sendBroadcast(ArrayList<ParcelableStock> parcelableStocks) {
-        final Intent receiverIntent = new Intent(this, MonitoringReceiver.class);
-        receiverIntent.setAction(MonitoringReceiver.STOCK_INFOS_FETCHED);
-        receiverIntent.putParcelableArrayListExtra(ServiceParams.ResultExtra.STOCK_INFOS, parcelableStocks);
+        // only send broadcast if there are anything to handle
+        if (!parcelableStocks.isEmpty()) {
+            final Intent receiverIntent = new Intent(this, MonitoringReceiver.class);
+            receiverIntent.setAction(MonitoringReceiver.ACTION_STOCK_INFOS_FETCHED);
+            receiverIntent.putParcelableArrayListExtra(ServiceParams.ResultExtra.STOCK_INFOS, parcelableStocks);
 
-        sendBroadcast(receiverIntent);
+            sendBroadcast(receiverIntent);
+        }
     }
 
     private void validateStock(Stock stock) throws StockNotFoundException {
