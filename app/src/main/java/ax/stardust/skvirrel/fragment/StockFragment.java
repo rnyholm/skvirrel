@@ -96,7 +96,7 @@ public class StockFragment extends Fragment {
         this.numericKeyboard = numericKeyboard;
     }
 
-    @Nullable
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.stock_fragment, container, false);
@@ -135,10 +135,10 @@ public class StockFragment extends Fragment {
     }
 
     private void updateWidgets() {
-        updateCompanyWidget(stockMonitoring);
-        updateTickerWidget(stockMonitoring, true);
+        updateCompanyWidget();
+        updateTickerWidget(true);
         updateMonitoringStatusWidget();
-        updateMonitoringOptionsWidgets(stockMonitoring);
+        updateMonitoringOptionsWidgets();
         updateNotifiedWidgets();
     }
 
@@ -220,19 +220,20 @@ public class StockFragment extends Fragment {
         resetNotificationButton.setOnClickListener(view -> {
             stockMonitoring.resetNotified();
             getDatabaseManager().update(stockMonitoring);
+            updateMonitoringStatusWidget();
             updateNotifiedWidgets();
         });
 
         removeStockMonitoringButton.setOnClickListener(view -> activity.removeStockMonitoringAndFragment(stockMonitoring));
     }
 
-    private void updateCompanyWidget(StockMonitoring stockMonitoring) {
+    private void updateCompanyWidget() {
         String companyName = stockMonitoring.getCompanyName();
         companyTextView.setText(StringUtils.isNotEmpty(companyName) ? companyName
                 : activity.getString(R.string.enter_ticker_hint));
     }
 
-    private void updateTickerWidget(StockMonitoring stockMonitoring, boolean setTicker) {
+    private void updateTickerWidget(boolean setTicker) {
         String companyName = stockMonitoring.getCompanyName();
         String ticker = stockMonitoring.getTicker();
 
@@ -250,7 +251,7 @@ public class StockFragment extends Fragment {
         }
     }
 
-    private void updateMonitoringOptionsWidgets(StockMonitoring stockMonitoring) {
+    private void updateMonitoringOptionsWidgets() {
         StockMonitoring.MonitoringOptions monitoringOptions = stockMonitoring.getMonitoringOptions();
         PriceMonitoring priceMonitoring = monitoringOptions.getPriceMonitoring();
         RsiMonitoring rsiMonitoring = monitoringOptions.getRsiMonitoring();
@@ -309,9 +310,13 @@ public class StockFragment extends Fragment {
 
         // figure out the actual monitoring status
         if (stockMonitoring.hasValidDataForMonitoring()) {
-            if (stockMonitoring.isNotified()) {
-                monitoringStatus = String.format(getString(R.string.monitoring_status_notified),
+            if (stockMonitoring.isAllNotified()) {
+                monitoringStatus = String.format(getString(R.string.monitoring_status_all_notified),
                         AbstractMonitoring.getJoinedTranslatedMonitoringNames(activity, stockMonitoring.getNotifiedMonitorings()));
+            } else if (stockMonitoring.isNotified()) {
+                monitoringStatus = String.format(getString(R.string.monitoring_status_notified),
+                        AbstractMonitoring.getJoinedTranslatedMonitoringNames(activity, stockMonitoring.getNotifiedMonitorings()),
+                        AbstractMonitoring.getJoinedTranslatedMonitoringNames(activity, stockMonitoring.getMonitoringsThatShouldBeMonitored()));
             } else {
                 monitoringStatus = String.format(getString(R.string.monitoring_status_ok),
                         AbstractMonitoring.getJoinedTranslatedMonitoringNames(activity, stockMonitoring.getValidMonitorings()));
@@ -344,8 +349,8 @@ public class StockFragment extends Fragment {
                     stockMonitoring = getDatabaseManager().update(stockMonitoring);
 
                     // and update the ui accordingly
-                    updateCompanyWidget(stockMonitoring);
-                    updateTickerWidget(stockMonitoring, false);
+                    updateCompanyWidget();
+                    updateTickerWidget(false);
                     updateMonitoringStatusWidget();
 
                     break;

@@ -17,7 +17,8 @@
     <string name="monitoring_status_default">Enter a ticker above and some monitoring options below to start monitoring.</string>
     <string name="monitoring_status_missing_monitoring_options">Enter some monitoring options below to start monitoring.</string>
     <string name="monitoring_status_ok">Monitoring active for %s.</string>
-    <string name="monitoring_status_notified">Monitoring notified for %s. Reset notification to activate monitoring again.</string>
+    <string name="monitoring_status_all_notified">Monitoring notified for %s. Reset notification to activate monitoring again.</string>
     <string name="and">and</string>
     <string name="monitoring_status_missing_ticker">Enter a ticker above to start monitoring.</string>
+    <string name="monitoring_status_notified">Monitoring notified for %s, but is still active for %s. Reset notification to activate all monitorings again.</string>
 </resources>

@@ -2,6 +2,8 @@ package ax.stardust.skvirrel.monitoring;
 
 import android.content.Context;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,7 +23,7 @@ public abstract class AbstractMonitoring {
         PRICE(R.string.price),
         RSI(R.string.rsi);
 
-        private int stringResourceId;
+        private final int stringResourceId;
 
         MonitoringType(int stringResourceId) {
             this.stringResourceId = stringResourceId;
@@ -109,7 +111,14 @@ public abstract class AbstractMonitoring {
      */
     public static String getJoinedTranslatedMonitoringNames(Context context, List<AbstractMonitoring> monitorings) {
         List<String> translatedMonitoringNames = monitorings.stream()
-                .map(monitoring -> monitoring.getMonitoringType().getTranslatedName(context))
+                .map(monitoring -> {
+                    MonitoringType monitoringType = monitoring.getMonitoringType();
+                    String translatedName = monitoringType.getTranslatedName(context);
+                    if (MonitoringType.PRICE.equals(monitoringType)) {
+                        return StringUtils.toRootLowerCase(translatedName);
+                    }
+                    return translatedName;
+                })
                 .collect(Collectors.toList());
 
         return SkvirrelUtils.join(context, translatedMonitoringNames);

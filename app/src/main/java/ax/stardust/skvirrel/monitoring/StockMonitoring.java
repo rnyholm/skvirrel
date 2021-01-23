@@ -110,12 +110,26 @@ public class StockMonitoring {
     }
 
     /**
-     * To find out if this stock monitoring have some option that has been notified
+     * To find out if all monitoring options of this monitoring has been notified. Note that
+     * monitorings must also be valid
+     *
+     * @return true if all monitoring options of this monitoring has been notified else false
+     */
+    public boolean isAllNotified() {
+        return monitoringOptions.get().stream()
+                .filter(AbstractMonitoring::isValid)
+                .allMatch(AbstractMonitoring::isNotified);
+    }
+
+    /**
+     * To find out if this stock monitoring have some option that has been notified. Note that
+     * monitorings must also be valid
      *
      * @return true if this stock monitoring have some notified option else false
      */
     public boolean isNotified() {
         return monitoringOptions.get().stream()
+                .filter(AbstractMonitoring::isValid)
                 .anyMatch(AbstractMonitoring::isNotified);
     }
 
@@ -242,7 +256,7 @@ public class StockMonitoring {
             }
 
             MonitoringNotFoundException exception = new MonitoringNotFoundException(monitoringType.name());
-            Timber.e(exception, "Unable to get monitoring");
+            Timber.e(exception, "getMonitoringOfType: Unable to get monitoring");
             throw exception;
         }
     }
