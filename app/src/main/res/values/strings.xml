@@ -32,6 +32,10 @@
     <string name="notification_channel_description">Let skvirrel notify upon triggering of stock monitorings</string>
     <string name="notification_title">Stock monitoring triggered for %s</string>
 
+    <!-- getting started -->
+    <string name="getting_started_title">Hi there&#128075;</string>
+    <string name="getting_started">"Press the \"Add stock monitoring\" button above to get started. Then enter a ticker for the stock you would like to monitor along with one or more monitoring options of your interest and you are good to go&#128077;\nskvirrel is now monitoring the stock for you and will notify you if your monitoring trigger, easy peasy&#128512;"</string>
+
     <!-- keyboard -->
     <string name="keyboard_0" translatable="false">0</string>
     <string name="keyboard_1" translatable="false">1</string>
@@ -76,5 +80,4 @@
 
     <!-- other -->
     <string name="filter_view_skvirrel" translatable="false">View skvirrel</string>
-    <string name="debug_stock_info" translatable="false">Stock information for debugging purposes...</string>
 </resources>

@@ -23,18 +23,23 @@ import ax.stardust.skvirrel.persistence.DatabaseManager;
 import ax.stardust.skvirrel.service.ServiceParams;
 import timber.log.Timber;
 
+/**
+ * Skvirrel, the main activity for the application.
+ */
 public class Skvirrel extends AppCompatActivity {
-
-    private DatabaseManager databaseManager;
 
     private FragmentManager fragmentManager;
     private FragmentTransaction fragmentTransaction;
 
-    private Button addStockMonitoringButton;
-
     private AlphanumericKeyboard alphanumericKeyboard;
     private NumericKeyboard numericKeyboard;
 
+    private DatabaseManager databaseManager;
+
+    private Button addStockMonitoringButton;
+
+    private TextView gettingStartedTitleTextView;
+    private TextView gettingStartedTextView;
     private TextView versionNameTextView;
 
     private List<StockMonitoring> stockMonitorings = new ArrayList<>();
@@ -42,11 +47,11 @@ public class Skvirrel extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_skvirrel);
         findViews();
         addStockFragments();
         setListeners();
+        toggleGettingStartedTextView();
     }
 
     @Override
@@ -64,7 +69,14 @@ public class Skvirrel extends AppCompatActivity {
         addStockMonitoringButton = findViewById(R.id.add_stock_monitoring_btn);
         alphanumericKeyboard = findViewById(R.id.alphanumeric_keyboard);
         numericKeyboard = findViewById(R.id.numeric_keyboard);
+        gettingStartedTitleTextView = findViewById(R.id.getting_started_title_tv);
+        gettingStartedTextView = findViewById(R.id.getting_started_tv);
         versionNameTextView = findViewById(R.id.version_name_tv);
+    }
+
+    private void addStockFragments() {
+        stockMonitorings = getDatabaseManager().fetchAll();
+        stockMonitorings.forEach(this::addStockFragment);
     }
 
     private void setListeners() {
@@ -73,13 +85,9 @@ public class Skvirrel extends AppCompatActivity {
             // update ui with a new stock fragment
             StockMonitoring stockMonitoring = getDatabaseManager().insert(new StockMonitoring());
             stockMonitorings.add(stockMonitoring);
+            toggleGettingStartedTextView();
             addStockFragment(stockMonitoring);
         });
-    }
-
-    private void addStockFragments() {
-        stockMonitorings = getDatabaseManager().fetchAll();
-        stockMonitorings.forEach(this::addStockFragment);
     }
 
     private void addStockFragment(StockMonitoring stockMonitoring) {
@@ -90,16 +98,15 @@ public class Skvirrel extends AppCompatActivity {
         fragmentTransaction.commit();
     }
 
-    private DatabaseManager getDatabaseManager() {
-        if (databaseManager == null) {
-            databaseManager = new DatabaseManager(this);
-        }
-        return databaseManager;
-    }
-
+    /**
+     * Removes given stock monitoring both from user interface and database
+     *
+     * @param stockMonitoring stock monitoring to be removed
+     */
     public void removeStockMonitoringAndFragment(StockMonitoring stockMonitoring) {
         fragmentManager = getSupportFragmentManager();
 
+        // find fragment for stock monitoring and remove it
         final Fragment fragment = fragmentManager.findFragmentByTag(String.valueOf(stockMonitoring.getId()));
         if (fragment != null) {
             fragmentTransaction = fragmentManager.beginTransaction();
@@ -109,8 +116,25 @@ public class Skvirrel extends AppCompatActivity {
             Timber.e("removeStockMonitoringAndFragment: No fragment found with tag: %s", stockMonitoring.getId());
         }
 
+        // remove stock monitoring from db and list of stock monitoring within this object
         getDatabaseManager().delete(stockMonitoring.getId());
         stockMonitorings.remove(stockMonitoring);
+
+        // at last toggle getting started text views visibility
+        toggleGettingStartedTextView();
+    }
+
+    private void toggleGettingStartedTextView() {
+        int visibility = stockMonitorings.isEmpty() ? View.VISIBLE : View.GONE;
+        gettingStartedTextView.setVisibility(visibility);
+        gettingStartedTitleTextView.setVisibility(visibility);
+    }
+
+    private DatabaseManager getDatabaseManager() {
+        if (databaseManager == null) {
+            databaseManager = new DatabaseManager(this);
+        }
+        return databaseManager;
     }
 
     @Override

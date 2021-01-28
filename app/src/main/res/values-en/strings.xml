@@ -21,4 +21,6 @@
     <string name="and">and</string>
     <string name="monitoring_status_missing_ticker">Enter a ticker above to start monitoring.</string>
     <string name="monitoring_status_notified">Monitoring notified for %s, but is still active for %s. Reset notification to activate all monitorings again.</string>
+    <string name="getting_started_title">Hi there&#128075;</string>
+    <string name="getting_started">"Press the \"Add stock monitoring\" button above to get started. Then enter a ticker for the stock you would like to monitor along with one or more monitoring options of your interest and you are good to go&#128077;\nskvirrel is now monitoring the stock for you and will notify you if your monitoring trigger, easy peasy&#128512;"</string>
 </resources>

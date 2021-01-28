@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--suppress AndroidDomInspection -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/skvirrel_ll"
@@ -33,8 +32,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
-
-<!--                <include layout="@layout/stock_fragment" />-->
             </LinearLayout>
 
             <RelativeLayout
@@ -58,15 +55,35 @@
                     android:textColor="@color/colorButtonText" />
             </RelativeLayout>
 
-            <!--            <TextView-->
-<!--                android:id="@+id/debug_stock_info_tv"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_gravity="bottom"-->
-<!--                android:fontFamily="@font/montserrat"-->
-<!--                android:text="@string/debug_stock_info"-->
-<!--                android:textSize="14sp" />-->
+            <RelativeLayout
+                android:id="@+id/getting_started_rl"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
+                <TextView
+                    android:id="@+id/getting_started_title_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="50dp"
+                    android:fontFamily="@font/montserrat"
+                    android:text="@string/getting_started_title"
+                    android:textAlignment="center"
+                    android:textColor="@color/colorHeadingText"
+                    android:textSize="18sp"
+                    tools:visibility="visible" />
+
+                <TextView
+                    android:id="@+id/getting_started_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/getting_started_title_tv"
+                    android:fontFamily="@font/montserrat"
+                    android:text="@string/getting_started"
+                    android:textAlignment="center"
+                    android:textColor="@color/colorText"
+                    android:textSize="14sp"
+                    tools:visibility="visible" />
+            </RelativeLayout>
         </LinearLayout>
 
     </ScrollView>

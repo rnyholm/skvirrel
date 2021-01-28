@@ -73,7 +73,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/montserrat"
         android:text="@string/monitoring_status_default"
-        android:textColor="@color/colorHeadingText"
+        android:textColor="@color/colorText"
         android:textSize="14sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/monitoring_options_tv"/>
