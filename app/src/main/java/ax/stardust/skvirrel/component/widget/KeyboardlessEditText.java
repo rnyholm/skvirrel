@@ -15,7 +15,6 @@ import androidx.appcompat.widget.AppCompatEditText;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Objects;
-import java.util.function.Function;
 
 import timber.log.Timber;
 
@@ -31,10 +30,19 @@ import timber.log.Timber;
  * sure of what every little code snippet are doing. Therefore this is to be used with a bit caution.
  */
 public class KeyboardlessEditText extends AppCompatEditText {
+
+    /**
+     * The different types of valid input for a keyboardless edit text.
+     */
+    public enum Input {
+        TEXT,
+        NUMERIC_DECIMAL,
+        NUMERIC_INTEGER
+    }
+
     private static final Method SHOW_SOFT_INPUT_ON_FOCUS = getMethod(boolean.class);
 
-    private Function<String, Object> validatorFunction;
-//    private Input input = Input.NONE;
+    private Input input;
 
     public KeyboardlessEditText(Context context) {
         super(context);
@@ -57,7 +65,7 @@ public class KeyboardlessEditText extends AppCompatEditText {
             setFocusableInTouchMode(true);
         }
 
-        // Need to show the cursor when user interacts with EditText so that the edit operations
+        // need to show the cursor when user interacts with EditText so that the edit operations
         // still work. Without the cursor, the edit operations won't appear.
         setOnClickListener(onClickListener);
         setOnLongClickListener(onLongClickListener);
@@ -65,25 +73,17 @@ public class KeyboardlessEditText extends AppCompatEditText {
         setShowSoftInputOnFocus(false); // This is a hidden method in TextView.
         reflexSetShowSoftInputOnFocus(); // Workaround.
 
-        // Ensure that cursor is at the end of the input box when initialized. Without this, the
+        // ensure that cursor is at the end of the input box when initialized. Without this, the
         // cursor may be at index 0 when there is text added via layout XML.
         setSelection(Objects.requireNonNull(getText()).length());
     }
 
-//    public Input getInput() {
-//        return input;
-//    }
-
-//    public void setInput(Input input) {
-//        this.input = input;
-//    }
-
-    public Function<String, Object> getValidatorFunction() {
-        return validatorFunction;
+    public Input getInput() {
+        return input;
     }
 
-    public void setValidatorFunction(Function<String, Object> validatorFunction) {
-        this.validatorFunction = validatorFunction;
+    public void setInput(Input input) {
+        this.input = input;
     }
 
     private final View.OnClickListener onClickListener = v -> setCursorVisible(true);
@@ -104,7 +104,7 @@ public class KeyboardlessEditText extends AppCompatEditText {
     public boolean onTouchEvent(MotionEvent event) {
         final boolean ret = super.onTouchEvent(event);
 
-        // Must be done after super.onTouchEvent()
+        // must be done after super.onTouchEvent()
         hideKeyboard();
         return ret;
     }
@@ -116,7 +116,7 @@ public class KeyboardlessEditText extends AppCompatEditText {
     }
 
     private void hideKeyboard() {
-        // Hide system keyboard
+        // hide system keyboard
         final InputMethodManager inputMethodManager = ((InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE));
         if (inputMethodManager != null && inputMethodManager.isActive(this)) {
             inputMethodManager.hideSoftInputFromWindow(getApplicationWindowToken(), 0);
@@ -127,7 +127,7 @@ public class KeyboardlessEditText extends AppCompatEditText {
         if (SHOW_SOFT_INPUT_ON_FOCUS != null) {
             invokeMethod(this, false);
         } else {
-            // Use fallback method. Not tested.
+            // use fallback method. Not tested.
             hideKeyboard();
         }
     }

@@ -34,6 +34,7 @@ public class KeyboardHandler implements View.OnFocusChangeListener, View.OnTouch
                 Editable editable = keyboardlessEditText.getText();
                 InputConnection inputConnection = view.onCreateInputConnection(new EditorInfo());
                 this.skvirrelKeyboard.show();
+                this.skvirrelKeyboard.configureSeparatorButton(keyboardlessEditText.getInput());
                 this.skvirrelKeyboard.enableDeleteButton(editable != null && StringUtils.isNotEmpty(editable.toString()));
                 this.skvirrelKeyboard.setInputConnection(inputConnection);
             } else {
@@ -51,6 +52,7 @@ public class KeyboardHandler implements View.OnFocusChangeListener, View.OnTouch
                 Editable editable = keyboardlessEditText.getText();
                 InputConnection inputConnection = view.onCreateInputConnection(new EditorInfo());
                 this.skvirrelKeyboard.show();
+                this.skvirrelKeyboard.configureSeparatorButton(keyboardlessEditText.getInput());
                 this.skvirrelKeyboard.enableDeleteButton(editable != null && StringUtils.isNotEmpty(editable.toString()));
                 this.skvirrelKeyboard.setInputConnection(inputConnection);
             }

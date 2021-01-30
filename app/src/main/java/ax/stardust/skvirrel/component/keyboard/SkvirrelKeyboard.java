@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import org.apache.commons.lang3.StringUtils;
 
 import ax.stardust.skvirrel.R;
+import ax.stardust.skvirrel.component.widget.KeyboardlessEditText;
 
 /**
  * Custom implementation of a keyboard used within the application.
@@ -106,6 +107,14 @@ public abstract class SkvirrelKeyboard extends LinearLayout implements View.OnCl
      * Set keyboard key(button values)
      */
     protected abstract void setKeyValues();
+
+    /**
+     * To configure separator character button depending on type of input, example usage
+     * could be to hide the button depending on input type
+     *
+     * @param input input type for which separator character button is configured
+     */
+    public abstract void configureSeparatorButton(KeyboardlessEditText.Input input);
 
     @Override
     public boolean onLongClick(View view) {

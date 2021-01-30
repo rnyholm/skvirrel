@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.widget.Button;
 
 import ax.stardust.skvirrel.R;
+import ax.stardust.skvirrel.component.widget.KeyboardlessEditText;
 
 /**
  * Alphanumeric keyboard implementation of the skvirrel keyboard.
@@ -203,5 +204,10 @@ public class AlphanumericKeyboard extends SkvirrelKeyboard {
         keyValues.put(R.id.alphanumeric_keyboard_button_z, "Z");
         keyValues.put(R.id.alphanumeric_keyboard_button_dot, ".");
         keyValues.put(R.id.alphanumeric_keyboard_button_dash, "-");
+    }
+
+    @Override
+    public void configureSeparatorButton(KeyboardlessEditText.Input input) {
+        // do nothing
     }
 }

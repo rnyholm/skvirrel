@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.widget.Button;
 
 import ax.stardust.skvirrel.R;
+import ax.stardust.skvirrel.component.widget.KeyboardlessEditText;
 
 /**
  * Numeric keyboard implementation of the skvirrel keyboard.
@@ -96,5 +97,15 @@ public class NumericKeyboard extends SkvirrelKeyboard {
         keyValues.put(R.id.numeric_keyboard_button_8, "8");
         keyValues.put(R.id.numeric_keyboard_button_9, "9");
         keyValues.put(R.id.numeric_keyboard_button_dot, ".");
+    }
+
+    @Override
+    public void configureSeparatorButton(KeyboardlessEditText.Input input) {
+        // hide separator button if numeric integer input
+        if (KeyboardlessEditText.Input.NUMERIC_INTEGER.equals(input)) {
+            buttonDot.setVisibility(INVISIBLE);
+        } else {
+            buttonDot.setVisibility(VISIBLE);
+        }
     }
 }

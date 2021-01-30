@@ -101,6 +101,7 @@ public class StockFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.stock_fragment, container, false);
         findViews(view);
+        setInputTypes();
         setDefaultValues();
         updateWidgets();
         setListeners();
@@ -126,6 +127,12 @@ public class StockFragment extends Fragment {
         priceAboveRadioButton = view.findViewById(R.id.price_above_rb);
         rsiAboveRadioButton = view.findViewById(R.id.rsi_above_rb);
         rsiBelowRadioButton = view.findViewById(R.id.rsi_below_rb);
+    }
+
+    private void setInputTypes() {
+        tickerEditText.setInput(KeyboardlessEditText.Input.TEXT);
+        priceEditText.setInput(KeyboardlessEditText.Input.NUMERIC_DECIMAL);
+        rsiEditText.setInput(KeyboardlessEditText.Input.NUMERIC_INTEGER);
     }
 
     private void setDefaultValues() {
