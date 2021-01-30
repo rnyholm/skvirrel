@@ -23,7 +23,6 @@ import yahoofinance.quotes.stock.StockStats;
  * A lighter and parcelable version of the {@link yahoofinance.Stock} class.
  */
 public class ParcelableStock implements Parcelable {
-
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#0.00");
     private static final DecimalFormat MARKET_CAP_BILLION_FORMAT = new DecimalFormat("###.00B");
     private static final DecimalFormat MARKET_CAP_MILLION_FORMAT = new DecimalFormat("###.00M");
@@ -170,7 +169,7 @@ public class ParcelableStock implements Parcelable {
         if (bigDecimal == null) {
             return NOT_AVAILABLE;
         }
-        return DECIMAL_FORMAT.format(bigDecimal);
+        return DECIMAL_FORMAT.format(bigDecimal).replace(",", ".");
     }
 
     private static String getMarketCapString(BigDecimal marketCap) {
@@ -180,15 +179,19 @@ public class ParcelableStock implements Parcelable {
 
         // billion
         if (marketCap.compareTo(BILLION_BIG_DECIMAL) >= 0) {
-            return MARKET_CAP_BILLION_FORMAT.format(marketCap.divide(BILLION_BIG_DECIMAL, 2, RoundingMode.DOWN));
+            return MARKET_CAP_BILLION_FORMAT
+                    .format(marketCap.divide(BILLION_BIG_DECIMAL, 2, RoundingMode.DOWN))
+                    .replace(",", ".");
         }
 
         // million
         if (marketCap.compareTo(MILLION_BIG_DECIMAL) >= 0) {
-            return MARKET_CAP_MILLION_FORMAT.format(marketCap.divide(MILLION_BIG_DECIMAL, 2, RoundingMode.DOWN));
+            return MARKET_CAP_MILLION_FORMAT
+                    .format(marketCap.divide(MILLION_BIG_DECIMAL, 2, RoundingMode.DOWN))
+                    .replace(",", ".");
         }
 
-        return MARKET_CAP_FORMAT.format(marketCap);
+        return MARKET_CAP_FORMAT.format(marketCap).replace(",", ".");
     }
 
     private static String getString(StockDividend dividend) {
@@ -200,7 +203,7 @@ public class ParcelableStock implements Parcelable {
     }
 
     private static String getString(long l) {
-        return VOLUME_FORMAT.format(l);
+        return VOLUME_FORMAT.format(l).replace(".", ",");
     }
 
     private static String getString(Calendar calendar) {

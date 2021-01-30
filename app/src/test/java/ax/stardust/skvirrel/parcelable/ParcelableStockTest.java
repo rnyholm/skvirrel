@@ -124,29 +124,27 @@ public class ParcelableStockTest {
         Mockito.when(mockedStats.getMarketCap()).thenReturn(MARKET_CAP);
 
         ParcelableStock ps = ParcelableStock.from(mockedStock);
-        char separatorCharacter = ps.getPrice().contains(".") ? '.' : ',';
 
         assertEquals(NAME, ps.getName());
         assertEquals(TICKER, ps.getTicker());
         assertEquals(STOCK_EXCHANGE, ps.getStockExchange());
         assertEquals(CURRENCY, ps.getCurrency());
-        assertEquals(replaceSeparatorCharacter(PRICE_STR, separatorCharacter), ps.getPrice());
-        assertEquals(replaceSeparatorCharacter(CHANGE_STR, separatorCharacter), ps.getChange());
-        assertEquals(replaceSeparatorCharacter(CHANGE_PERCENT_STR, separatorCharacter), ps.getChangePercent());
-        assertEquals(replaceSeparatorCharacter(PREVIOUS_CLOSE_STR, separatorCharacter), ps.getPreviousClose());
-        assertEquals(replaceSeparatorCharacter(OPEN_STR, separatorCharacter), ps.getOpen());
-        assertEquals(replaceSeparatorCharacter(LOW_STR, separatorCharacter), ps.getLow());
-        assertEquals(replaceSeparatorCharacter(HIGH_STR, separatorCharacter), ps.getHigh());
-        assertEquals(replaceSeparatorCharacter(LOW_52_WEEK_STR, separatorCharacter), ps.getLow52Week());
-        assertEquals(replaceSeparatorCharacter(HIGH_52_WEEK_STR, separatorCharacter), ps.getHigh52Week());
-        assertEquals(replaceSeparatorCharacter(MARKET_CAP_STR, separatorCharacter), ps.getMarketCap());
+        assertEquals(PRICE_STR, ps.getPrice());
+        assertEquals(CHANGE_STR, ps.getChange());
+        assertEquals(CHANGE_PERCENT_STR, ps.getChangePercent());
+        assertEquals(PREVIOUS_CLOSE_STR, ps.getPreviousClose());
+        assertEquals(OPEN_STR, ps.getOpen());
+        assertEquals(LOW_STR, ps.getLow());
+        assertEquals(HIGH_STR, ps.getHigh());
+        assertEquals(LOW_52_WEEK_STR, ps.getLow52Week());
+        assertEquals(HIGH_52_WEEK_STR, ps.getHigh52Week());
+        assertEquals(MARKET_CAP_STR, ps.getMarketCap());
         assertEquals(VOLUME_FORMAT.format(VOLUME), ps.getVolume());
         assertEquals(VOLUME_FORMAT.format(AVG_VOLUME), ps.getAvgVolume());
-        assertEquals(replaceSeparatorCharacter(PE_STR, separatorCharacter), ps.getPe());
-        assertEquals(replaceSeparatorCharacter(EPS_STR, separatorCharacter), ps.getEps());
+        assertEquals(PE_STR, ps.getPe());
+        assertEquals(EPS_STR, ps.getEps());
         assertEquals(DATE_FORMAT.format(EARNINGS.getTime()), ps.getEarnings());
-        assertEquals(String.format(DIVIDEND_FORMAT, replaceSeparatorCharacter(DIVIDEND_STR, separatorCharacter),
-                replaceSeparatorCharacter(DIVIDEND_YIELD_STR, separatorCharacter)), ps.getDividend());
+        assertEquals(String.format(DIVIDEND_FORMAT, DIVIDEND_STR, DIVIDEND_YIELD_STR), ps.getDividend());
     }
 
     @Test
@@ -196,19 +194,5 @@ public class ParcelableStockTest {
         Mockito.when(mockedStats.getMarketCap()).thenReturn(new BigDecimal("1670000000"));
         ps = ParcelableStock.from(mockedStock);
         assertTrue(ps.getMarketCap().contains("B"));
-    }
-
-    private String replaceSeparatorCharacter(String string, char newSeparatorCharacter) {
-        if (newSeparatorCharacter == '.') {
-            if (!string.contains(String.valueOf(newSeparatorCharacter))) {
-                return string.replace(',', newSeparatorCharacter);
-            }
-        } else {
-            if (!string.contains(String.valueOf(newSeparatorCharacter))) {
-                return string.replace('.', newSeparatorCharacter);
-            }
-        }
-
-        return string;
     }
 }
