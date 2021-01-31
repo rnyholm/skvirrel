@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="7dp"
-    android:background="@drawable/stock_fragment_background"
+    android:background="@drawable/stock_fragment"
     android:paddingStart="6dp"
     android:paddingTop="4dp"
     android:paddingEnd="6dp"

@@ -4,10 +4,12 @@
     <color name="colorPrimaryDark">#141414</color>
     <color name="colorAccent">#525252</color>
     <color name="colorError">#FF9999</color>
+    <color name="colorNotified">#FFE66D</color>s
     <color name="colorDisabled">#E0E0E0</color>
     <color name="colorCursor">#E0E0E0</color>
-    <color name="colorContentCardBackground">#FFFFFF</color>
-    <color name="colorContentCardBorder">#E0E0E0</color>
+    <color name="colorStockFragmentBackground">#FFFFFF</color>
+    <color name="colorStockFragmentBorder">#E0E0E0</color>
+    <color name="colorStockFragmentNotifiedBorder">#FFE66D</color>
     <color name="colorButtonText">#FAFAFA</color>
     <color name="colorButtonDisabled">#E0E0E0</color>
     <color name="colorButtonBlackDefault">#525252</color>

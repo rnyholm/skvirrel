@@ -44,7 +44,6 @@ import timber.log.Timber;
  * Fragment holding ui and data behind it for a stock monitoring.
  */
 public class StockFragment extends Fragment {
-
     // parent of fragment
     private final Skvirrel activity;
     private final AlphanumericKeyboard alphanumericKeyboard;
@@ -52,6 +51,8 @@ public class StockFragment extends Fragment {
 
     private StockMonitoring stockMonitoring;
     private DatabaseManager databaseManager;
+
+    private View fragmentView;
 
     private TextView companyTextView;
     private TextView monitoringStatusTextView;
@@ -96,16 +97,15 @@ public class StockFragment extends Fragment {
         this.numericKeyboard = numericKeyboard;
     }
 
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.stock_fragment, container, false);
-        findViews(view);
+        fragmentView = inflater.inflate(R.layout.stock_fragment, container, false);
+        findViews(fragmentView);
         setInputTypes();
         setDefaultValues();
         updateWidgets();
         setListeners();
-        return view;
+        return fragmentView;
     }
 
     private void findViews(View view) {
@@ -289,7 +289,14 @@ public class StockFragment extends Fragment {
     }
 
     private void updateNotifiedWidgets() {
+        StockMonitoring.MonitoringOptions monitoringOptions = stockMonitoring.getMonitoringOptions();
+        PriceMonitoring priceMonitoring = monitoringOptions.getPriceMonitoring();
+        RsiMonitoring rsiMonitoring = monitoringOptions.getRsiMonitoring();
+
         resetNotificationButton.setEnabled(stockMonitoring.isNotified());
+        fragmentView.setBackgroundResource(stockMonitoring.isNotified() ? R.drawable.stock_fragment_notified : R.drawable.stock_fragment);
+        priceEditText.setBackgroundResource(priceMonitoring.isNotified() ? R.drawable.input_notified : R.drawable.input_default);
+        rsiEditText.setBackgroundResource(rsiMonitoring.isNotified() ? R.drawable.input_notified : R.drawable.input_default);
     }
 
     private DatabaseManager getDatabaseManager() {
