@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import ax.stardust.skvirrel.R;
-import ax.stardust.skvirrel.parcelable.ParcelableStock;
+import ax.stardust.skvirrel.stock.parcelable.ParcelableStock;
 import ax.stardust.skvirrel.util.SkvirrelUtils;
 
 /**

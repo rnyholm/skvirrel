@@ -1,4 +1,4 @@
-package ax.stardust.skvirrel.parcelable;
+package ax.stardust.skvirrel.stock.parcelable;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -7,14 +7,21 @@ import androidx.annotation.NonNull;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
+import ax.stardust.skvirrel.service.ServiceParams;
+import ax.stardust.skvirrel.stock.indicator.RelativeStrengthIndex;
 import yahoofinance.Stock;
+import yahoofinance.histquotes.HistoricalQuote;
+import yahoofinance.histquotes.Interval;
 import yahoofinance.quotes.stock.StockDividend;
 import yahoofinance.quotes.stock.StockQuote;
 import yahoofinance.quotes.stock.StockStats;
@@ -55,6 +62,8 @@ public class ParcelableStock implements Parcelable {
     private String earnings;
     private String dividend;    // dividend and yield
 
+    private Double rsi14Close;
+
     private ParcelableStock() {
         // just empty...
     }
@@ -80,17 +89,27 @@ public class ParcelableStock implements Parcelable {
         eps = in.readString();
         earnings = in.readString();
         dividend = in.readString();
+        rsi14Close = in.readDouble();
     }
 
     /**
      * Creates a parcelable stock from given {@link yahoofinance.Stock}
      *
-     * @param stock yahoo stock from which parcelable stock is
+     * @param stock yahoo stock from which parcelable stock is created
      * @return parcelable stock
      */
-    public static ParcelableStock from(Stock stock) {
+    public static ParcelableStock from(Stock stock) throws IOException {
         StockQuote quote = stock.getQuote();
         StockStats stats = stock.getStats();
+
+        // TODO: Only fetch history if necessary
+        Calendar from = Calendar.getInstance();
+        from.add(Calendar.DATE, ServiceParams.DAYS_OF_HISTORY);
+
+        // get history from specific date and filter out any eventual null values
+        List<HistoricalQuote> historicalQuotes = stock.getHistory(from, Interval.DAILY).stream()
+                .filter(historicalQuote -> historicalQuote.getClose() != null)
+                .collect(Collectors.toList());
 
         ParcelableStock parcelableStock = new ParcelableStock();
         parcelableStock.setTicker(getString(stock.getSymbol()));
@@ -113,6 +132,7 @@ public class ParcelableStock implements Parcelable {
         parcelableStock.setEps(getString(stats.getEps()));
         parcelableStock.setEarnings(getString(stats.getEarningsAnnouncement()));
         parcelableStock.setDividend(getString(stock.getDividend()));
+        parcelableStock.setRsi14Close(calculateRsi(historicalQuotes));
 
         return parcelableStock;
     }
@@ -151,6 +171,7 @@ public class ParcelableStock implements Parcelable {
         parcel.writeString(eps);
         parcel.writeString(earnings);
         parcel.writeString(dividend);
+        parcel.writeDouble(rsi14Close);
     }
 
     @Override
@@ -212,6 +233,10 @@ public class ParcelableStock implements Parcelable {
         }
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
         return dateFormat.format(calendar.getTime());
+    }
+
+    private static Double calculateRsi(List<HistoricalQuote> historicalQuotes) {
+        return RelativeStrengthIndex.create(historicalQuotes, RelativeStrengthIndex.DEFAULT_PERIOD).getLastResult();
     }
 
     public String getTicker() {
@@ -374,6 +399,14 @@ public class ParcelableStock implements Parcelable {
         this.dividend = dividend;
     }
 
+    public Double getRsi14Close() {
+        return rsi14Close;
+    }
+
+    public void setRsi14Close(Double rsi14Close) {
+        this.rsi14Close = rsi14Close;
+    }
+
     @Override
     @NonNull
     public String toString() {
@@ -398,6 +431,7 @@ public class ParcelableStock implements Parcelable {
                 "\n\teps='" + eps + '\'' +
                 "\n\tearnings='" + earnings + '\'' +
                 "\n\tdividend='" + dividend + '\'' +
+                "\n\trsi14Close='" + rsi14Close + '\'' +
                 "\n}";
     }
 }

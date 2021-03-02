@@ -2,7 +2,7 @@ package ax.stardust.skvirrel.monitoring;
 
 import org.apache.commons.lang3.math.NumberUtils;
 
-import ax.stardust.skvirrel.parcelable.ParcelableStock;
+import ax.stardust.skvirrel.stock.parcelable.ParcelableStock;
 
 /**
  * Class representing a RSI monitoring.
@@ -54,6 +54,10 @@ public class RsiMonitoring extends AbstractMonitoring {
 
     @Override
     public boolean checkMonitoringCriteria(ParcelableStock parcelableStock) {
-        return false;
+        if (Criteria.Comparator.BELOW.equals(comparator)) {
+            return parcelableStock.getRsi14Close() <= (double) rsi;
+        }
+
+        return parcelableStock.getRsi14Close() >= (double) rsi;
     }
 }

@@ -1,4 +1,4 @@
-package ax.stardust.skvirrel.parcelable;
+package ax.stardust.skvirrel.stock.parcelable;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -7,13 +7,16 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
+import ax.stardust.skvirrel.test.util.SkvirrelTestUtils;
 import yahoofinance.Stock;
+import yahoofinance.histquotes.Interval;
 import yahoofinance.quotes.stock.StockDividend;
 import yahoofinance.quotes.stock.StockQuote;
 import yahoofinance.quotes.stock.StockStats;
@@ -75,7 +78,7 @@ public class ParcelableStockTest {
     private static StockDividend mockedDividend;
 
     @BeforeClass
-    public static void setUp() {
+    public static void setUp() throws IOException {
         mockedStock = Mockito.mock(Stock.class);
         mockedQuote = Mockito.mock(StockQuote.class);
         mockedStats = Mockito.mock(StockStats.class);
@@ -107,6 +110,8 @@ public class ParcelableStockTest {
         Mockito.when(mockedStock.getQuote()).thenReturn(mockedQuote);
         Mockito.when(mockedStock.getStats()).thenReturn(mockedStats);
         Mockito.when(mockedStock.getDividend()).thenReturn(mockedDividend);
+        Mockito.when(mockedStock.getHistory(Mockito.any(Calendar.class), Mockito.any(Interval.class)))
+                .thenReturn(SkvirrelTestUtils.getMockedHistoricalQuotes());
     }
 
     @AfterClass
@@ -118,7 +123,7 @@ public class ParcelableStockTest {
     }
 
     @Test
-    public void testFromBasics() {
+    public void testFromBasics() throws IOException {
         Mockito.when(mockedDividend.getAnnualYield()).thenReturn(DIVIDEND);
         Mockito.when(mockedDividend.getAnnualYieldPercent()).thenReturn(DIVIDEND_YIELD);
         Mockito.when(mockedStats.getMarketCap()).thenReturn(MARKET_CAP);
@@ -148,7 +153,7 @@ public class ParcelableStockTest {
     }
 
     @Test
-    public void testFromMissingDividend() {
+    public void testFromMissingDividend() throws IOException {
         Mockito.when(mockedStock.getDividend()).thenReturn(null);
         ParcelableStock ps = ParcelableStock.from(mockedStock);
         assertEquals(NOT_AVAILABLE, ps.getDividend());
@@ -166,7 +171,7 @@ public class ParcelableStockTest {
     }
 
     @Test
-    public void testFromMarketCapFormatting() {
+    public void testFromMarketCapFormatting() throws IOException {
         Mockito.when(mockedStats.getMarketCap()).thenReturn(BigDecimal.ONE);
         ParcelableStock ps = ParcelableStock.from(mockedStock);
         assertEquals("1", ps.getMarketCap());

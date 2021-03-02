@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ax.stardust.skvirrel.R;
+import ax.stardust.skvirrel.test.util.SkvirrelTestUtils;
 
 import static org.junit.Assert.assertEquals;
 
@@ -44,5 +45,14 @@ public class SkvirrelUtilsTest {
         strings.add("runs");
         strings.add("jumps");
         assertEquals("the, little, fox, runs and jumps", SkvirrelUtils.join(mockContext, strings));
+    }
+
+    @Test
+    public void testRound() {
+        assertEquals(1.00, SkvirrelUtils.round(1), SkvirrelTestUtils.DELTA);
+        assertEquals(-1.00, SkvirrelUtils.round(-1), SkvirrelTestUtils.DELTA);
+        assertEquals(1000.00, SkvirrelUtils.round(999.999), SkvirrelTestUtils.DELTA);
+        assertEquals(89.95, SkvirrelUtils.round(89.951), SkvirrelTestUtils.DELTA);
+        assertEquals(89.96, SkvirrelUtils.round(89.956), SkvirrelTestUtils.DELTA);
     }
 }

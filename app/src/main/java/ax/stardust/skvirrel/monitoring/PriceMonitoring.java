@@ -4,7 +4,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 
 import java.text.DecimalFormat;
 
-import ax.stardust.skvirrel.parcelable.ParcelableStock;
+import ax.stardust.skvirrel.stock.parcelable.ParcelableStock;
 
 /**
  * Class representing a price monitoring.

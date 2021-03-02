@@ -2,6 +2,7 @@ package ax.stardust.skvirrel.util;
 
 import android.content.Context;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import ax.stardust.skvirrel.R;
@@ -10,6 +11,8 @@ import ax.stardust.skvirrel.R;
  * Class containing static utility methods.
  */
 public class SkvirrelUtils {
+
+    private static final int NUMBER_OF_DECIMALS = 2;
 
     /**
      * Joins given list of strings into a list of format: one, two and three
@@ -32,5 +35,18 @@ public class SkvirrelUtils {
         }
 
         return list.get(0);
+    }
+
+    /**
+     * Rounds given double value to a double with two decimals. Rounding is done using
+     * {@link BigDecimal#ROUND_HALF_UP}
+     *
+     * @param value value to round
+     * @return rounded double
+     */
+    public static double round(double value) {
+        BigDecimal bigDecimal = new BigDecimal(value);
+        bigDecimal = bigDecimal.setScale(NUMBER_OF_DECIMALS, BigDecimal.ROUND_HALF_UP);
+        return bigDecimal.doubleValue();
     }
 }

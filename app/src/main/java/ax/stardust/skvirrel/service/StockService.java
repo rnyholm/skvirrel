@@ -14,7 +14,7 @@ import java.util.Objects;
 
 import ax.stardust.skvirrel.exception.StockNotFoundException;
 import ax.stardust.skvirrel.exception.StockServiceException;
-import ax.stardust.skvirrel.parcelable.ParcelableStock;
+import ax.stardust.skvirrel.stock.parcelable.ParcelableStock;
 import ax.stardust.skvirrel.receiver.MonitoringReceiver;
 import timber.log.Timber;
 import yahoofinance.Stock;

@@ -8,6 +8,10 @@ public class ServiceParams {
     public static final int MONITORING_JOB_SERVICE_ID = 0;
     public static final int STOCK_SERVICE_ID = 1;
 
+    // Number of days to fetch historical quotes from yahoo finance for the different
+    // stock indicators
+    public static final int DAYS_OF_HISTORY = -200;
+
     public static final String STOCK_SERVICE = "stock_service";
     public static final String PENDING_RESULT = "pending_result";
     public static final String ERROR_SITUATION = "error_situation";

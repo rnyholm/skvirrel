@@ -16,7 +16,7 @@ import ax.stardust.skvirrel.BuildConfig;
 import ax.stardust.skvirrel.monitoring.AbstractMonitoring;
 import ax.stardust.skvirrel.monitoring.StockMonitoring;
 import ax.stardust.skvirrel.notification.NotificationHandler;
-import ax.stardust.skvirrel.parcelable.ParcelableStock;
+import ax.stardust.skvirrel.stock.parcelable.ParcelableStock;
 import ax.stardust.skvirrel.persistence.DatabaseManager;
 import ax.stardust.skvirrel.service.ServiceParams;
 import timber.log.Timber;
