@@ -92,18 +92,23 @@ public class NotificationHandler {
             // get joined notification text
             String notificationText = SkvirrelUtils.join(context, notificationTexts);
 
+            // get time for notification
+            long currentTimeMillis = System.currentTimeMillis();
+
             // build up the notification
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_notification)
-                    .setContentTitle(context.getString(R.string.notification_title, stockMonitoring.getCompanyName()))
+                    .setContentTitle(context.getString(R.string.notification_title, stockMonitoring.getTicker()))
                     .setContentText(notificationText)
+                    .setWhen(currentTimeMillis)
                     .setPriority(NotificationCompat.PRIORITY_MAX)
+                    .setLights(0xFF0000FF, 150, 400)
                     // Set the intent that will fire when the user taps the notification
                     .setContentIntent(pendingIntent)
                     .setAutoCancel(true);
 
             NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
-            notificationManager.notify((int) System.currentTimeMillis(), builder.build());
+            notificationManager.notify((int) currentTimeMillis, builder.build()); // use current time as id
 
             // at last mark the "triggered" as notified and update to db
             abstractMonitorings.forEach(AbstractMonitoring::notifyy);
