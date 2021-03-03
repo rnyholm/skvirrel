@@ -289,14 +289,8 @@ public class StockFragment extends Fragment {
     }
 
     private void updateNotifiedWidgets() {
-        StockMonitoring.MonitoringOptions monitoringOptions = stockMonitoring.getMonitoringOptions();
-        PriceMonitoring priceMonitoring = monitoringOptions.getPriceMonitoring();
-        RsiMonitoring rsiMonitoring = monitoringOptions.getRsiMonitoring();
-
         resetNotificationButton.setEnabled(stockMonitoring.isNotified());
         fragmentView.setBackgroundResource(stockMonitoring.isNotified() ? R.drawable.stock_fragment_notified : R.drawable.stock_fragment);
-        priceEditText.setBackgroundResource(priceMonitoring.isNotified() ? R.drawable.input_notified : R.drawable.input_default);
-        rsiEditText.setBackgroundResource(rsiMonitoring.isNotified() ? R.drawable.input_notified : R.drawable.input_default);
     }
 
     private DatabaseManager getDatabaseManager() {
