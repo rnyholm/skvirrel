@@ -4,7 +4,9 @@ import org.apache.commons.lang3.math.NumberUtils;
 
 import java.text.DecimalFormat;
 
+import ax.stardust.skvirrel.exception.MonitoringException;
 import ax.stardust.skvirrel.stock.parcelable.ParcelableStock;
+import timber.log.Timber;
 
 /**
  * Class representing a price monitoring.
@@ -55,7 +57,13 @@ public class PriceMonitoring extends AbstractMonitoring {
 
     @Override
     public boolean checkMonitoringCriteria(ParcelableStock parcelableStock) {
-        double stockPrice = Double.parseDouble(parcelableStock.getPrice());
+        double stockPrice = parcelableStock.getPrice();
+
+        if (Double.isNaN(stockPrice)) {
+            MonitoringException exception = new MonitoringException("Price of parcelable stock is NaN");
+            Timber.e(exception, "Unable to check monitoring criteria");
+            throw exception;
+        }
 
         if (Criteria.Comparator.BELOW.equals(comparator)) {
             return stockPrice <= price;

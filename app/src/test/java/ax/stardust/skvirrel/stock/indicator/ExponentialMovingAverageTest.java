@@ -32,7 +32,6 @@ public class ExponentialMovingAverageTest {
         assertEquals(35.37, ema.getLastResult(), SkvirrelTestUtils.DELTA);
 
         ema = ExponentialMovingAverage.create(SkvirrelTestUtils.getMockedHistoricalQuotes(), 19);
-        System.out.println(ema);
 
         results = ema.getResults();
         assertEquals(0.00, results[0], SkvirrelTestUtils.DELTA);

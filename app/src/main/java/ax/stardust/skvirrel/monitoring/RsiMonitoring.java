@@ -55,9 +55,9 @@ public class RsiMonitoring extends AbstractMonitoring {
     @Override
     public boolean checkMonitoringCriteria(ParcelableStock parcelableStock) {
         if (Criteria.Comparator.BELOW.equals(comparator)) {
-            return parcelableStock.getRsi14Close() <= (double) rsi;
+            return parcelableStock.getRsi14Close() <= rsi;
         }
 
-        return parcelableStock.getRsi14Close() >= (double) rsi;
+        return parcelableStock.getRsi14Close() >= rsi;
     }
 }
