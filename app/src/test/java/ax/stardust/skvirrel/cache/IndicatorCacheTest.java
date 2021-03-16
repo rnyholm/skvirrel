@@ -26,8 +26,7 @@ public class IndicatorCacheTest {
         assertEquals(timeInMillis, indicatorCache.getExpires().getTime());
 
         indicatorCache.setExpires(calendar.getTime());
-        assertEquals(timeInMillis + (60 * 1000 * IndicatorCache.TIME_TO_LIVE_DEBUG),
-                indicatorCache.getExpires().getTime());
+        assertTrue(indicatorCache.getExpires().getTime() > timeInMillis);
     }
 
     @Test
@@ -45,12 +44,12 @@ public class IndicatorCacheTest {
         assertTrue(indicatorCache.needsRefresh());
 
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MINUTE, -10);
+        calendar.add(Calendar.HOUR, -10);
 
         indicatorCache.setExpires(calendar.getTime());
         assertTrue(indicatorCache.needsRefresh());
 
-        calendar.add(Calendar.MINUTE, 20);
+        calendar.add(Calendar.HOUR, 20);
 
         indicatorCache.setExpires(calendar.getTime());
         assertFalse(indicatorCache.needsRefresh());
@@ -62,12 +61,12 @@ public class IndicatorCacheTest {
         assertTrue(indicatorCache.hasExpired());
 
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MINUTE, -10);
+        calendar.add(Calendar.HOUR, -10);
 
         indicatorCache.setExpires(calendar.getTime());
         assertTrue(indicatorCache.hasExpired());
 
-        calendar.add(Calendar.MINUTE, 20);
+        calendar.add(Calendar.HOUR, 20);
 
         indicatorCache.setExpires(calendar.getTime());
         assertFalse(indicatorCache.hasExpired());

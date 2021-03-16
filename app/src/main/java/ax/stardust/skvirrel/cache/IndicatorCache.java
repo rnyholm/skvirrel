@@ -12,8 +12,8 @@ import ax.stardust.skvirrel.util.SkvirrelUtils;
 public class IndicatorCache {
 
     // time to live for this cache in minutes
-    public static final int TIME_TO_LIVE_DEBUG = 10;
-    public static final int TIME_TO_LIVE_RELEASE = 60;
+    private static final int TIME_TO_LIVE_DEBUG = 10;
+    private static final int TIME_TO_LIVE_RELEASE = 60;
 
     private long id;
 
