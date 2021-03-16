@@ -33,14 +33,14 @@ public class DatabaseManagerTest {
     @BeforeClass
     public static void setUp() {
         mockedDatabaseManager = Mockito.mock(DatabaseManager.class);
-        Mockito.when(mockedDatabaseManager.fetchAllForMonitoring()).thenCallRealMethod();
+        Mockito.when(mockedDatabaseManager.fetchAllStockMonitoringsForMonitoring()).thenCallRealMethod();
         Mockito.when(mockedDatabaseManager.fetchAllTickersForMonitoring()).thenCallRealMethod();
-        Mockito.when(mockedDatabaseManager.fetchAll()).thenReturn(provideMockStockMonitorings());
+        Mockito.when(mockedDatabaseManager.fetchAllStockMonitorings()).thenReturn(provideMockStockMonitorings());
     }
 
     @Test
     public void testFetchAllForMonitoring() {
-        List<StockMonitoring> stockMonitorings = mockedDatabaseManager.fetchAllForMonitoring();
+        List<StockMonitoring> stockMonitorings = mockedDatabaseManager.fetchAllStockMonitoringsForMonitoring();
         assertNotNull(stockMonitorings);
         assertEquals(3, stockMonitorings.size());
 

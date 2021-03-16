@@ -77,7 +77,7 @@ public class StockService extends JobIntentService {
                     stock = YahooFinance.get(Objects.requireNonNull(intent.getStringExtra(ServiceParams.RequestExtra.TICKER)));
                     validateStock(stock);
 
-                    result.putExtra(ServiceParams.ResultExtra.STOCK_INFO, ParcelableStock.from(stock));
+                    result.putExtra(ServiceParams.ResultExtra.STOCK_INFO, ParcelableStock.from(this, stock));
                     sendReply(reply, ServiceParams.ResultCode.SUCCESS, result);
 
                     Timber.d("onHandleWork: Successfully fetched stock: %s", stock.getName());
@@ -92,7 +92,7 @@ public class StockService extends JobIntentService {
                             try {
                                 Stock s = YahooFinance.get(Objects.requireNonNull(ticker));
                                 validateStock(s);
-                                parcelableStocks.add(ParcelableStock.from(s));
+                                parcelableStocks.add(ParcelableStock.from(this, s));
                             } catch (Exception e) {
                                 Timber.e(e, "onHandleWork: Something went wrong while fetching stock info for ticker: %s", ticker);
                             }

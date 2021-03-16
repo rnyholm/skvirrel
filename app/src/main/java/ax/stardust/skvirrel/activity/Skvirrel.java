@@ -21,6 +21,7 @@ import ax.stardust.skvirrel.fragment.StockFragment;
 import ax.stardust.skvirrel.monitoring.StockMonitoring;
 import ax.stardust.skvirrel.persistence.DatabaseManager;
 import ax.stardust.skvirrel.service.ServiceParams;
+import ax.stardust.skvirrel.cache.CacheManager;
 import timber.log.Timber;
 
 /**
@@ -35,6 +36,7 @@ public class Skvirrel extends AppCompatActivity {
     private NumericKeyboard numericKeyboard;
 
     private DatabaseManager databaseManager;
+    private CacheManager cacheManager;
 
     private Button addStockMonitoringButton;
 
@@ -52,6 +54,14 @@ public class Skvirrel extends AppCompatActivity {
         addStockFragments();
         setListeners();
         toggleGettingStartedTextView();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // suitable place to maintain indicator cache a bit
+        getCacheManager().cleanIndicatorCache();
     }
 
     @Override
@@ -75,7 +85,7 @@ public class Skvirrel extends AppCompatActivity {
     }
 
     private void addStockFragments() {
-        stockMonitorings = getDatabaseManager().fetchAll();
+        stockMonitorings = getDatabaseManager().fetchAllStockMonitorings();
         stockMonitorings.forEach(this::addStockFragment);
     }
 
@@ -117,7 +127,7 @@ public class Skvirrel extends AppCompatActivity {
         }
 
         // remove stock monitoring from db and list of stock monitoring within this object
-        getDatabaseManager().delete(stockMonitoring.getId());
+        getDatabaseManager().delete(stockMonitoring);
         stockMonitorings.remove(stockMonitoring);
 
         // at last toggle getting started text views visibility
@@ -135,6 +145,13 @@ public class Skvirrel extends AppCompatActivity {
             databaseManager = new DatabaseManager(this);
         }
         return databaseManager;
+    }
+
+    private CacheManager getCacheManager() {
+        if (cacheManager == null) {
+            cacheManager = new CacheManager(this);
+        }
+        return cacheManager;
     }
 
     @Override

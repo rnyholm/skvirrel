@@ -11,8 +11,10 @@ import com.google.gson.GsonBuilder;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
+import ax.stardust.skvirrel.cache.IndicatorCache;
 import ax.stardust.skvirrel.monitoring.AbstractMonitoring;
 import ax.stardust.skvirrel.monitoring.StockMonitoring;
 import ax.stardust.skvirrel.persistence.gson.AbstractMonitoringJsonAdapter;
@@ -46,7 +48,8 @@ public class DatabaseManager {
      */
     public StockMonitoring insert(StockMonitoring stockMonitoring) {
         TransactionHandler.runInTransaction(context, database -> {
-            long id = database.insert(DatabaseHelper.TABLE_NAME, null, getContentValues(stockMonitoring));
+            long id = database.insert(DatabaseHelper.STOCK_MONITORING_TABLE_NAME,
+                    null, getContentValues(stockMonitoring));
             stockMonitoring.setId(id);
 
             Timber.d("Stock monitoring with id: %s and ticker: %s inserted",
@@ -58,6 +61,26 @@ public class DatabaseManager {
     }
 
     /**
+     * Inserts a new indicator cache into database
+     *
+     * @param indicatorCache indicator cache to insert
+     * @return inserted indicator cache with the newly created id after insertion
+     */
+    public IndicatorCache insert(IndicatorCache indicatorCache) {
+        TransactionHandler.runInTransaction(context, database -> {
+            long id = database.insert(DatabaseHelper.INDICATOR_CACHE_TABLE_NAME,
+                    null, getContentValues(indicatorCache));
+            indicatorCache.setId(id);
+
+            Timber.d("Indicator cache with id: %s and ticker: %s inserted",
+                    indicatorCache.getId(),
+                    indicatorCache.getTicker());
+        });
+
+        return indicatorCache;
+    }
+
+    /**
      * Updates stock monitoring
      *
      * @param stockMonitoring stock monitoring to be updated
@@ -66,8 +89,8 @@ public class DatabaseManager {
     public StockMonitoring update(StockMonitoring stockMonitoring) {
         TransactionHandler.runInTransaction(context, database -> {
             // ignore result on update, it's always 0
-            database.update(DatabaseHelper.TABLE_NAME, getContentValues(stockMonitoring),
-                    DatabaseHelper.ID + " = ?", new String[]{String.valueOf(stockMonitoring.getId())});
+            database.update(DatabaseHelper.STOCK_MONITORING_TABLE_NAME, getContentValues(stockMonitoring),
+                    DatabaseHelper.ID_COLUMN + " = ?", new String[]{String.valueOf(stockMonitoring.getId())});
 
             Timber.d("Stock monitoring with id: %s and ticker: %s updated",
                     stockMonitoring.getId(),
@@ -78,16 +101,36 @@ public class DatabaseManager {
     }
 
     /**
+     * Updates indicator cache
+     *
+     * @param indicatorCache indicator cache to be updated
+     * @return updated indicator cache
+     */
+    public IndicatorCache update(IndicatorCache indicatorCache) {
+        TransactionHandler.runInTransaction(context, database -> {
+            // ignore results on update, it's always 0
+            database.update(DatabaseHelper.INDICATOR_CACHE_TABLE_NAME, getContentValues(indicatorCache),
+                    DatabaseHelper.ID_COLUMN + " = ?", new String[]{String.valueOf(indicatorCache.getId())});
+
+            Timber.d("Indicator cache with id: %s and ticker: %s updated",
+                    indicatorCache.getId(),
+                    indicatorCache.getTicker());
+        });
+
+        return indicatorCache;
+    }
+
+    /**
      * Fetch all stock monitorings that exists in database
      *
      * @return list of all stock monitorings existing in database
      */
     @SuppressLint("StringFormatInTimber")
-    public List<StockMonitoring> fetchAll() {
+    public List<StockMonitoring> fetchAllStockMonitorings() {
         List<StockMonitoring> stockMonitorings = new ArrayList<>();
 
         TransactionHandler.runInTransaction(context, database -> {
-            Cursor cursor = database.rawQuery(DatabaseHelper.SELECT_ALL, null);
+            Cursor cursor = database.rawQuery(DatabaseHelper.SELECT_ALL_FROM_STOCK_MONITORING_TABLE, null);
             if (cursor != null) {
                 if (cursor.moveToFirst()) {
                     do {
@@ -113,8 +156,8 @@ public class DatabaseManager {
      *
      * @return list of stock monitorings that should be monitored
      */
-    public List<StockMonitoring> fetchAllForMonitoring() {
-        return fetchAll().stream()
+    public List<StockMonitoring> fetchAllStockMonitoringsForMonitoring() {
+        return fetchAllStockMonitorings().stream()
                 .filter(StockMonitoring::hasValidDataForMonitoring)
                 .filter(StockMonitoring::shouldBeMonitored)
                 .collect(Collectors.toList());
@@ -126,49 +169,141 @@ public class DatabaseManager {
      * @return array list of tickers that should be monitored
      */
     public ArrayList<String> fetchAllTickersForMonitoring() {
-        return fetchAllForMonitoring().stream()
+        return fetchAllStockMonitoringsForMonitoring().stream()
                 .map(StockMonitoring::getTicker)
                 .distinct()
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
-     * Deletes stock monitoring with given id
+     * Fetch all indicator caches that exists in database
      *
-     * @param id id of stock monitoring to be deleted
+     * @return list of all indicator caches existing in database
      */
-    public void delete(long id) {
+    @SuppressLint("StringFormatInTimber")
+    public List<IndicatorCache> fetchAllIndicatorCaches() {
+        List<IndicatorCache> indicatorCaches = new ArrayList<>();
+
+        TransactionHandler.runInTransaction(context, database -> {
+            Cursor cursor = database.rawQuery(DatabaseHelper.SELECT_ALL_FROM_INDICATOR_CACHE_TABLE, null);
+            if (cursor != null) {
+                if (cursor.moveToFirst()) {
+                    do {
+                        indicatorCaches.add(getIndicatorCache(cursor));
+                    } while (cursor.moveToNext());
+                }
+
+                cursor.close();
+            }
+
+            Timber.d("Indicator caches fetched with id's and tickers: %s",
+                    indicatorCaches.stream()
+                            .map(ic -> String.format("%s(%s)", ic.getId(), ic.getTicker()))
+                            .collect(Collectors.joining(", ")));
+        });
+
+        return indicatorCaches;
+    }
+
+    /**
+     * Fetch indicator cache for given ticker
+     *
+     * @param ticker ticker for which indicator cache is to be fetched
+     * @return indicator cache for ticker or null if it doesn't exist
+     */
+    public IndicatorCache fetchIndicatorCacheForTicker(String ticker) {
+        AtomicReference<IndicatorCache> indicatorCacheReference = new AtomicReference<>();
+
+        TransactionHandler.runInTransaction(context, database -> {
+            Cursor cursor = database.rawQuery(DatabaseHelper.SELECT_ALL_FOR_TICKER_FROM_INDICATOR_CACHE_TABLE, new String[]{ticker});
+            if (cursor != null) {
+                if (cursor.moveToFirst()) { // should only be one row cause of unique constraint on column ticker
+                    IndicatorCache indicatorCache = getIndicatorCache(cursor);
+                    indicatorCacheReference.set(indicatorCache);
+
+                    Timber.d("Indicator cache fetched with id:%s and ticker: %s",
+                            indicatorCache.getId(), indicatorCache.getTicker());
+                }
+                cursor.close();
+            }
+        });
+
+        return indicatorCacheReference.get();
+    }
+
+    /**
+     * Deletes stock monitoring
+     *
+     * @param stockMonitoring stock monitoring to be deleted
+     */
+    public void delete(StockMonitoring stockMonitoring) {
         TransactionHandler.runInTransaction(context, database -> {
             // returns rows affected by operation, for now we ignore it
-            database.delete(DatabaseHelper.TABLE_NAME, DatabaseHelper.ID + " = ?", new String[]{String.valueOf(id)});
+            database.delete(DatabaseHelper.STOCK_MONITORING_TABLE_NAME,
+                    DatabaseHelper.ID_COLUMN + " = ?", new String[]{String.valueOf(stockMonitoring.getId())});
 
-            Timber.d("Stock monitoring with id: %s deleted", id);
+            Timber.d("Stock monitoring with id: %s and ticker: %s deleted",
+                    stockMonitoring.getId(),
+                    stockMonitoring.getTicker());
+        });
+    }
+
+    /**
+     * Deletes indicator cache
+     *
+     * @param indicatorCache indicator cache to be deleted
+     */
+    public void delete(IndicatorCache indicatorCache) {
+        TransactionHandler.runInTransaction(context, database -> {
+            // returns row affected by operation, for now we ignore it
+            database.delete(DatabaseHelper.INDICATOR_CACHE_TABLE_NAME,
+                    DatabaseHelper.ID_COLUMN + " = ?", new String[]{String.valueOf(indicatorCache.getId())});
+
+            Timber.d("Indicator cache with id: %s and ticker: %S deleted",
+                    indicatorCache.getId(),
+                    indicatorCache.getTicker());
         });
     }
 
     private ContentValues getContentValues(StockMonitoring stockMonitoring) {
         ContentValues contentValues = new ContentValues();
-        contentValues.put(DatabaseHelper.TICKER, stockMonitoring.getTicker());
-        contentValues.put(DatabaseHelper.COMPANY_NAME, stockMonitoring.getCompanyName());
-        contentValues.put(DatabaseHelper.MONITORING_OPTIONS, gson.toJson(stockMonitoring.getMonitoringOptions()));
-        contentValues.put(DatabaseHelper.VIEW_STATE, stockMonitoring.getViewState().name());
-        contentValues.put(DatabaseHelper.SORTING_ORDER, stockMonitoring.getSortingOrder());
+        contentValues.put(DatabaseHelper.TICKER_COLUMN, stockMonitoring.getTicker());
+        contentValues.put(DatabaseHelper.COMPANY_NAME_COLUMN, stockMonitoring.getCompanyName());
+        contentValues.put(DatabaseHelper.MONITORING_OPTIONS_COLUMN, gson.toJson(stockMonitoring.getMonitoringOptions()));
+        contentValues.put(DatabaseHelper.VIEW_STATE_COLUMN, stockMonitoring.getViewState().name());
+        contentValues.put(DatabaseHelper.SORTING_ORDER_COLUMN, stockMonitoring.getSortingOrder());
+
+        return contentValues;
+    }
+
+    private ContentValues getContentValues(IndicatorCache indicatorCache) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(DatabaseHelper.TICKER_COLUMN, indicatorCache.getTicker());
+        contentValues.put(DatabaseHelper.SMA_COLUMN, indicatorCache.getSma());
+        contentValues.put(DatabaseHelper.EMA_COLUMN, indicatorCache.getEma());
+        contentValues.put(DatabaseHelper.RSI_COLUMN, indicatorCache.getRsi());
+
+        if (indicatorCache.getExpires() != null) {
+            contentValues.put(DatabaseHelper.EXPIRES_COLUMN, indicatorCache.getExpires().getTime());
+        } else {
+            contentValues.put(DatabaseHelper.EXPIRES_COLUMN, Integer.MIN_VALUE);
+        }
 
         return contentValues;
     }
 
     private StockMonitoring getStockMonitoring(Cursor cursor) {
-        StockMonitoring stockMonitoring = new StockMonitoring(cursor.getInt(cursor.getColumnIndex(DatabaseHelper.ID)));
-        stockMonitoring.setTicker(cursor.getString(cursor.getColumnIndex(DatabaseHelper.TICKER)));
-        stockMonitoring.setCompanyName(cursor.getString(cursor.getColumnIndex(DatabaseHelper.COMPANY_NAME)));
-        stockMonitoring.setViewState(StockMonitoring.ViewState.valueOf(cursor.getString(cursor.getColumnIndex(DatabaseHelper.VIEW_STATE))));
-        stockMonitoring.setSortingOrder(cursor.getInt(cursor.getColumnIndex(DatabaseHelper.SORTING_ORDER)));
+        StockMonitoring stockMonitoring = new StockMonitoring(cursor.getInt(cursor.getColumnIndex(DatabaseHelper.ID_COLUMN)));
+        stockMonitoring.setTicker(cursor.getString(cursor.getColumnIndex(DatabaseHelper.TICKER_COLUMN)));
+        stockMonitoring.setCompanyName(cursor.getString(cursor.getColumnIndex(DatabaseHelper.COMPANY_NAME_COLUMN)));
+        stockMonitoring.setViewState(StockMonitoring.ViewState.valueOf(cursor.getString(cursor.getColumnIndex(DatabaseHelper.VIEW_STATE_COLUMN))));
+        stockMonitoring.setSortingOrder(cursor.getInt(cursor.getColumnIndex(DatabaseHelper.SORTING_ORDER_COLUMN)));
 
         // special handling for monitoring options as the specific monitorings within it should
         // hold a reference to the stock monitoring that owns it, and this reference is not
         // serializable which means we must set it manual
         StockMonitoring.MonitoringOptions monitoringOptions = gson.fromJson(
-                cursor.getString(cursor.getColumnIndex(DatabaseHelper.MONITORING_OPTIONS)),
+                cursor.getString(cursor.getColumnIndex(DatabaseHelper.MONITORING_OPTIONS_COLUMN)),
                 StockMonitoring.MonitoringOptions.class);
         monitoringOptions.setStockMonitoring(stockMonitoring);
 
@@ -176,5 +311,17 @@ public class DatabaseManager {
         stockMonitoring.setMonitoringOptions(monitoringOptions);
 
         return stockMonitoring;
+    }
+
+    private IndicatorCache getIndicatorCache(Cursor cursor) {
+        IndicatorCache indicatorCache = new IndicatorCache(
+                cursor.getInt(cursor.getColumnIndex(DatabaseHelper.ID_COLUMN)),
+                cursor.getString(cursor.getColumnIndex(DatabaseHelper.TICKER_COLUMN)));
+        indicatorCache.setSma(cursor.getDouble(cursor.getColumnIndex(DatabaseHelper.SMA_COLUMN)));
+        indicatorCache.setEma(cursor.getDouble(cursor.getColumnIndex(DatabaseHelper.EMA_COLUMN)));
+        indicatorCache.setRsi(cursor.getDouble(cursor.getColumnIndex(DatabaseHelper.RSI_COLUMN)));
+        indicatorCache.setExpires(cursor.getLong(cursor.getColumnIndex(DatabaseHelper.EXPIRES_COLUMN)));
+
+        return indicatorCache;
     }
 }

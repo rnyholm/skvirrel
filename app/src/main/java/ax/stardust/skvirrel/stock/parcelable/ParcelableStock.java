@@ -1,5 +1,7 @@
 package ax.stardust.skvirrel.stock.parcelable;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -16,11 +18,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+import ax.stardust.skvirrel.cache.CacheManager;
+import ax.stardust.skvirrel.cache.IndicatorCache;
+import ax.stardust.skvirrel.exception.StockServiceException;
 import ax.stardust.skvirrel.service.ServiceParams;
 import ax.stardust.skvirrel.stock.indicator.ExponentialMovingAverage;
 import ax.stardust.skvirrel.stock.indicator.RelativeStrengthIndex;
 import ax.stardust.skvirrel.stock.indicator.SimpleMovingAverage;
 import ax.stardust.skvirrel.util.SkvirrelUtils;
+import timber.log.Timber;
 import yahoofinance.Stock;
 import yahoofinance.histquotes.HistoricalQuote;
 import yahoofinance.histquotes.Interval;
@@ -120,25 +126,29 @@ public class ParcelableStock implements Parcelable {
     /**
      * Creates a parcelable stock from given {@link yahoofinance.Stock}
      *
-     * @param stock yahoo stock from which parcelable stock is created
+     * @param context context for which parcelable stock is created from
+     * @param stock   yahoo stock from which parcelable stock is created
      * @return parcelable stock
      */
-    public static ParcelableStock from(Stock stock) throws IOException {
+    @SuppressLint("BinaryOperationInTimber")
+    public static ParcelableStock from(Context context, Stock stock) throws IOException {
         StockQuote quote = stock.getQuote();
         StockStats stats = stock.getStats();
         StockDividend dividend = stock.getDividend();
 
-        // TODO: Only fetch history if necessary
-        Calendar from = Calendar.getInstance();
-        from.add(Calendar.DATE, ServiceParams.DAYS_OF_HISTORY);
+        // resolve ticker
+        String ticker = getString(stock.getSymbol());
 
-        // get history from specific date and filter out any eventual null values
-        List<HistoricalQuote> historicalQuotes = stock.getHistory(from, Interval.DAILY).stream()
-                .filter(historicalQuote -> historicalQuote.getClose() != null)
-                .collect(Collectors.toList());
+        // and validate it, this should NOT happen, and if it does abort mission
+        if (NOT_AVAILABLE.equals(ticker)) {
+            StockServiceException exception = new StockServiceException(
+                    String.format("Resolved ticker is: %s, abort further handling", ticker));
+            Timber.e(exception, "Unable to create parcelable stock");
+            throw exception;
+        }
 
         ParcelableStock parcelableStock = new ParcelableStock();
-        parcelableStock.setTicker(getString(stock.getSymbol()));
+        parcelableStock.setTicker(ticker);
         parcelableStock.setName(getString(stock.getName()));
         parcelableStock.setStockExchange(getString(stock.getStockExchange()));
         parcelableStock.setCurrency(getString(stock.getCurrency()));
@@ -161,17 +171,43 @@ public class ParcelableStock implements Parcelable {
         // only set dividend data if enough data exists
         if (dividend == null ||
                 (dividend.getAnnualYield() == null || dividend.getAnnualYieldPercent() == null)) {
-            parcelableStock.setAnnualYield(Double.NaN);
-            parcelableStock.setAnnualYieldPercent(Double.NaN);
+            parcelableStock.setAnnualYield(SkvirrelUtils.UNSET);
+            parcelableStock.setAnnualYieldPercent(SkvirrelUtils.UNSET);
         } else {
             parcelableStock.setAnnualYield(getDouble(dividend.getAnnualYield()));
             parcelableStock.setAnnualYieldPercent(getDouble(dividend.getAnnualYieldPercent()));
         }
 
-        // do some calculation of some indicator data
-        parcelableStock.setSma50Close(calculateSma50Close(historicalQuotes));
-        parcelableStock.setEma50Close(calculateEma50Close(historicalQuotes));
-        parcelableStock.setRsi14Close(calculateRsi14Close(historicalQuotes));
+        CacheManager cacheManager = new CacheManager(context);
+        IndicatorCache indicatorCache = cacheManager.getIndicatorCache(ticker);
+
+        // fetch further data from yahoo finance if refresh of cache is needed
+        if (indicatorCache.needsRefresh()) {
+            Timber.d("Indicator cache for ticker: %s needs to be refreshed, fetching "
+                    + "fresh data from yahoo finance and make needed calculations", indicatorCache.getTicker());
+
+            Calendar from = Calendar.getInstance();
+            from.add(Calendar.DATE, ServiceParams.DAYS_OF_HISTORY);
+
+            // get history from specific date and filter out any eventual null values
+            List<HistoricalQuote> historicalQuotes = stock.getHistory(from, Interval.DAILY).stream()
+                    .filter(historicalQuote -> historicalQuote.getClose() != null)
+                    .collect(Collectors.toList());
+
+            // do some calculation of some indicator data and add them to cache
+            indicatorCache.setSma(calculateSma50Close(historicalQuotes));
+            indicatorCache.setEma(calculateEma50Close(historicalQuotes));
+            indicatorCache.setRsi(calculateRsi14Close(historicalQuotes));
+            indicatorCache.setExpires(Calendar.getInstance().getTime());
+
+            // at last update the cache
+            indicatorCache = cacheManager.updateIndicatorCache(indicatorCache);
+        }
+
+        // set calculated values from cache
+        parcelableStock.setSma50Close(indicatorCache.getSma());
+        parcelableStock.setEma50Close(indicatorCache.getEma());
+        parcelableStock.setRsi14Close(indicatorCache.getRsi());
 
         return parcelableStock;
     }
@@ -234,7 +270,7 @@ public class ParcelableStock implements Parcelable {
 
     private static double getDouble(BigDecimal bigDecimal) {
         if (bigDecimal == null) {
-            return Double.NaN;
+            return SkvirrelUtils.UNSET;
         }
         return bigDecimal.doubleValue();
     }
@@ -311,7 +347,7 @@ public class ParcelableStock implements Parcelable {
     }
 
     /**
-     * To get price, returns {@link Double#NaN} if data was not available from yahoo finance
+     * To get price, returns {@link SkvirrelUtils#UNSET} if data was not available from yahoo finance
      *
      * @return price
      */
@@ -324,7 +360,7 @@ public class ParcelableStock implements Parcelable {
     }
 
     /**
-     * To get change, returns {@link Double#NaN} if data was not available from yahoo finance
+     * To get change, returns {@link SkvirrelUtils#UNSET} if data was not available from yahoo finance
      *
      * @return change
      */
@@ -337,7 +373,7 @@ public class ParcelableStock implements Parcelable {
     }
 
     /**
-     * To get change percent, returns {@link Double#NaN} if data was not available from yahoo finance
+     * To get change percent, returns {@link SkvirrelUtils#UNSET} if data was not available from yahoo finance
      *
      * @return change percent
      */
@@ -350,7 +386,7 @@ public class ParcelableStock implements Parcelable {
     }
 
     /**
-     * To get previous close, returns {@link Double#NaN} if data was not available from yahoo finance
+     * To get previous close, returns {@link SkvirrelUtils#UNSET} if data was not available from yahoo finance
      *
      * @return previous close
      */
@@ -363,7 +399,7 @@ public class ParcelableStock implements Parcelable {
     }
 
     /**
-     * To get open, returns {@link Double#NaN} if data was not available from yahoo finance
+     * To get open, returns {@link SkvirrelUtils#UNSET} if data was not available from yahoo finance
      *
      * @return open
      */
@@ -376,7 +412,7 @@ public class ParcelableStock implements Parcelable {
     }
 
     /**
-     * To get low, returns {@link Double#NaN} if data was not available from yahoo finance
+     * To get low, returns {@link SkvirrelUtils#UNSET} if data was not available from yahoo finance
      *
      * @return low
      */
@@ -389,7 +425,7 @@ public class ParcelableStock implements Parcelable {
     }
 
     /**
-     * To get high, returns {@link Double#NaN} if data was not available from yahoo finance
+     * To get high, returns {@link SkvirrelUtils#UNSET} if data was not available from yahoo finance
      *
      * @return high
      */
@@ -402,7 +438,7 @@ public class ParcelableStock implements Parcelable {
     }
 
     /**
-     * To get 52 week low, returns {@link Double#NaN} if data was not available from yahoo finance
+     * To get 52 week low, returns {@link SkvirrelUtils#UNSET} if data was not available from yahoo finance
      *
      * @return 52 week low
      */
@@ -415,7 +451,7 @@ public class ParcelableStock implements Parcelable {
     }
 
     /**
-     * To get 52 week high, returns {@link Double#NaN} if data was not available from yahoo finance
+     * To get 52 week high, returns {@link SkvirrelUtils#UNSET} if data was not available from yahoo finance
      *
      * @return 52 week high
      */
@@ -428,7 +464,7 @@ public class ParcelableStock implements Parcelable {
     }
 
     /**
-     * To get market cap, returns {@link Double#NaN} if data was not available from yahoo finance
+     * To get market cap, returns {@link SkvirrelUtils#UNSET} if data was not available from yahoo finance
      *
      * @return market cap
      */
@@ -441,7 +477,7 @@ public class ParcelableStock implements Parcelable {
     }
 
     /**
-     * To get pe, returns {@link Double#NaN} if data was not available from yahoo finance
+     * To get pe, returns {@link SkvirrelUtils#UNSET} if data was not available from yahoo finance
      *
      * @return pe
      */
@@ -454,7 +490,7 @@ public class ParcelableStock implements Parcelable {
     }
 
     /**
-     * To get eps, returns {@link Double#NaN} if data was not available from yahoo finance
+     * To get eps, returns {@link SkvirrelUtils#UNSET} if data was not available from yahoo finance
      *
      * @return eps
      */
@@ -467,7 +503,7 @@ public class ParcelableStock implements Parcelable {
     }
 
     /**
-     * To get annual yield, returns {@link Double#NaN} if data was not available from yahoo finance
+     * To get annual yield, returns {@link SkvirrelUtils#UNSET} if data was not available from yahoo finance
      *
      * @return annual yield
      */
@@ -480,7 +516,7 @@ public class ParcelableStock implements Parcelable {
     }
 
     /**
-     * To get annual yield percent, returns {@link Double#NaN} if data was not available from yahoo finance
+     * To get annual yield percent, returns {@link SkvirrelUtils#UNSET} if data was not available from yahoo finance
      *
      * @return annual yield percent
      */
@@ -571,14 +607,14 @@ public class ParcelableStock implements Parcelable {
     }
 
     /**
-     * Convenience method to transform given double to a string. If given double isNaN then a
-     * default string of N/A is returned
+     * Convenience method to transform given double to a string. If given double {@link SkvirrelUtils#UNSET}
+     * then a default string of N/A is returned
      *
      * @param value to transform
      * @return string representation of given double
      */
     public static String getString(double value) {
-        if (Double.isNaN(value)) {
+        if (SkvirrelUtils.UNSET == value) {
             return NOT_AVAILABLE;
         }
         return DECIMAL_FORMAT.format(value).replace(",", ".");
@@ -586,10 +622,10 @@ public class ParcelableStock implements Parcelable {
 
     /**
      * Convenience method to transform given double to a string with given suffix.
-     * If given double isNaN then a default string of N/A is returned, else string representation
-     * of given double with given suffix is returned
+     * If given double {@link SkvirrelUtils#UNSET} then a default string of N/A is returned,
+     * else string representation of given double with given suffix is returned
      *
-     * @param value to transform
+     * @param value  to transform
      * @param suffix of transformed double
      * @return string representation of given double with given suffix
      */
@@ -599,14 +635,14 @@ public class ParcelableStock implements Parcelable {
     }
 
     /**
-     * Convenience method to transform given market cap to a string. If given market cap isNaN
-     * then a default string of N/A is returned
+     * Convenience method to transform given market cap to a string. If given market cap
+     * {@link SkvirrelUtils#UNSET} then a default string of N/A is returned
      *
      * @param marketCap to transform
      * @return string representation of market cap
      */
     public static String getMarketCapString(double marketCap) {
-        if (Double.isNaN(marketCap)) {
+        if (SkvirrelUtils.UNSET == marketCap) {
             return NOT_AVAILABLE;
         }
 
@@ -629,14 +665,15 @@ public class ParcelableStock implements Parcelable {
 
     /**
      * Convenience method to transform given annual yield and percentage into a string.
-     * If either the annual yield or percentage isNaN then a default string of N/A is returned
+     * If either the annual yield or percentage {@link SkvirrelUtils#UNSET}
+     * then a default string of N/A is returned
      *
      * @param annualYield        to transform
      * @param annualYieldPercent to transform
      * @return string representation of annual yield and percentage
      */
     public static String getDividendString(double annualYield, double annualYieldPercent) {
-        if (Double.isNaN(annualYield) || Double.isNaN(annualYieldPercent)) {
+        if (SkvirrelUtils.UNSET == annualYield || SkvirrelUtils.UNSET == annualYieldPercent) {
             return NOT_AVAILABLE;
         }
         return String.format("%s(%s%%)", getString(annualYield), getString(annualYieldPercent));

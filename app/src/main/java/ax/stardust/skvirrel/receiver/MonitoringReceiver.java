@@ -54,7 +54,7 @@ public class MonitoringReceiver extends BroadcastReceiver {
         HashMap<StockMonitoring, List<AbstractMonitoring>> stockMonitoringsToNotify = new HashMap<>();
 
         // fetch all stock monitorings that should be monitored
-        List<StockMonitoring> stockMonitorings = getDatabaseManager(context).fetchAllForMonitoring();
+        List<StockMonitoring> stockMonitorings = getDatabaseManager(context).fetchAllStockMonitoringsForMonitoring();
 
         // go through each parcelable stock and each stock monitoring...
         parcelableStocks.forEach(parcelableStock -> {

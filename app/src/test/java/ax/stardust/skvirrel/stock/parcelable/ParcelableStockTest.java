@@ -1,6 +1,8 @@
 package ax.stardust.skvirrel.stock.parcelable;
 
 
+import android.content.Context;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -17,6 +19,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
+import ax.stardust.skvirrel.cache.CacheManager;
+import ax.stardust.skvirrel.cache.IndicatorCache;
 import ax.stardust.skvirrel.stock.indicator.ExponentialMovingAverage;
 import ax.stardust.skvirrel.stock.indicator.SimpleMovingAverage;
 import ax.stardust.skvirrel.test.util.SkvirrelTestUtils;
@@ -31,7 +35,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({SimpleMovingAverage.class, ExponentialMovingAverage.class})
+@PrepareForTest({SimpleMovingAverage.class, ExponentialMovingAverage.class, ParcelableStock.class})
 public class ParcelableStockTest {
 
     private static final DecimalFormat VOLUME_FORMAT = new DecimalFormat("###,###,###");
@@ -90,19 +94,26 @@ public class ParcelableStockTest {
     private static final ExponentialMovingAverage EMA_MOCK =
             ExponentialMovingAverage.create(SkvirrelTestUtils.getMockedHistoricalQuotes(), 14);
 
+    private static Context mockedContext;
+    private static CacheManager mockedCacheManager;
     private static Stock mockedStock;
     private static StockStats mockedStats;
     private static StockDividend mockedDividend;
 
     @BeforeClass
     public static void setUp() throws IOException {
+        IndicatorCache indicatorCache = new IndicatorCache(TICKER);
         StockQuote mockedQuote = Mockito.mock(StockQuote.class);
 
+        mockedContext = Mockito.mock(Context.class);
+        mockedCacheManager = Mockito.mock(CacheManager.class);
         mockedStock = Mockito.mock(Stock.class);
         mockedStats = Mockito.mock(StockStats.class);
         mockedDividend = Mockito.mock(StockDividend.class);
 
-        // set the basics
+        Mockito.when(mockedCacheManager.getIndicatorCache(Mockito.anyString())).thenReturn(indicatorCache);
+        Mockito.when(mockedCacheManager.updateIndicatorCache(indicatorCache)).thenReturn(indicatorCache);
+
         Mockito.when(mockedQuote.getPrice()).thenReturn(PRICE);
         Mockito.when(mockedQuote.getChange()).thenReturn(CHANGE);
         Mockito.when(mockedQuote.getChangeInPercent()).thenReturn(CHANGE_PERCENT);
@@ -133,7 +144,7 @@ public class ParcelableStockTest {
     }
 
     @Before
-    public void init() {
+    public void init() throws Exception {
         // static mocks
         PowerMockito.mockStatic(SimpleMovingAverage.class);
         PowerMockito.mockStatic(ExponentialMovingAverage.class);
@@ -142,6 +153,8 @@ public class ParcelableStockTest {
                 .thenReturn(SMA_MOCK);
         PowerMockito.when(ExponentialMovingAverage.create(Mockito.anyList(), Mockito.anyInt()))
                 .thenReturn(EMA_MOCK);
+
+        PowerMockito.whenNew(CacheManager.class).withArguments(mockedContext).thenReturn(mockedCacheManager);
     }
 
     @Test
@@ -150,7 +163,7 @@ public class ParcelableStockTest {
         Mockito.when(mockedDividend.getAnnualYieldPercent()).thenReturn(ANNUAL_YIELD_PERCENT);
         Mockito.when(mockedStats.getMarketCap()).thenReturn(MARKET_CAP);
 
-        ParcelableStock ps = ParcelableStock.from(mockedStock);
+        ParcelableStock ps = ParcelableStock.from(mockedContext, mockedStock);
 
         assertEquals(TICKER, ps.getTicker());
         assertEquals(NAME, ps.getName());
@@ -202,49 +215,49 @@ public class ParcelableStockTest {
     @Test
     public void testFromMissingDividend() throws IOException {
         Mockito.when(mockedStock.getDividend()).thenReturn(null);
-        ParcelableStock ps = ParcelableStock.from(mockedStock);
+        ParcelableStock ps = ParcelableStock.from(mockedContext, mockedStock);
         assertEquals(NOT_AVAILABLE, ParcelableStock.getDividendString(ps.getAnnualYield(), ps.getAnnualYieldPercent()));
 
         Mockito.when(mockedDividend.getAnnualYield()).thenReturn(null);
         Mockito.when(mockedStock.getDividend()).thenReturn(mockedDividend);
-        ps = ParcelableStock.from(mockedStock);
+        ps = ParcelableStock.from(mockedContext, mockedStock);
         assertEquals(NOT_AVAILABLE, ParcelableStock.getDividendString(ps.getAnnualYield(), ps.getAnnualYieldPercent()));
 
         Mockito.when(mockedDividend.getAnnualYield()).thenReturn(ANNUAL_YIELD);
         Mockito.when(mockedDividend.getAnnualYieldPercent()).thenReturn(null);
         Mockito.when(mockedStock.getDividend()).thenReturn(mockedDividend);
-        ps = ParcelableStock.from(mockedStock);
+        ps = ParcelableStock.from(mockedContext, mockedStock);
         assertEquals(NOT_AVAILABLE, ParcelableStock.getDividendString(ps.getAnnualYield(), ps.getAnnualYieldPercent()));
     }
 
     @Test
     public void testFromMarketCapFormatting() throws IOException {
         Mockito.when(mockedStats.getMarketCap()).thenReturn(BigDecimal.ONE);
-        ParcelableStock ps = ParcelableStock.from(mockedStock);
+        ParcelableStock ps = ParcelableStock.from(mockedContext, mockedStock);
         assertEquals(1, ps.getMarketCap(), SkvirrelTestUtils.DELTA);
 
         Mockito.when(mockedStats.getMarketCap()).thenReturn(new BigDecimal("999999"));
-        ps = ParcelableStock.from(mockedStock);
+        ps = ParcelableStock.from(mockedContext, mockedStock);
         assertFalse(ParcelableStock.getMarketCapString(ps.getMarketCap()).contains("M"));
 
         Mockito.when(mockedStats.getMarketCap()).thenReturn(new BigDecimal("1000000"));
-        ps = ParcelableStock.from(mockedStock);
+        ps = ParcelableStock.from(mockedContext, mockedStock);
         assertTrue(ParcelableStock.getMarketCapString(ps.getMarketCap()).contains("M"));
 
         Mockito.when(mockedStats.getMarketCap()).thenReturn(new BigDecimal("1560000"));
-        ps = ParcelableStock.from(mockedStock);
+        ps = ParcelableStock.from(mockedContext, mockedStock);
         assertTrue(ParcelableStock.getMarketCapString(ps.getMarketCap()).contains("M"));
 
         Mockito.when(mockedStats.getMarketCap()).thenReturn(new BigDecimal("1999999"));
-        ps = ParcelableStock.from(mockedStock);
+        ps = ParcelableStock.from(mockedContext, mockedStock);
         assertTrue(ParcelableStock.getMarketCapString(ps.getMarketCap()).contains("M"));
 
         Mockito.when(mockedStats.getMarketCap()).thenReturn(new BigDecimal("1000000000"));
-        ps = ParcelableStock.from(mockedStock);
+        ps = ParcelableStock.from(mockedContext, mockedStock);
         assertTrue(ParcelableStock.getMarketCapString(ps.getMarketCap()).contains("B"));
 
         Mockito.when(mockedStats.getMarketCap()).thenReturn(new BigDecimal("1670000000"));
-        ps = ParcelableStock.from(mockedStock);
+        ps = ParcelableStock.from(mockedContext, mockedStock);
         assertTrue(ParcelableStock.getMarketCapString(ps.getMarketCap()).contains("B"));
     }
 }

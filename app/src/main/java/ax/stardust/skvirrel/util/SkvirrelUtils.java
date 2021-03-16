@@ -12,6 +12,9 @@ import ax.stardust.skvirrel.R;
  */
 public class SkvirrelUtils {
 
+    /** A value indicating that a double is unset within this application */
+    public static final double UNSET = -1.1;
+
     private static final int NUMBER_OF_DECIMALS = 2;
 
     /**
