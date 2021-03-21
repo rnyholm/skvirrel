@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/confirm_dialog"
+    android:layout_width="match_parent"
+    android:background="@drawable/confirm_dialog"
+    android:layout_height="wrap_content"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/confirm_title_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/confirm_dialog_dummy_title"
+        android:textAlignment="center"
+        android:textColor="@color/colorHeadingText"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/confirm_message_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/confirm_dialog_dummy_message"
+        android:textAlignment="center"
+        android:textColor="@color/colorText"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/confirm_title_tv" />
+
+    <Button
+        android:id="@+id/confirm_positive_btn"
+        android:layout_width="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_height="30dp"
+        android:background="@drawable/button_red_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/confirm_dialog_dummy_button_positive"
+        android:textAllCaps="false"
+        android:textColor="@color/colorButtonText"
+        app:layout_constraintTop_toBottomOf="@+id/confirm_message_tv"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/confirm_negative_btn"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="spread"/>
+
+    <Button
+        android:id="@+id/confirm_negative_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:background="@drawable/button_black_selector"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/confirm_dialog_dummy_button_negative"
+        android:textAllCaps="false"
+        android:textColor="@color/colorButtonText"
+        app:layout_constraintStart_toEndOf="@+id/confirm_positive_btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintBaseline_toBaselineOf="@+id/confirm_positive_btn" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

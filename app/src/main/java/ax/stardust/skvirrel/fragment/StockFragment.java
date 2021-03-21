@@ -20,10 +20,13 @@ import androidx.fragment.app.Fragment;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Objects;
 import java.util.SplittableRandom;
 
 import ax.stardust.skvirrel.R;
 import ax.stardust.skvirrel.activity.Skvirrel;
+import ax.stardust.skvirrel.component.dialog.ConfirmDialog;
+import ax.stardust.skvirrel.component.dialog.DialogInteractionListener;
 import ax.stardust.skvirrel.component.keyboard.AlphanumericKeyboard;
 import ax.stardust.skvirrel.component.keyboard.KeyboardHandler;
 import ax.stardust.skvirrel.component.keyboard.NumericKeyboard;
@@ -43,7 +46,7 @@ import timber.log.Timber;
 /**
  * Fragment holding ui and data behind it for a stock monitoring.
  */
-public class StockFragment extends Fragment {
+public class StockFragment extends Fragment implements DialogInteractionListener {
     // parent of fragment
     private final Skvirrel activity;
     private final AlphanumericKeyboard alphanumericKeyboard;
@@ -51,6 +54,9 @@ public class StockFragment extends Fragment {
 
     private StockMonitoring stockMonitoring;
     private DatabaseManager databaseManager;
+
+    // a handle to remove stock monitoring dialog is needed in order to handle events from it
+    private ConfirmDialog removeDialog;
 
     private View fragmentView;
 
@@ -231,7 +237,28 @@ public class StockFragment extends Fragment {
             updateNotifiedWidgets();
         });
 
-        removeStockMonitoringButton.setOnClickListener(view -> activity.removeStockMonitoringAndFragment(stockMonitoring));
+
+        removeStockMonitoringButton.setOnClickListener(view -> createAndShowRemoveDialog());
+    }
+
+    private void createAndShowRemoveDialog() {
+        String ticker = stockMonitoring.getTicker();
+        String companyName = stockMonitoring.getCompanyName();
+
+        // resolve message
+        String resolvedMessage = StringUtils.isBlank(ticker) || StringUtils.isBlank(companyName) ?
+                getString(R.string.remove_stock_monitoring_dialog_message_without_stock) :
+                getString(R.string.remove_stock_monitoring_dialog_message_with_stock, companyName, ticker);
+
+        // create dialog and store a handle to it, needed in order to listen on events from it
+        removeDialog = new ConfirmDialog(
+                getString(R.string.remove_stock_monitoring_dialog_title),
+                resolvedMessage,
+                getString(R.string.remove_stock_monitoring_dialog_remove),
+                getString(R.string.remove_stock_monitoring_dialog_cancel));
+
+        removeDialog.setTargetFragment(this, (int) stockMonitoring.getId());
+        removeDialog.show(Objects.requireNonNull(getFragmentManager()), ConfirmDialog.FRAGMENT_TAG);
     }
 
     private void updateCompanyWidget() {
@@ -339,6 +366,21 @@ public class StockFragment extends Fragment {
 
         // finally set monitoring status text
         monitoringStatusTextView.setText(monitoringStatus);
+    }
+
+    @Override
+    public void onPositiveButtonPressed() {
+        if (removeDialog != null) {
+            activity.removeStockMonitoringAndFragment(stockMonitoring);
+            removeDialog.dismiss();
+        }
+    }
+
+    @Override
+    public void onNegativeButtonPressed() {
+        if (removeDialog != null) {
+            removeDialog.dismiss();
+        }
     }
 
     @Override

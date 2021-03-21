@@ -24,6 +24,17 @@
     <string name="remove_stock_monitoring">Remove stock monitoring</string>
     <string name="and">and</string>
 
+    <!-- dialogs -->
+    <string name="confirm_dialog_dummy_title" translatable="false">Replace this title</string>
+    <string name="confirm_dialog_dummy_message" translatable="false">Replace this message</string>
+    <string name="confirm_dialog_dummy_button_positive" translatable="false">Positive</string>
+    <string name="confirm_dialog_dummy_button_negative" translatable="false">Negative</string>
+    <string name="remove_stock_monitoring_dialog_title">Remove stock monitoring</string>
+    <string name="remove_stock_monitoring_dialog_message_with_stock">Are you sure you want to remove stock monitoring for %s(%s)?</string>
+    <string name="remove_stock_monitoring_dialog_message_without_stock">Are you sure you want to remove stock monitoring?</string>
+    <string name="remove_stock_monitoring_dialog_remove">Remove</string>
+    <string name="remove_stock_monitoring_dialog_cancel">Cancel</string>
+
     <!-- other stock related texts -->
     <string name="add_stock_monitoring">Add stock monitoring</string>
 

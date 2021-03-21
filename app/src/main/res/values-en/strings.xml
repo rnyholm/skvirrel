@@ -7,7 +7,6 @@
     <string name="reset_notification">Reset notification</string>
     <string name="price">Price</string>
 
-    <!-- notifications -->
     <string name="notification_channel_name">Stock monitorings</string>
     <string name="notification_channel_description">Let skvirrel notify upon triggering of stock monitorings</string>
     <string name="notification_title">Stock monitoring triggered for %s</string>
@@ -23,4 +22,9 @@
     <string name="monitoring_status_notified">Monitoring notified for %s, but is still active for %s. Reset notification to activate all monitorings again.</string>
     <string name="getting_started_title">Hi there&#128075;</string>
     <string name="getting_started">"Press the \"Add stock monitoring\" button above to get started. Then enter a ticker for the stock you would like to monitor along with one or more monitoring options of your interest and you are good to go&#128077;\nskvirrel is now monitoring the stock for you and will notify you if your monitoring trigger, easy peasy&#128512;"</string>
+    <string name="remove_stock_monitoring_dialog_title">Remove stock monitoring</string>
+    <string name="remove_stock_monitoring_dialog_message_with_stock">Are you sure you want to remove stock monitoring for %s(%s)?</string>
+    <string name="remove_stock_monitoring_dialog_message_without_stock">Are you sure you want to remove stock monitoring?</string>
+    <string name="remove_stock_monitoring_dialog_remove">Remove</string>
+    <string name="remove_stock_monitoring_dialog_cancel">Cancel</string>
 </resources>

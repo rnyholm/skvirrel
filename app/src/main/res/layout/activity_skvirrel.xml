@@ -47,7 +47,6 @@
                     android:layout_height="30dp"
                     android:background="@drawable/button_black_selector"
                     android:fontFamily="@font/montserrat"
-
                     android:paddingLeft="25dp"
                     android:paddingRight="25dp"
                     android:text="@string/add_stock_monitoring"
