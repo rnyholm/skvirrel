@@ -55,6 +55,10 @@ public class KeyboardHandler implements View.OnFocusChangeListener, View.OnTouch
                 this.skvirrelKeyboard.configureSeparatorButton(keyboardlessEditText.getInput());
                 this.skvirrelKeyboard.enableDeleteButton(editable != null && StringUtils.isNotEmpty(editable.toString()));
                 this.skvirrelKeyboard.setInputConnection(inputConnection);
+
+                // request focus in case it gets missed by the system on touch,
+                // the edit text can be a bit buggy regarding this
+                keyboardlessEditText.requestFocus();
             }
         }
         // let the rest of the framework handle this event also
