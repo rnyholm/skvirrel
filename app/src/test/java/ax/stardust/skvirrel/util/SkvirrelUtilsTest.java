@@ -8,6 +8,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,8 @@ import ax.stardust.skvirrel.R;
 import ax.stardust.skvirrel.test.util.SkvirrelTestUtils;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SkvirrelUtilsTest {
@@ -54,5 +57,18 @@ public class SkvirrelUtilsTest {
         assertEquals(1000.00, SkvirrelUtils.round(999.999), SkvirrelTestUtils.DELTA);
         assertEquals(89.95, SkvirrelUtils.round(89.951), SkvirrelTestUtils.DELTA);
         assertEquals(89.96, SkvirrelUtils.round(89.956), SkvirrelTestUtils.DELTA);
+    }
+
+    @Test
+    public void testEquals() {
+        assertTrue(SkvirrelUtils.equals(new BigDecimal("0.00000"), new BigDecimal("0.00")));
+        assertTrue(SkvirrelUtils.equals(new BigDecimal("1.0"), new BigDecimal("1.000")));
+        assertTrue(SkvirrelUtils.equals(new BigDecimal("-1.0"), new BigDecimal("-1.000")));
+        assertTrue(SkvirrelUtils.equals(new BigDecimal("-23.987645"), new BigDecimal("-23.987645")));
+        assertTrue(SkvirrelUtils.equals(new BigDecimal("-23.987645"), new BigDecimal("-23.987643")));
+        assertTrue(SkvirrelUtils.equals(new BigDecimal("23.98765"), new BigDecimal("23.987643")));
+        assertFalse(SkvirrelUtils.equals(new BigDecimal("23.98765"), new BigDecimal("23.983643")));
+        assertFalse(SkvirrelUtils.equals(new BigDecimal("23.18765"), new BigDecimal("23.983643")));
+        assertFalse(SkvirrelUtils.equals(new BigDecimal("-23.18765"), new BigDecimal("23.983643")));
     }
 }
