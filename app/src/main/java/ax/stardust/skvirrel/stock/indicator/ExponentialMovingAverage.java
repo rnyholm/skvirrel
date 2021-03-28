@@ -2,6 +2,7 @@ package ax.stardust.skvirrel.stock.indicator;
 
 import androidx.annotation.NonNull;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Locale;
 
@@ -32,7 +33,7 @@ public class ExponentialMovingAverage implements Indicator {
     public static final int DEFAULT_PERIOD = 50;
 
     // data needed for the calculations to be made
-    private final List<HistoricalQuote> historicalQuotes;
+    private List<HistoricalQuote> historicalQuotes;
     private final int period;
 
     // calculated date
@@ -41,12 +42,15 @@ public class ExponentialMovingAverage implements Indicator {
     private double[] sma;
     private double[] ema;
 
-    private ExponentialMovingAverage(List<HistoricalQuote> historicalQuotes, int period) {
+    private ExponentialMovingAverage(List<HistoricalQuote> historicalQuotes, BigDecimal currentPrice, int period) {
         this.historicalQuotes = historicalQuotes;
         this.period = period;
 
         // sanity check before anything else
         validate();
+
+        // add current price to the historical quotes if needed
+        handleCurrentPrice(currentPrice);
 
         // do the calculation up instantiation
         calculate();
@@ -56,11 +60,13 @@ public class ExponentialMovingAverage implements Indicator {
      * Creates a new instance of exponential moving average
      *
      * @param historicalQuotes historical quotes for EMA calculation
+     * @param currentPrice     current price
      * @param period           period of EMA
      * @return created instance of exponential moving average
      */
-    public static ExponentialMovingAverage create(List<HistoricalQuote> historicalQuotes, int period) {
-        return new ExponentialMovingAverage(historicalQuotes, period);
+    public static ExponentialMovingAverage create(List<HistoricalQuote> historicalQuotes,
+                                                  BigDecimal currentPrice, int period) {
+        return new ExponentialMovingAverage(historicalQuotes, currentPrice, period);
     }
 
     @Override
@@ -71,6 +77,11 @@ public class ExponentialMovingAverage implements Indicator {
             Timber.e(exception, "Unable to create exponential moving average");
             throw exception;
         }
+    }
+
+    @Override
+    public void handleCurrentPrice(BigDecimal currentPrice) {
+        historicalQuotes = IndicatorUtils.handleCurrentPrice(historicalQuotes, currentPrice);
     }
 
     @Override

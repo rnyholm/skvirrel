@@ -2,6 +2,7 @@ package ax.stardust.skvirrel.stock.indicator;
 
 import androidx.annotation.NonNull;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Locale;
 
@@ -27,21 +28,37 @@ public class SimpleMovingAverage implements Indicator {
     public static final int DEFAULT_PERIOD = 50;
 
     // data needed for the calculations to be made
-    private final List<HistoricalQuote> historicalQuotes;
+    private List<HistoricalQuote> historicalQuotes;
     private final int period;
 
     // calculated data
     private double[] sma;
 
-    private SimpleMovingAverage(List<HistoricalQuote> historicalQuotes, int period) {
+    private SimpleMovingAverage(List<HistoricalQuote> historicalQuotes, BigDecimal currentPrice, int period) {
         this.historicalQuotes = historicalQuotes;
         this.period = period;
 
         // sanity check before anything else
         validate();
 
+        // add current price to the historical quotes if needed
+        handleCurrentPrice(currentPrice);
+
         // do the calculation up instantiation
         calculate();
+    }
+
+    /**
+     * Creates a new instance of simple moving average
+     *
+     * @param historicalQuotes historical quotes for SMA calculation
+     * @param currentPrice     current price
+     * @param period           period of SMA
+     * @return created instance of simple moving average
+     */
+    public static SimpleMovingAverage create(List<HistoricalQuote> historicalQuotes,
+                                             BigDecimal currentPrice, int period) {
+        return new SimpleMovingAverage(historicalQuotes, currentPrice, period);
     }
 
     /**
@@ -52,7 +69,7 @@ public class SimpleMovingAverage implements Indicator {
      * @return created instance of simple moving average
      */
     public static SimpleMovingAverage create(List<HistoricalQuote> historicalQuotes, int period) {
-        return new SimpleMovingAverage(historicalQuotes, period);
+        return new SimpleMovingAverage(historicalQuotes, null, period);
     }
 
     @Override
@@ -63,6 +80,11 @@ public class SimpleMovingAverage implements Indicator {
             Timber.e(exception, "Unable to create simple moving average");
             throw exception;
         }
+    }
+
+    @Override
+    public void handleCurrentPrice(BigDecimal currentPrice) {
+        historicalQuotes = IndicatorUtils.handleCurrentPrice(historicalQuotes, currentPrice);
     }
 
     @Override

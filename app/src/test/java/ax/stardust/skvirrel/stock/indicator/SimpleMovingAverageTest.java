@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import ax.stardust.skvirrel.exception.IndicatorException;
@@ -31,27 +32,27 @@ public class SimpleMovingAverageTest {
         assertEquals(35.38, results[19], SkvirrelTestUtils.DELTA);
         assertEquals(35.38, sma.getLastResult(), SkvirrelTestUtils.DELTA);
 
-        sma = SimpleMovingAverage.create(SkvirrelTestUtils.getMockedHistoricalQuotes(), 20);
+        sma = SimpleMovingAverage.create(SkvirrelTestUtils.getMockedHistoricalQuotes(), BigDecimal.valueOf(35.89), 20);
 
         results = sma.getResults();
         assertEquals(0.00, results[0], SkvirrelTestUtils.DELTA);
         assertEquals(0.00, results[12], SkvirrelTestUtils.DELTA);
         assertEquals(0.00, results[16], SkvirrelTestUtils.DELTA);
-        assertEquals(35.15, results[19], SkvirrelTestUtils.DELTA);
-        assertEquals(35.15, sma.getLastResult(), SkvirrelTestUtils.DELTA);
+        assertEquals(35.2, results[19], SkvirrelTestUtils.DELTA);
+        assertEquals(35.2, sma.getLastResult(), SkvirrelTestUtils.DELTA);
     }
 
     @Test
     public void testCreateException() {
         try {
-            SimpleMovingAverage.create(null, 14);
+            SimpleMovingAverage.create(null, BigDecimal.valueOf(35.89), 14);
             fail("Exception should have been thrown");
         } catch (IndicatorException ignore) {
             // exception is expected
         }
 
         try {
-            SimpleMovingAverage.create(new ArrayList<>(), 14);
+            SimpleMovingAverage.create(new ArrayList<>(), null, 14);
             fail("Exception should have been thrown");
         } catch (IndicatorException ignore) {
             // exception is expected

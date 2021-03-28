@@ -1,5 +1,7 @@
 package ax.stardust.skvirrel.stock.indicator;
 
+import java.math.BigDecimal;
+
 /**
  * Interface for a technical stock indicator.
  */
@@ -10,6 +12,13 @@ interface Indicator {
      * This method is supposed to throw an exception if the data is invalid
      */
     void validate();
+
+    /**
+     * To handle current price for the calculations
+     *
+     * @param currentPrice current price to be handled
+     */
+    void handleCurrentPrice(BigDecimal currentPrice);
 
     /**
      * Does the actual calculation of the indicator

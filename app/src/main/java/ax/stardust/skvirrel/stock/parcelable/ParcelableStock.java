@@ -135,6 +135,7 @@ public class ParcelableStock implements Parcelable {
         StockQuote quote = stock.getQuote();
         StockStats stats = stock.getStats();
         StockDividend dividend = stock.getDividend();
+        BigDecimal currentPrice = quote.getPrice();
 
         // resolve ticker
         String ticker = getString(stock.getSymbol());
@@ -152,7 +153,7 @@ public class ParcelableStock implements Parcelable {
         parcelableStock.setName(getString(stock.getName()));
         parcelableStock.setStockExchange(getString(stock.getStockExchange()));
         parcelableStock.setCurrency(getString(stock.getCurrency()));
-        parcelableStock.setPrice(getDouble(quote.getPrice()));
+        parcelableStock.setPrice(getDouble(currentPrice));
         parcelableStock.setChange(getDouble(quote.getChange()));
         parcelableStock.setChangePercent(getDouble(quote.getChangeInPercent()));
         parcelableStock.setPreviousClose(getDouble(quote.getPreviousClose()));
@@ -195,9 +196,9 @@ public class ParcelableStock implements Parcelable {
                     .collect(Collectors.toList());
 
             // do some calculation of some indicator data and add them to cache
-            indicatorCache.setSma(calculateSma50Close(historicalQuotes));
-            indicatorCache.setEma(calculateEma50Close(historicalQuotes));
-            indicatorCache.setRsi(calculateRsi14Close(historicalQuotes));
+            indicatorCache.setSma(calculateSma50Close(historicalQuotes, currentPrice));
+            indicatorCache.setEma(calculateEma50Close(historicalQuotes, currentPrice));
+            indicatorCache.setRsi(calculateRsi14Close(historicalQuotes, currentPrice));
             indicatorCache.setExpires(Calendar.getInstance().getTime());
 
             // at last update the cache
@@ -282,16 +283,16 @@ public class ParcelableStock implements Parcelable {
         return l;
     }
 
-    private static double calculateSma50Close(List<HistoricalQuote> historicalQuotes) {
-        return SimpleMovingAverage.create(historicalQuotes, SimpleMovingAverage.DEFAULT_PERIOD).getLastResult();
+    private static double calculateSma50Close(List<HistoricalQuote> historicalQuotes, BigDecimal currentPrice) {
+        return SimpleMovingAverage.create(historicalQuotes, currentPrice, SimpleMovingAverage.DEFAULT_PERIOD).getLastResult();
     }
 
-    private static double calculateEma50Close(List<HistoricalQuote> historicalQuotes) {
-        return ExponentialMovingAverage.create(historicalQuotes, ExponentialMovingAverage.DEFAULT_PERIOD).getLastResult();
+    private static double calculateEma50Close(List<HistoricalQuote> historicalQuotes, BigDecimal currentPrice) {
+        return ExponentialMovingAverage.create(historicalQuotes, currentPrice, ExponentialMovingAverage.DEFAULT_PERIOD).getLastResult();
     }
 
-    private static double calculateRsi14Close(List<HistoricalQuote> historicalQuotes) {
-        return RelativeStrengthIndex.create(historicalQuotes, RelativeStrengthIndex.DEFAULT_PERIOD).getLastResult();
+    private static double calculateRsi14Close(List<HistoricalQuote> historicalQuotes, BigDecimal currentPrice) {
+        return RelativeStrengthIndex.create(historicalQuotes, currentPrice, RelativeStrengthIndex.DEFAULT_PERIOD).getLastResult();
     }
 
     /**

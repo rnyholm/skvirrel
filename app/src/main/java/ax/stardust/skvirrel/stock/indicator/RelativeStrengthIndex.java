@@ -2,6 +2,7 @@ package ax.stardust.skvirrel.stock.indicator;
 
 import androidx.annotation.NonNull;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -28,7 +29,7 @@ public class RelativeStrengthIndex implements Indicator {
     public static final int DEFAULT_PERIOD = 14;
 
     // data needed for the calculations to be made
-    private final List<HistoricalQuote> historicalQuotes;
+    private List<HistoricalQuote> historicalQuotes;
     private final int period;
 
     // calculated data
@@ -40,12 +41,15 @@ public class RelativeStrengthIndex implements Indicator {
     private double[] rs;
     private double[] rsi;
 
-    private RelativeStrengthIndex(List<HistoricalQuote> historicalQuotes, int period) {
+    private RelativeStrengthIndex(List<HistoricalQuote> historicalQuotes, BigDecimal currentPrice, int period) {
         this.historicalQuotes = historicalQuotes;
         this.period = period;
 
         // sanity check before anything else
         validate();
+
+        // add current price to the historical quotes if needed
+        handleCurrentPrice(currentPrice);
 
         // do the calculation up instantiation
         calculate();
@@ -55,11 +59,13 @@ public class RelativeStrengthIndex implements Indicator {
      * Creates a new instance of relative strength index
      *
      * @param historicalQuotes historical quotes for RSI calculation
+     * @param currentPrice     current price
      * @param period           period of RSI
      * @return created instance of relative strength index
      */
-    public static RelativeStrengthIndex create(List<HistoricalQuote> historicalQuotes, int period) {
-        return new RelativeStrengthIndex(historicalQuotes, period);
+    public static RelativeStrengthIndex create(List<HistoricalQuote> historicalQuotes,
+                                               BigDecimal currentPrice, int period) {
+        return new RelativeStrengthIndex(historicalQuotes, currentPrice, period);
     }
 
     @Override
@@ -70,6 +76,11 @@ public class RelativeStrengthIndex implements Indicator {
             Timber.e(exception, "Unable to create relative strength index");
             throw exception;
         }
+    }
+
+    @Override
+    public void handleCurrentPrice(BigDecimal currentPrice) {
+        historicalQuotes = IndicatorUtils.handleCurrentPrice(historicalQuotes, currentPrice);
     }
 
     @Override

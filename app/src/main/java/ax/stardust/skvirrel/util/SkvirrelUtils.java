@@ -15,7 +15,8 @@ public class SkvirrelUtils {
     /** A value indicating that a double is unset within this application */
     public static final double UNSET = -1.1;
 
-    private static final int NUMBER_OF_DECIMALS = 2;
+    private static final int TWO_DECIMALS = 2;
+    private static final int THREE_DECIMALS = 3;
 
     /**
      * Joins given list of strings into a list of format: one, two and three
@@ -48,8 +49,32 @@ public class SkvirrelUtils {
      * @return rounded double
      */
     public static double round(double value) {
+        return round(value, TWO_DECIMALS);
+    }
+
+    /**
+     * Rounds given double value to a double with given number of decimals. Rounding is done using
+     * {@link BigDecimal#ROUND_HALF_UP}
+     *
+     * @param value            value to round
+     * @param numberOfDecimals number of decimals for round
+     * @return rounded double
+     */
+    private static double round(double value, int numberOfDecimals) {
         BigDecimal bigDecimal = new BigDecimal(value);
-        bigDecimal = bigDecimal.setScale(NUMBER_OF_DECIMALS, BigDecimal.ROUND_HALF_UP);
+        bigDecimal = bigDecimal.setScale(numberOfDecimals, BigDecimal.ROUND_HALF_UP);
         return bigDecimal.doubleValue();
+    }
+
+    /**
+     * To find out if given values are numerically equal to each other
+     *
+     * @param value1 big decimal to compare
+     * @param value2 big decimal to compare
+     * @return true if given values are numerically equal to each other, else false
+     */
+    public static boolean equals(BigDecimal value1, BigDecimal value2) {
+        return round(value1.doubleValue(), THREE_DECIMALS)
+                == round(value2.doubleValue(), THREE_DECIMALS);
     }
 }

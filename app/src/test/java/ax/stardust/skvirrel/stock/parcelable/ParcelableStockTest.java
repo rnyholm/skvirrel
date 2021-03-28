@@ -60,9 +60,9 @@ public class ParcelableStockTest {
     private static final String EPS_STR = "0.51";
     private static final String ANNUAL_YIELD_STR = "5.88";
     private static final String ANNUAL_YIELD_PERCENT_STR = "3.91";
-    private static final String SMA_50_CLOSE_STR = "35.38";
-    private static final String EMA_50_CLOSE_STR = "35.37";
-    private static final String RSI_14_CLOSE_STR = "56.72";
+    private static final String SMA_50_CLOSE_STR = "38.41";
+    private static final String EMA_50_CLOSE_STR = "40.96";
+    private static final String RSI_14_CLOSE_STR = "96.49";
     private static final String NOT_AVAILABLE = "N/A";
 
     private static final BigDecimal PRICE = new BigDecimal(PRICE_STR);
@@ -89,10 +89,10 @@ public class ParcelableStockTest {
     private static final Calendar EARNINGS = Calendar.getInstance();
 
     private static final SimpleMovingAverage SMA_MOCK =
-            SimpleMovingAverage.create(SkvirrelTestUtils.getMockedHistoricalQuotes(), 14);
+            SimpleMovingAverage.create(SkvirrelTestUtils.getMockedHistoricalQuotes(), PRICE, 14);
 
     private static final ExponentialMovingAverage EMA_MOCK =
-            ExponentialMovingAverage.create(SkvirrelTestUtils.getMockedHistoricalQuotes(), 14);
+            ExponentialMovingAverage.create(SkvirrelTestUtils.getMockedHistoricalQuotes(), PRICE, 14);
 
     private static Context mockedContext;
     private static CacheManager mockedCacheManager;
@@ -149,9 +149,9 @@ public class ParcelableStockTest {
         PowerMockito.mockStatic(SimpleMovingAverage.class);
         PowerMockito.mockStatic(ExponentialMovingAverage.class);
 
-        PowerMockito.when(SimpleMovingAverage.create(Mockito.anyList(), Mockito.anyInt()))
+        PowerMockito.when(SimpleMovingAverage.create(Mockito.anyList(), Mockito.any(BigDecimal.class), Mockito.anyInt()))
                 .thenReturn(SMA_MOCK);
-        PowerMockito.when(ExponentialMovingAverage.create(Mockito.anyList(), Mockito.anyInt()))
+        PowerMockito.when(ExponentialMovingAverage.create(Mockito.anyList(), Mockito.any(BigDecimal.class), Mockito.anyInt()))
                 .thenReturn(EMA_MOCK);
 
         PowerMockito.whenNew(CacheManager.class).withArguments(mockedContext).thenReturn(mockedCacheManager);

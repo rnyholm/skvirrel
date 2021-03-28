@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import ax.stardust.skvirrel.exception.IndicatorException;
@@ -17,7 +18,7 @@ public class ExponentialMovingAverageTest {
 
     @Test
     public void testCreate() {
-        ExponentialMovingAverage ema = ExponentialMovingAverage.create(SkvirrelTestUtils.getMockedHistoricalQuotes(), 14);
+        ExponentialMovingAverage ema = ExponentialMovingAverage.create(SkvirrelTestUtils.getMockedHistoricalQuotes(), null, 14);
 
         double[] results = ema.getResults();
         assertEquals(0.00, results[0], SkvirrelTestUtils.DELTA);
@@ -31,35 +32,35 @@ public class ExponentialMovingAverageTest {
         assertEquals(35.37, results[19], SkvirrelTestUtils.DELTA);
         assertEquals(35.37, ema.getLastResult(), SkvirrelTestUtils.DELTA);
 
-        ema = ExponentialMovingAverage.create(SkvirrelTestUtils.getMockedHistoricalQuotes(), 19);
+        ema = ExponentialMovingAverage.create(SkvirrelTestUtils.getMockedHistoricalQuotes(), BigDecimal.valueOf(35.74), 19);
 
         results = ema.getResults();
         assertEquals(0.00, results[0], SkvirrelTestUtils.DELTA);
         assertEquals(0.00, results[12], SkvirrelTestUtils.DELTA);
         assertEquals(0.00, results[17], SkvirrelTestUtils.DELTA);
-        assertEquals(35.13, results[18], SkvirrelTestUtils.DELTA);
-        assertEquals(35.17, results[19], SkvirrelTestUtils.DELTA);
-        assertEquals(35.17, ema.getLastResult(), SkvirrelTestUtils.DELTA);
+        assertEquals(35.17, results[18], SkvirrelTestUtils.DELTA);
+        assertEquals(35.23, results[19], SkvirrelTestUtils.DELTA);
+        assertEquals(35.23, ema.getLastResult(), SkvirrelTestUtils.DELTA);
     }
 
     @Test
     public void testCreateException() {
         try {
-            ExponentialMovingAverage.create(null, 14);
+            ExponentialMovingAverage.create(null, null, 14);
             fail("Exception should have been thrown");
         } catch (IndicatorException ignore) {
             // exception is expected
         }
 
         try {
-            ExponentialMovingAverage.create(new ArrayList<>(), 14);
+            ExponentialMovingAverage.create(new ArrayList<>(), BigDecimal.valueOf(35.74), 14);
             fail("Exception should have been thrown");
         } catch (IndicatorException ignore) {
             // exception is expected
         }
 
         try {
-            ExponentialMovingAverage.create(SkvirrelTestUtils.getMockedHistoricalQuotes(), 20);
+            ExponentialMovingAverage.create(SkvirrelTestUtils.getMockedHistoricalQuotes(), null, 20);
             fail("Exception should have been thrown");
         } catch (IndicatorException ignore) {
             // exception is expected
