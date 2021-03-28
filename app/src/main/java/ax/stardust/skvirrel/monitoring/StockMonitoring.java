@@ -256,7 +256,7 @@ public class StockMonitoring {
             }
 
             MonitoringNotFoundException exception = new MonitoringNotFoundException(monitoringType.name());
-            Timber.e(exception, "getMonitoringOfType: Unable to get monitoring");
+            Timber.e(exception, "Unable to get monitoring");
             throw exception;
         }
     }

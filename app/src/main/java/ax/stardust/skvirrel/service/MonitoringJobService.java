@@ -44,7 +44,7 @@ public class MonitoringJobService extends JobService {
     public boolean onStopJob(JobParameters jobParameters) {
         // system decides to stop execution before job finished, just log it and return false,
         // or in other words, more or less ignore this...
-        Timber.d("onStopJob: System decided to stop job before application manage to do it");
+        Timber.d("System decided to stop job before application manage to do it");
         return false;
     }
 

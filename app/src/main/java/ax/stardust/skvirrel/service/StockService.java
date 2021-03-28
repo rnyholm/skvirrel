@@ -47,7 +47,7 @@ public class StockService extends JobIntentService {
         // mandatory to pass an operation with the intent
         if (operation == null) {
             StockServiceException stockServiceException = new StockServiceException("No stock service operation was passed in with intent");
-            Timber.e(stockServiceException);
+            Timber.e(stockServiceException, "Unable to handle work");
             throw stockServiceException;
         }
 
@@ -70,7 +70,7 @@ public class StockService extends JobIntentService {
                     result.putExtra(ServiceParams.ResultExtra.COMPANY_NAME, stock.getName());
                     sendReply(reply, ServiceParams.ResultCode.SUCCESS, result);
 
-                    Timber.d("onHandleWork: Successfully fetched stock: %s", stock.getName());
+                    Timber.d("Successfully fetched stock: %s", stock.getName());
 
                     break;
                 case GET_STOCK_INFO:
@@ -80,7 +80,7 @@ public class StockService extends JobIntentService {
                     result.putExtra(ServiceParams.ResultExtra.STOCK_INFO, ParcelableStock.from(this, stock));
                     sendReply(reply, ServiceParams.ResultCode.SUCCESS, result);
 
-                    Timber.d("onHandleWork: Successfully fetched stock: %s", stock.getName());
+                    Timber.d("Successfully fetched stock: %s", stock.getName());
 
                     break;
                 case GET_STOCK_INFOS:
@@ -94,7 +94,7 @@ public class StockService extends JobIntentService {
                                 validateStock(s);
                                 parcelableStocks.add(ParcelableStock.from(this, s));
                             } catch (Exception e) {
-                                Timber.e(e, "onHandleWork: Something went wrong while fetching stock info for ticker: %s", ticker);
+                                Timber.e(e, "Something went wrong while fetching stock info for ticker: %s", ticker);
                             }
                         });
                     }
@@ -103,12 +103,12 @@ public class StockService extends JobIntentService {
                     sendBroadcast(parcelableStocks);
                     MonitoringJobService.Handler.getInstance().notifyJobFinished();
 
-                    Timber.d("onHandleWork: Successfully fetched stocks: %s", StringUtils.joinWith(", ", tickers));
+                    Timber.d("Successfully fetched stocks: %s", StringUtils.joinWith(", ", tickers));
 
                     break;
                 default:
                     String errorMessage = String.format("Unsupported operation: %s", intent.getStringExtra(ServiceParams.STOCK_SERVICE));
-                    Timber.e("onHandleWork: %s", errorMessage);
+                    Timber.e(errorMessage);
                     result.putExtra(ServiceParams.ERROR_SITUATION, errorMessage);
                     sendReply(reply, ServiceParams.ResultCode.COMMON_ERROR, result);
             }
@@ -122,7 +122,7 @@ public class StockService extends JobIntentService {
             result.putExtra(ServiceParams.ERROR_SITUATION, errorMessage);
             sendReply(reply, resultCode, result);
 
-            Timber.e(e, "onHandleWork: %s", errorMessage);
+            Timber.e(e, errorMessage);
         }
     }
 
@@ -133,7 +133,7 @@ public class StockService extends JobIntentService {
             try {
                 reply.send(this, resultCode, result);
             } catch (PendingIntent.CanceledException e) {
-                Timber.e(e, "onHandleWork: Something unexpected happened while sending reply");
+                Timber.e(e, "Something unexpected happened while sending reply");
             }
         }
     }

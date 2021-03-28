@@ -123,7 +123,7 @@ public class Skvirrel extends AppCompatActivity {
             fragmentTransaction.remove(fragment);
             fragmentTransaction.commit();
         } else {
-            Timber.e("removeStockMonitoringAndFragment: No fragment found with tag: %s", stockMonitoring.getId());
+            Timber.e("No fragment found with tag: %s", stockMonitoring.getId());
         }
 
         // remove stock monitoring from db and list of stock monitoring within this object

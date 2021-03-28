@@ -95,7 +95,7 @@ public class MonitoringReceiver extends BroadcastReceiver {
                             String.format("%s(%s)", parcelableStock.getName(), parcelableStock.getTicker()))
                     .collect(Collectors.joining(", "));
 
-            String logEntry = String.format("onReceive: Broadcast received\nAction: %s\nParcelable stocks: %s",
+            String logEntry = String.format("Broadcast received\nAction: %s\nParcelable stocks: %s",
                     intent.getAction(), parcelableStocksString);
 
             Timber.d(logEntry);

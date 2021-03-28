@@ -40,7 +40,7 @@ public class AbstractMonitoringJsonAdapter implements
             String errorMessage = type == null ? "Unable to find monitoring type property in json object"
                     : "Unable to find monitoring data in json object";
             JsonParseException exception = new JsonParseException(errorMessage);
-            Timber.e(exception);
+            Timber.e(exception, "Unable to deserialize");
             throw exception;
         }
 
@@ -48,7 +48,7 @@ public class AbstractMonitoringJsonAdapter implements
             return context.deserialize(data, Class.forName(type.getAsString()));
         } catch (ClassNotFoundException e) {
             JsonParseException exception = new JsonParseException(e);
-            Timber.e(exception);
+            Timber.e(exception, "Unable to deserialize");
             throw exception;
         }
     }

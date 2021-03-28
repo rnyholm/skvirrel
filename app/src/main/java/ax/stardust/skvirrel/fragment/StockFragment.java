@@ -93,7 +93,7 @@ public class StockFragment extends Fragment implements DialogInteractionListener
                 || alphanumericKeyboard == null || numericKeyboard == null) {
             String errorMessage = "Cannot instantiate fragment with null activity, stockMonitoring, alphanumeric or numeric keyboard";
             IllegalArgumentException exception = new IllegalArgumentException(errorMessage);
-            Timber.e(exception, "StockFragment: Unable to instantiate StockFragment");
+            Timber.e(exception, "Unable to instantiate StockFragment");
             throw exception;
         }
 
@@ -407,7 +407,7 @@ public class StockFragment extends Fragment implements DialogInteractionListener
                 case ServiceParams.RequestCode.GET_STOCK_INFO:
                     break;
                 default:
-                    Timber.e("onActivityResult: Unsupported request code: %s", requestCode);
+                    Timber.e("Unsupported request code: %s", requestCode);
             }
         } else { // common error
             Toast.makeText(activity, data.getStringExtra(ServiceParams.ERROR_SITUATION), Toast.LENGTH_LONG).show();

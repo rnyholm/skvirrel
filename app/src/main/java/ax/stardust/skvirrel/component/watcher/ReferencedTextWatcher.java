@@ -19,10 +19,10 @@ import timber.log.Timber;
  */
 public class ReferencedTextWatcher implements TextWatcher {
 
-    private StockFragment stockFragment;
-    private KeyboardlessEditText editText;
-    private SkvirrelKeyboard skvirrelKeyboard;
-    private AbstractMonitoring monitoring;
+    private final StockFragment stockFragment;
+    private final KeyboardlessEditText editText;
+    private final SkvirrelKeyboard skvirrelKeyboard;
+    private final AbstractMonitoring monitoring;
 
     private DatabaseManager databaseManager;
 
@@ -58,7 +58,7 @@ public class ReferencedTextWatcher implements TextWatcher {
                 // given value was faulty, reset monitoring to better reflect whats happening
                 monitoring.resetValue();
                 this.editText.setBackgroundResource(R.drawable.input_error);
-                Timber.d(e, "Something unexpected happened which prevented value of monitoring to be set");
+                Timber.d(e, "Value of monitoring could not be set");
             }
         } else { // empty input is okay but to be sure, reset monitoring
             monitoring.resetValue();

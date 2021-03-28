@@ -158,11 +158,11 @@ public class KeyboardlessEditText extends AppCompatEditText {
         try {
             Objects.requireNonNull(KeyboardlessEditText.SHOW_SOFT_INPUT_ON_FOCUS).invoke(receiver, args);
         } catch (IllegalArgumentException e) {
-            Timber.e(e, "invokeMethod: Safe invoke fail - Invalid args");
+            Timber.e(e, "Safe invoke fail - Invalid args");
         } catch (IllegalAccessException e) {
-            Timber.e(e, "invokeMethod: Safe invoke fail - Invalid access");
+            Timber.e(e, "Safe invoke fail - Invalid access");
         } catch (InvocationTargetException e) {
-            Timber.e(e, "invokeMethod: Safe invoke fail - Invalid target");
+            Timber.e(e, "Safe invoke fail - Invalid target");
         }
     }
 }
