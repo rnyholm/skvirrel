@@ -10,21 +10,15 @@ import android.view.inputmethod.InputConnection;
 import org.apache.commons.lang3.StringUtils;
 
 import ax.stardust.skvirrel.component.widget.KeyboardlessEditText;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Handler for the application keyboard, handles different user events.
  */
+@RequiredArgsConstructor
 public class KeyboardHandler implements View.OnFocusChangeListener, View.OnTouchListener {
-    private final SkvirrelKeyboard skvirrelKeyboard;
 
-    /**
-     * Creates a new instance of keyboard handler for given keyboard
-     *
-     * @param skvirrelKeyboard keyboard which this handler should handle
-     */
-    public KeyboardHandler(SkvirrelKeyboard skvirrelKeyboard) {
-        this.skvirrelKeyboard = skvirrelKeyboard;
-    }
+    private final SkvirrelKeyboard skvirrelKeyboard;
 
     @Override
     public void onFocusChange(View view, boolean hasFocus) {

@@ -5,10 +5,14 @@ import java.util.Date;
 
 import ax.stardust.skvirrel.BuildConfig;
 import ax.stardust.skvirrel.util.SkvirrelUtils;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Small cache of some indicator values.
  */
+@Getter
+@Setter
 public class IndicatorCache {
 
     // time to live for this cache in minutes
@@ -43,50 +47,6 @@ public class IndicatorCache {
     public IndicatorCache(long id, String ticker) {
         this(ticker);
         this.id = id;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public String getTicker() {
-        return ticker;
-    }
-
-    public void setTicker(String ticker) {
-        this.ticker = ticker;
-    }
-
-    public double getSma() {
-        return sma;
-    }
-
-    public void setSma(double sma) {
-        this.sma = sma;
-    }
-
-    public double getEma() {
-        return ema;
-    }
-
-    public void setEma(double ema) {
-        this.ema = ema;
-    }
-
-    public double getRsi() {
-        return rsi;
-    }
-
-    public void setRsi(double rsi) {
-        this.rsi = rsi;
-    }
-
-    public Timestamp getExpires() {
-        return expires;
     }
 
     public void setExpires(Date expires) {

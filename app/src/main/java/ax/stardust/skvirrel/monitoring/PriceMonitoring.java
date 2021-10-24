@@ -7,11 +7,13 @@ import java.text.DecimalFormat;
 import ax.stardust.skvirrel.exception.MonitoringException;
 import ax.stardust.skvirrel.stock.parcelable.ParcelableStock;
 import ax.stardust.skvirrel.util.SkvirrelUtils;
+import lombok.Getter;
 import timber.log.Timber;
 
 /**
  * Class representing a price monitoring.
  */
+@Getter
 public class PriceMonitoring extends AbstractMonitoring {
 
     private double price = 0;
@@ -24,10 +26,6 @@ public class PriceMonitoring extends AbstractMonitoring {
     public PriceMonitoring(StockMonitoring stockMonitoring) {
         super(stockMonitoring);
         monitoringType = MonitoringType.PRICE;
-    }
-
-    public double getPrice() {
-        return price;
     }
 
     @Override

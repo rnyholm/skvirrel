@@ -27,6 +27,7 @@ import ax.stardust.skvirrel.R;
 import ax.stardust.skvirrel.activity.Skvirrel;
 import ax.stardust.skvirrel.component.dialog.ConfirmDialog;
 import ax.stardust.skvirrel.component.dialog.DialogInteractionListener;
+import ax.stardust.skvirrel.component.dialog.StockDetailsDialog;
 import ax.stardust.skvirrel.component.keyboard.AlphanumericKeyboard;
 import ax.stardust.skvirrel.component.keyboard.KeyboardHandler;
 import ax.stardust.skvirrel.component.keyboard.NumericKeyboard;
@@ -41,6 +42,7 @@ import ax.stardust.skvirrel.monitoring.StockMonitoring;
 import ax.stardust.skvirrel.persistence.DatabaseManager;
 import ax.stardust.skvirrel.service.ServiceParams;
 import ax.stardust.skvirrel.service.StockService;
+import ax.stardust.skvirrel.stock.parcelable.ParcelableStock;
 import timber.log.Timber;
 
 /**
@@ -55,8 +57,9 @@ public class StockFragment extends Fragment implements DialogInteractionListener
     private StockMonitoring stockMonitoring;
     private DatabaseManager databaseManager;
 
-    // a handle to remove stock monitoring dialog is needed in order to handle events from it
+    // a handle to dialogs are needed in order to handle events from them
     private ConfirmDialog removeDialog;
+    private StockDetailsDialog stockDetailsDialog;
 
     private View fragmentView;
 
@@ -150,6 +153,7 @@ public class StockFragment extends Fragment implements DialogInteractionListener
     private void updateWidgets() {
         updateCompanyWidget();
         updateTickerWidget(true);
+        updateViewStockInfoWidget();
         updateMonitoringStatusWidget();
         updateMonitoringOptionsWidgets();
         updateNotifiedWidgets();
@@ -195,6 +199,7 @@ public class StockFragment extends Fragment implements DialogInteractionListener
                 // if input was empty we need to also update monitoring status as no intents are
                 // sent during these cases and the usual way of updating this is not triggered
                 if (StringUtils.isEmpty(input)) {
+                    updateViewStockInfoWidget();
                     updateMonitoringStatusWidget();
                 }
             }
@@ -228,6 +233,11 @@ public class StockFragment extends Fragment implements DialogInteractionListener
             intent.putExtra(ServiceParams.PENDING_RESULT, pendingResult);
             intent.putExtra(ServiceParams.STOCK_FRAGMENT_TAG, getTag());
             StockService.enqueueWork(activity, intent);
+
+            // show the stock details dialog already but with a spinner, indicating user that we're fetching data
+            stockDetailsDialog = new StockDetailsDialog();
+            stockDetailsDialog.setTargetFragment(this, (int) stockMonitoring.getId());
+            stockDetailsDialog.show(Objects.requireNonNull(getFragmentManager()), StockDetailsDialog.FRAGMENT_TAG);
         });
 
         resetNotificationButton.setOnClickListener(view -> {
@@ -236,7 +246,6 @@ public class StockFragment extends Fragment implements DialogInteractionListener
             updateMonitoringStatusWidget();
             updateNotifiedWidgets();
         });
-
 
         removeStockMonitoringButton.setOnClickListener(view -> createAndShowRemoveDialog());
     }
@@ -283,6 +292,10 @@ public class StockFragment extends Fragment implements DialogInteractionListener
         } else {
             tickerEditText.setBackgroundResource(R.drawable.input_error);
         }
+    }
+
+    private void updateViewStockInfoWidget() {
+        viewStockInfoButton.setEnabled(stockMonitoring.hasValidTicker());
     }
 
     private void updateMonitoringOptionsWidgets() {
@@ -373,6 +386,7 @@ public class StockFragment extends Fragment implements DialogInteractionListener
         if (removeDialog != null) {
             activity.removeStockMonitoringAndFragment(stockMonitoring);
             removeDialog.dismiss();
+            removeDialog = null;
         }
     }
 
@@ -380,6 +394,15 @@ public class StockFragment extends Fragment implements DialogInteractionListener
     public void onNegativeButtonPressed() {
         if (removeDialog != null) {
             removeDialog.dismiss();
+            removeDialog = null;
+        }
+    }
+
+    @Override
+    public void onNeutralButtonPressed() {
+        if (stockDetailsDialog != null) {
+            stockDetailsDialog.dismiss();
+            stockDetailsDialog = null;
         }
     }
 
@@ -401,10 +424,17 @@ public class StockFragment extends Fragment implements DialogInteractionListener
                     // and update the ui accordingly
                     updateCompanyWidget();
                     updateTickerWidget(false);
+                    updateViewStockInfoWidget();
                     updateMonitoringStatusWidget();
 
                     break;
                 case ServiceParams.RequestCode.GET_STOCK_INFO:
+                    if (resultCode == ServiceParams.ResultCode.SUCCESS) {
+                        if (stockDetailsDialog != null) {
+                            ParcelableStock parcelableStock = data.getParcelableExtra(ServiceParams.ResultExtra.STOCK_INFO);
+                            stockDetailsDialog.setParcelableStockAndUpdateDialog(parcelableStock);
+                        }
+                    }
                     break;
                 default:
                     Timber.e("Unsupported request code: %s", requestCode);

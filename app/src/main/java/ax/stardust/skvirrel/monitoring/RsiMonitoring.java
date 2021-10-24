@@ -3,10 +3,12 @@ package ax.stardust.skvirrel.monitoring;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import ax.stardust.skvirrel.stock.parcelable.ParcelableStock;
+import lombok.Getter;
 
 /**
  * Class representing a RSI monitoring.
  */
+@Getter
 public class RsiMonitoring extends AbstractMonitoring {
 
     private int rsi;
@@ -19,10 +21,6 @@ public class RsiMonitoring extends AbstractMonitoring {
     public RsiMonitoring(StockMonitoring stockMonitoring) {
         super(stockMonitoring);
         monitoringType = MonitoringType.RSI;
-    }
-
-    public int getRsi() {
-        return rsi;
     }
 
     @Override

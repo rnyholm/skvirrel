@@ -8,18 +8,22 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import ax.stardust.skvirrel.exception.MonitoringNotFoundException;
+import lombok.Getter;
+import lombok.Setter;
 import timber.log.Timber;
 
 /**
  * Class containing the different information needed for proper stock monitoring.
  */
+@Getter
+@Setter
 public class StockMonitoring {
 
     /**
      * UI state, if this stock monitoring should be displayed as collapsed or expanded.
      */
     public enum ViewState {
-        COLLAPSED, EXPANDED
+        @SuppressWarnings("unused") COLLAPSED, EXPANDED
     }
 
     private long id;
@@ -48,54 +52,6 @@ public class StockMonitoring {
     public StockMonitoring(long id) {
         this();
         this.id = id;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public int getSortingOrder() {
-        return sortingOrder;
-    }
-
-    public void setSortingOrder(int sortingOrder) {
-        this.sortingOrder = sortingOrder;
-    }
-
-    public String getTicker() {
-        return ticker;
-    }
-
-    public void setTicker(String ticker) {
-        this.ticker = ticker;
-    }
-
-    public String getCompanyName() {
-        return companyName;
-    }
-
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
-    }
-
-    public MonitoringOptions getMonitoringOptions() {
-        return monitoringOptions;
-    }
-
-    public void setMonitoringOptions(MonitoringOptions monitoringOptions) {
-        this.monitoringOptions = monitoringOptions;
-    }
-
-    public ViewState getViewState() {
-        return viewState;
-    }
-
-    public void setViewState(ViewState viewState) {
-        this.viewState = viewState;
     }
 
     /**

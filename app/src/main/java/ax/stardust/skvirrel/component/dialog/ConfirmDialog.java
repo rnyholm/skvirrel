@@ -12,11 +12,13 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import ax.stardust.skvirrel.R;
+import lombok.RequiredArgsConstructor;
 import timber.log.Timber;
 
 /**
  * A simple confirm dialog with title, message and a positive and negative button.
  */
+@RequiredArgsConstructor
 public class ConfirmDialog extends DialogFragment {
 
     public static final String FRAGMENT_TAG = ConfirmDialog.class.getSimpleName();
@@ -33,21 +35,6 @@ public class ConfirmDialog extends DialogFragment {
 
     private Button positiveButton;
     private Button negativeButton;
-
-    /**
-     * Creates a new instance with given data
-     *
-     * @param title          title of the dialog
-     * @param message        message if the dialog
-     * @param positiveAnswer text of the positive button
-     * @param negativeAnswer text of the negative button
-     */
-    public ConfirmDialog(String title, String message, String positiveAnswer, String negativeAnswer) {
-        this.title = title;
-        this.message = message;
-        this.positiveAnswer = positiveAnswer;
-        this.negativeAnswer = negativeAnswer;
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

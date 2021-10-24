@@ -12,6 +12,7 @@ import ax.stardust.skvirrel.component.widget.KeyboardlessEditText;
  * Alphanumeric keyboard implementation of the skvirrel keyboard.
  */
 public class AlphanumericKeyboard extends SkvirrelKeyboard {
+
     private Button buttonA;
     private Button buttonB;
     private Button buttonC;

@@ -14,4 +14,9 @@ public interface DialogInteractionListener {
      * Action for when a negative(no/cancel etc.) button has been pressed within a dialog
      */
     void onNegativeButtonPressed();
+
+    /**
+     * Action for when a neutral(close etc.) button has been pressed within a dialog
+     */
+    void onNeutralButtonPressed();
 }

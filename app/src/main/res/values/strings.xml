@@ -34,6 +34,28 @@
     <string name="remove_stock_monitoring_dialog_message_without_stock">Are you sure you want to remove stock monitoring?</string>
     <string name="remove_stock_monitoring_dialog_remove">Remove</string>
     <string name="remove_stock_monitoring_dialog_cancel">Cancel</string>
+    <string name="stock_details_exchange_ticker_currency" translatable="false">%s: %s (%s)</string>
+    <string name="stock_details_day_change" translatable="false">%s (%s)</string>
+    <string name="stock_details_fetching_data">Fetching data</string>
+    <string name="stock_details_summary_title">Summary</string>
+    <string name="stock_details_indicators_title">Indicators</string>
+    <string name="stock_details_previous_close_title">Previous Close</string>
+    <string name="stock_details_open_title">Open</string>
+    <string name="stock_details_low_title">Low</string>
+    <string name="stock_details_high_title">High</string>
+    <string name="stock_details_low_52_week_title">52wk Low</string>
+    <string name="stock_details_high_52_week_title">52wk High</string>
+    <string name="stock_details_market_cap_title">Market Cap</string>
+    <string name="stock_details_volume_title">Volume</string>
+    <string name="stock_details_volume_avg_title">Avg Volume(3M)</string>
+    <string name="stock_details_pe_title">P/E Ratio(TTM)</string>
+    <string name="stock_details_eps_title">EPS(TTM)</string>
+    <string name="stock_details_earnings_date_title">Earnings Date</string>
+    <string name="stock_details_dividend_title">Dividend</string>
+    <string name="stock_details_sma_title">SMA(50,close)</string>
+    <string name="stock_details_ema_title">EMA(50,close)</string>
+    <string name="stock_details_rsi_title">RSI(14,close)</string>
+    <string name="stock_details_close">Close</string>
 
     <!-- other stock related texts -->
     <string name="add_stock_monitoring">Add stock monitoring</string>
@@ -46,6 +68,9 @@
     <!-- getting started -->
     <string name="getting_started_title">Hi there&#128075;</string>
     <string name="getting_started">"Press the \"Add stock monitoring\" button above to get started. Then enter a ticker for the stock you would like to monitor along with one or more monitoring options of your interest and you are good to go&#128077;\nskvirrel is now monitoring the stock for you and will notify you if your monitoring trigger, easy peasy&#128512;"</string>
+
+    <!-- characters -->
+    <string name="dash" translatable="false">-</string>
 
     <!-- keyboard -->
     <string name="keyboard_0" translatable="false">0</string>

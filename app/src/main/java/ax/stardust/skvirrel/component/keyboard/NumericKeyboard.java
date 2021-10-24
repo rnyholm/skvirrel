@@ -12,6 +12,7 @@ import ax.stardust.skvirrel.component.widget.KeyboardlessEditText;
  * Numeric keyboard implementation of the skvirrel keyboard.
  */
 public class NumericKeyboard extends SkvirrelKeyboard {
+
     // the only difference from a skvirrel "base" keyboard :(
     private Button buttonDot;
 

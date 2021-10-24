@@ -18,6 +18,7 @@ import ax.stardust.skvirrel.component.widget.KeyboardlessEditText;
  * Custom implementation of a keyboard used within the application.
  */
 public abstract class SkvirrelKeyboard extends LinearLayout implements View.OnClickListener, View.OnLongClickListener {
+
     private static final int HIDE_DELAY = 25;
     private static final int CONTINUOUS_DELETE_DELAY = 60;
 

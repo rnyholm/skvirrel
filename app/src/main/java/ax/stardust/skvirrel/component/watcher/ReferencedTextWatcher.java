@@ -11,12 +11,14 @@ import ax.stardust.skvirrel.component.widget.KeyboardlessEditText;
 import ax.stardust.skvirrel.fragment.StockFragment;
 import ax.stardust.skvirrel.monitoring.AbstractMonitoring;
 import ax.stardust.skvirrel.persistence.DatabaseManager;
+import lombok.RequiredArgsConstructor;
 import timber.log.Timber;
 
 /**
  * Special implementation of text watcher which is specialised for monitoring input. Also
  * holds several references to dependencies in order for validation and so on to work.
  */
+@RequiredArgsConstructor
 public class ReferencedTextWatcher implements TextWatcher {
 
     private final StockFragment stockFragment;
@@ -25,22 +27,6 @@ public class ReferencedTextWatcher implements TextWatcher {
     private final AbstractMonitoring monitoring;
 
     private DatabaseManager databaseManager;
-
-    /**
-     * Creates a new instance of referenced text watcher with given data
-     *
-     * @param stockFragment    stock fragment for the watcher
-     * @param editText         input field from which input should be taken
-     * @param skvirrelKeyboard keyboard for this input field
-     * @param monitoring       monitoring for this watcher
-     */
-    public ReferencedTextWatcher(StockFragment stockFragment, KeyboardlessEditText editText,
-                                 SkvirrelKeyboard skvirrelKeyboard, AbstractMonitoring monitoring) {
-        this.stockFragment = stockFragment;
-        this.editText = editText;
-        this.skvirrelKeyboard = skvirrelKeyboard;
-        this.monitoring = monitoring;
-    }
 
     @Override
     public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {

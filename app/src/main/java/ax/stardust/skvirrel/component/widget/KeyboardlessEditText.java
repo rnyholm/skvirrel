@@ -16,6 +16,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
+import lombok.Getter;
+import lombok.Setter;
 import timber.log.Timber;
 
 /**
@@ -29,6 +31,8 @@ import timber.log.Timber;
  * As this stuff is copied and pasted(it was a pain to find any good stuff about this on stack overflow) I'm not 100%
  * sure of what every little code snippet are doing. Therefore this is to be used with a bit caution.
  */
+@Getter
+@Setter
 public class KeyboardlessEditText extends AppCompatEditText {
 
     /**
@@ -76,14 +80,6 @@ public class KeyboardlessEditText extends AppCompatEditText {
         // ensure that cursor is at the end of the input box when initialized. Without this, the
         // cursor may be at index 0 when there is text added via layout XML.
         setSelection(Objects.requireNonNull(getText()).length());
-    }
-
-    public Input getInput() {
-        return input;
-    }
-
-    public void setInput(Input input) {
-        this.input = input;
     }
 
     private final View.OnClickListener onClickListener = v -> setCursorVisible(true);

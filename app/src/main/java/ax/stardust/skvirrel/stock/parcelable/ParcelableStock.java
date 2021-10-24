@@ -5,17 +5,17 @@ import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import androidx.annotation.NonNull;
-
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import ax.stardust.skvirrel.cache.CacheManager;
@@ -26,6 +26,10 @@ import ax.stardust.skvirrel.stock.indicator.ExponentialMovingAverage;
 import ax.stardust.skvirrel.stock.indicator.RelativeStrengthIndex;
 import ax.stardust.skvirrel.stock.indicator.SimpleMovingAverage;
 import ax.stardust.skvirrel.util.SkvirrelUtils;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import timber.log.Timber;
 import yahoofinance.Stock;
 import yahoofinance.histquotes.HistoricalQuote;
@@ -37,25 +41,54 @@ import yahoofinance.quotes.stock.StockStats;
 /**
  * A lighter and parcelable version of the {@link yahoofinance.Stock} class.
  */
+@Getter
+@Setter
+@NoArgsConstructor
+@ToString
 public class ParcelableStock implements Parcelable {
+
+    /**
+     * Enum for describing the change trend.
+     */
+    public enum ChangeTrend {
+        POSITIVE, NEUTRAL, NEGATIVE;
+
+        /**
+         * To resolve change trend from given change
+         *
+         * @param change to resolve change trend from
+         * @return trend of change
+         */
+        public static ChangeTrend fromChange(double change) {
+            if (change > 0) {
+                return ChangeTrend.POSITIVE;
+            } else if (change < 0) {
+                return ChangeTrend.NEGATIVE;
+            }
+            return ChangeTrend.NEUTRAL;
+        }
+    }
 
     // formatters and constants
     private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#0.00");
-    private static final DecimalFormat MARKET_CAP_BILLION_FORMAT = new DecimalFormat("###.00B");
-    private static final DecimalFormat MARKET_CAP_MILLION_FORMAT = new DecimalFormat("###.00M");
-    private static final DecimalFormat MARKET_CAP_FORMAT = new DecimalFormat("###.##");
-    private static final DecimalFormat VOLUME_FORMAT = new DecimalFormat("###,###,###");
+    private static final DecimalFormat BILLION_FORMAT = new DecimalFormat("###.00B");
+    private static final DecimalFormat MILLION_FORMAT = new DecimalFormat("###.00M");
+    private static final DecimalFormat HUNDRED_FORMAT = new DecimalFormat("###.##");
 
     private static final int BILLION = 1000000000;
     private static final int MILLION = 1000000;
 
     private static final String NOT_AVAILABLE = "N/A";
 
+    public static final String LAST_TRADE_DATE_PATTERN = "MMM dd, yyyy K:mma";
+
     // values from yahoo finance
     private String ticker;
     private String name;
     private String stockExchange;
     private String currency;
+
+    private TimeZone timeZone;
 
     private double price;
     private double change;
@@ -75,6 +108,7 @@ public class ParcelableStock implements Parcelable {
     private long volume;
     private long avgVolume;
 
+    private Calendar lastTrade;
     private Calendar earnings;
 
     // calculated values
@@ -82,15 +116,18 @@ public class ParcelableStock implements Parcelable {
     private double ema50Close;
     private double rsi14Close;
 
-    private ParcelableStock() {
-        // just empty...
-    }
-
     protected ParcelableStock(Parcel in) {
         ticker = in.readString();
         name = in.readString();
         stockExchange = in.readString();
         currency = in.readString();
+
+        // special handling for resolving time zone
+        timeZone = null;
+        String timeZoneString = in.readString();
+        if (StringUtils.isNotEmpty(timeZoneString)) {
+            timeZone = TimeZone.getTimeZone(timeZoneString);
+        }
 
         price = in.readDouble();
         change = in.readDouble();
@@ -110,12 +147,19 @@ public class ParcelableStock implements Parcelable {
         volume = in.readLong();
         avgVolume = in.readLong();
 
-        // special handling for resolving earnings
+        // special handling for resolving last trade and earnings
+        lastTrade = null;
+        long lastTradeInMillis = in.readLong();
+        if (lastTradeInMillis != Long.MIN_VALUE) {
+            lastTrade = Calendar.getInstance();
+            lastTrade.setTimeInMillis(lastTradeInMillis);
+        }
+
         earnings = null;
-        long timeInMillis = in.readLong();
-        if (timeInMillis != Long.MIN_VALUE) {
+        long earningsInMillis = in.readLong();
+        if (earningsInMillis != Long.MIN_VALUE) {
             earnings = Calendar.getInstance();
-            earnings.setTimeInMillis(timeInMillis);
+            earnings.setTimeInMillis(earningsInMillis);
         }
 
         sma50Close = in.readDouble();
@@ -153,6 +197,7 @@ public class ParcelableStock implements Parcelable {
         parcelableStock.setName(getString(stock.getName()));
         parcelableStock.setStockExchange(getString(stock.getStockExchange()));
         parcelableStock.setCurrency(getString(stock.getCurrency()));
+        parcelableStock.setTimeZone(quote.getTimeZone());
         parcelableStock.setPrice(getDouble(currentPrice));
         parcelableStock.setChange(getDouble(quote.getChange()));
         parcelableStock.setChangePercent(getDouble(quote.getChangeInPercent()));
@@ -167,6 +212,7 @@ public class ParcelableStock implements Parcelable {
         parcelableStock.setAvgVolume(getLong(quote.getAvgVolume()));
         parcelableStock.setPe(getDouble(stats.getPe()));
         parcelableStock.setEps(getDouble(stats.getEps()));
+        parcelableStock.setLastTrade(quote.getLastTradeTime());
         parcelableStock.setEarnings(stats.getEarningsAnnouncement());
 
         // only set dividend data if enough data exists
@@ -231,6 +277,7 @@ public class ParcelableStock implements Parcelable {
         parcel.writeString(name);
         parcel.writeString(stockExchange);
         parcel.writeString(currency);
+        parcel.writeString(timeZone != null ? timeZone.getID() : "");
 
         parcel.writeDouble(price);
         parcel.writeDouble(change);
@@ -250,6 +297,7 @@ public class ParcelableStock implements Parcelable {
         parcel.writeLong(volume);
         parcel.writeLong(avgVolume);
 
+        parcel.writeLong(lastTrade != null ? lastTrade.getTimeInMillis() : Long.MIN_VALUE);
         parcel.writeLong(earnings != null ? earnings.getTimeInMillis() : Long.MIN_VALUE);
 
         parcel.writeDouble(sma50Close);
@@ -276,7 +324,7 @@ public class ParcelableStock implements Parcelable {
         return bigDecimal.doubleValue();
     }
 
-    private static Long getLong(Long l) {
+    private static long getLong(Long l) {
         if (l == null) {
             return Long.MIN_VALUE;
         }
@@ -296,448 +344,222 @@ public class ParcelableStock implements Parcelable {
     }
 
     /**
-     * To get ticker, returns N/A if data was not available from yahoo finance
-     *
-     * @return ticker
-     */
-    public String getTicker() {
-        return ticker;
-    }
-
-    public void setTicker(String ticker) {
-        this.ticker = ticker;
-    }
-
-    /**
-     * To get name, returns N/A if data was not available from yahoo finance
-     *
-     * @return name
-     */
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * To get stock exchange, returns N/A if data was not available from yahoo finance
-     *
-     * @return stock exchange
-     */
-    public String getStockExchange() {
-        return stockExchange;
-    }
-
-    public void setStockExchange(String stockExchange) {
-        this.stockExchange = stockExchange;
-    }
-
-    /**
-     * To get currency, returns N/A if data was not available from yahoo finance
-     *
-     * @return currency
-     */
-    public String getCurrency() {
-        return currency;
-    }
-
-    public void setCurrency(String currency) {
-        this.currency = currency;
-    }
-
-    /**
-     * To get price, returns {@link SkvirrelUtils#UNSET} if data was not available from yahoo finance
-     *
-     * @return price
-     */
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    /**
-     * To get change, returns {@link SkvirrelUtils#UNSET} if data was not available from yahoo finance
-     *
-     * @return change
-     */
-    public double getChange() {
-        return change;
-    }
-
-    public void setChange(double change) {
-        this.change = change;
-    }
-
-    /**
-     * To get change percent, returns {@link SkvirrelUtils#UNSET} if data was not available from yahoo finance
-     *
-     * @return change percent
-     */
-    public double getChangePercent() {
-        return changePercent;
-    }
-
-    public void setChangePercent(double changePercent) {
-        this.changePercent = changePercent;
-    }
-
-    /**
-     * To get previous close, returns {@link SkvirrelUtils#UNSET} if data was not available from yahoo finance
-     *
-     * @return previous close
-     */
-    public double getPreviousClose() {
-        return previousClose;
-    }
-
-    public void setPreviousClose(double previousClose) {
-        this.previousClose = previousClose;
-    }
-
-    /**
-     * To get open, returns {@link SkvirrelUtils#UNSET} if data was not available from yahoo finance
-     *
-     * @return open
-     */
-    public double getOpen() {
-        return open;
-    }
-
-    public void setOpen(double open) {
-        this.open = open;
-    }
-
-    /**
-     * To get low, returns {@link SkvirrelUtils#UNSET} if data was not available from yahoo finance
-     *
-     * @return low
-     */
-    public double getLow() {
-        return low;
-    }
-
-    public void setLow(double low) {
-        this.low = low;
-    }
-
-    /**
-     * To get high, returns {@link SkvirrelUtils#UNSET} if data was not available from yahoo finance
-     *
-     * @return high
-     */
-    public double getHigh() {
-        return high;
-    }
-
-    public void setHigh(double high) {
-        this.high = high;
-    }
-
-    /**
-     * To get 52 week low, returns {@link SkvirrelUtils#UNSET} if data was not available from yahoo finance
-     *
-     * @return 52 week low
-     */
-    public double getLow52Week() {
-        return low52Week;
-    }
-
-    public void setLow52Week(double low52Week) {
-        this.low52Week = low52Week;
-    }
-
-    /**
-     * To get 52 week high, returns {@link SkvirrelUtils#UNSET} if data was not available from yahoo finance
-     *
-     * @return 52 week high
-     */
-    public double getHigh52Week() {
-        return high52Week;
-    }
-
-    public void setHigh52Week(double high52Week) {
-        this.high52Week = high52Week;
-    }
-
-    /**
-     * To get market cap, returns {@link SkvirrelUtils#UNSET} if data was not available from yahoo finance
-     *
-     * @return market cap
-     */
-    public double getMarketCap() {
-        return marketCap;
-    }
-
-    public void setMarketCap(double marketCap) {
-        this.marketCap = marketCap;
-    }
-
-    /**
-     * To get pe, returns {@link SkvirrelUtils#UNSET} if data was not available from yahoo finance
-     *
-     * @return pe
-     */
-    public double getPe() {
-        return pe;
-    }
-
-    public void setPe(double pe) {
-        this.pe = pe;
-    }
-
-    /**
-     * To get eps, returns {@link SkvirrelUtils#UNSET} if data was not available from yahoo finance
-     *
-     * @return eps
-     */
-    public double getEps() {
-        return eps;
-    }
-
-    public void setEps(double eps) {
-        this.eps = eps;
-    }
-
-    /**
-     * To get annual yield, returns {@link SkvirrelUtils#UNSET} if data was not available from yahoo finance
-     *
-     * @return annual yield
-     */
-    public double getAnnualYield() {
-        return annualYield;
-    }
-
-    public void setAnnualYield(double annualYield) {
-        this.annualYield = annualYield;
-    }
-
-    /**
-     * To get annual yield percent, returns {@link SkvirrelUtils#UNSET} if data was not available from yahoo finance
-     *
-     * @return annual yield percent
-     */
-    public double getAnnualYieldPercent() {
-        return annualYieldPercent;
-    }
-
-    public void setAnnualYieldPercent(double annualYieldPercent) {
-        this.annualYieldPercent = annualYieldPercent;
-    }
-
-    /**
-     * To get volume, returns {@link Long#MIN_VALUE} if data was not available from yahoo finance
-     *
-     * @return volume
-     */
-    public Long getVolume() {
-        return volume;
-    }
-
-    public void setVolume(Long volume) {
-        this.volume = volume;
-    }
-
-    /**
-     * To get average volume, returns {@link Long#MIN_VALUE} if data was not available from yahoo finance
-     *
-     * @return average volume
-     */
-    public Long getAvgVolume() {
-        return avgVolume;
-    }
-
-    public void setAvgVolume(Long avgVolume) {
-        this.avgVolume = avgVolume;
-    }
-
-    /**
-     * To get earnings, returns null if data was not available from yahoo finance
-     *
-     * @return earnings
-     */
-    public Calendar getEarnings() {
-        return earnings;
-    }
-
-    public void setEarnings(Calendar earnings) {
-        this.earnings = earnings;
-    }
-
-    /**
-     * To get simple moving average(50, close)
-     *
-     * @return simple moving average(50, close)
-     */
-    public double getSma50Close() {
-        return sma50Close;
-    }
-
-    public void setSma50Close(double sma50Close) {
-        this.sma50Close = sma50Close;
-    }
-
-    /**
-     * To get exponential moving average(50, close)
-     *
-     * @return exponential moving average(50, close)
-     */
-    public double getEma50Close() {
-        return ema50Close;
-    }
-
-    public void setEma50Close(double ema50Close) {
-        this.ema50Close = ema50Close;
-    }
-
-    /**
-     * To get relative strength index(14, close)
-     *
-     * @return relative strength index(14, close)
-     */
-    public double getRsi14Close() {
-        return rsi14Close;
-    }
-
-    public void setRsi14Close(double rsi14Close) {
-        this.rsi14Close = rsi14Close;
-    }
-
-    /**
-     * Convenience method to transform given double to a string. If given double {@link SkvirrelUtils#UNSET}
-     * then a default string of N/A is returned
+     * Convenience method to transform given double value to a string.
+     * If given double is {@link SkvirrelUtils#UNSET} then a default string of N/A is returned.
      *
      * @param value to transform
      * @return string representation of given double
      */
-    public static String getString(double value) {
-        if (SkvirrelUtils.UNSET == value) {
-            return NOT_AVAILABLE;
-        }
-        return DECIMAL_FORMAT.format(value).replace(",", ".");
+    public static String toString(double value) {
+        return toString(value, Double.NaN, "", "", false, false);
     }
 
     /**
-     * Convenience method to transform given double to a string with given suffix.
-     * If given double {@link SkvirrelUtils#UNSET} then a default string of N/A is returned,
-     * else string representation of given double with given suffix is returned
+     * Convenience method to transform given double value to a string with given suffix. Besides that
+     * it's possible to choose if the values should be formatted as large numbers(millions, billions, etc.)
+     * If given double is {@link SkvirrelUtils#UNSET} then a default string of N/A is returned.
      *
      * @param value  to transform
-     * @param suffix of transformed double
-     * @return string representation of given double with given suffix
+     * @param largeNumberFormat if values should be formatted as large numbers(millions, billions, etc.)
+     * @return string representation of given double
      */
-    public static String getString(double value, String suffix) {
-        String str = getString(value);
-        return NOT_AVAILABLE.equals(str) ? str : str + suffix;
+    public static String toString(double value, boolean largeNumberFormat) {
+        return toString(value, Double.NaN, "", "", false, largeNumberFormat);
     }
 
     /**
-     * Convenience method to transform given market cap to a string. If given market cap
-     * {@link SkvirrelUtils#UNSET} then a default string of N/A is returned
+     * Convenience method to transform given double value to a string with given suffix.
+     * If given double is {@link SkvirrelUtils#UNSET} then a default string of N/A is returned.
      *
-     * @param marketCap to transform
-     * @return string representation of market cap
+     * @param value  to transform
+     * @param suffix of transformed value
+     * @return string representation of given double
      */
-    public static String getMarketCapString(double marketCap) {
-        if (SkvirrelUtils.UNSET == marketCap) {
+    public static String toString(double value, String suffix) {
+        return toString(value, Double.NaN, suffix, "", false, false);
+    }
+
+    /**
+     * Convenience method to transform given double value to a string with given suffix. It's also
+     * possible to force a prefix(+/- sign) on the formatted values.
+     * If given double is {@link SkvirrelUtils#UNSET} then a default string of N/A is returned.
+     *
+     * @param value       to transform
+     * @param suffix      of transformed value
+     * @param forcePrefix if prefix should be forced(+/- signs)
+     * @return string representation of given double
+     */
+    public static String toString(double value, String suffix, boolean forcePrefix) {
+        return toString(value, Double.NaN, suffix, "", forcePrefix, false);
+    }
+
+    /**
+     * Convenience method to transform given double values to a string with given suffix and formatted
+     * with given pattern.
+     * If the second double value is not a NaN then the method will take that into account as well.
+     * Note! formatting is only taken into account if two values are being handled, if no format
+     * is passed in a default one of '%s(%s)' is used.
+     * If given double(s) are {@link SkvirrelUtils#UNSET} then a default string of N/A is returned.
+     *
+     * @param value1 to transform
+     * @param value2 to transform
+     * @param suffix of transformed value(s)
+     * @param format format of the transformed values
+     * @return string representation of given double(s)
+     */
+    public static String toString(double value1, double value2, String suffix, String format) {
+        return toString(value1, value2, suffix, format, false, false);
+    }
+
+    /**
+     * Convenience method to transform given double values to a string with given suffix and formatted
+     * with given pattern. It's also possible to force a prefix(+/- sign) on the formatted values.
+     * Besides that it's possible to choose if the values should be formatted as large numbers(millions,
+     * billions, etc.)
+     * If the second double value is not a NaN then the method will take that into account as well.
+     * Note! formatting is only taken into account if two values are being handled, if no format
+     * is passed in a default one of '%s(%s)' is used.
+     * If given double(s) are {@link SkvirrelUtils#UNSET} then a default string of N/A is returned.
+     *
+     * @param value1            to transform
+     * @param value2            to transform
+     * @param suffix            of transformed value(s)
+     * @param format            format of the transformed values
+     * @param forcePrefix       if prefix should be forced(+/- signs)
+     * @param largeNumberFormat if values should be formatted as large numbers(millions, billions, etc.)
+     * @return string representation of given double(s)
+     */
+    public static String toString(double value1, double value2, String suffix, String format, boolean forcePrefix, boolean largeNumberFormat) {
+        if (SkvirrelUtils.UNSET == value1
+                || (!Double.isNaN(value2) && SkvirrelUtils.UNSET == value2)) {
             return NOT_AVAILABLE;
         }
 
+        String str1 = numberFormat(value1, largeNumberFormat);
+        String str2 = !Double.isNaN(value2) ? numberFormat(value2, largeNumberFormat) : "";
+
+        if (StringUtils.isBlank(str2)) {
+            str1 = str1 + suffix;
+        } else {
+            str2 = str2 + suffix;
+        }
+
+        if (forcePrefix) {
+            str1 = addPrefix(value1, str1);
+
+            if (StringUtils.isNotBlank(str2)) {
+                str2 = addPrefix(value2, str2);
+            }
+        }
+
+        if (StringUtils.isNotBlank(str2)) {
+            if (StringUtils.isBlank(format)) {
+                str1 = String.format("%s(%s)", str1, str2);
+            } else {
+                str1 = String.format(format, str1, str2);
+            }
+        }
+
+        return str1;
+    }
+
+    /**
+     * Convenience method to transform given time zone to a string. If given time zone is null
+     * then a default string of N/A is returned
+     *
+     * @param timeZone to transform
+     * @return string representation of given time zone
+     */
+    public static String toString(TimeZone timeZone) {
+        if (timeZone == null) {
+            return NOT_AVAILABLE;
+        }
+        return timeZone.getID();
+    }
+
+    /**
+     * Convenience method to transform given calendar with given timezone to a string formatted
+     * according to given pattern. A default pattern of 'dd MMM yyyy' will be used and no short
+     * display name of timezone will be appended to returned string.
+     * If given calendar or timezone is null then a default string of N/A is returned.
+     *
+     * @param calendar to transform
+     * @param timeZone time zone of calendar
+     * @return string representation of given calendar
+     */
+    public static String toString(Calendar calendar, TimeZone timeZone) {
+        return toString(calendar,timeZone, "", false);
+    }
+
+    /**
+     * Convenience method to transform given calendar with given timezone to a string formatted
+     * according to given pattern. It's also possible to decide whether or not to append the short
+     * display name of the timezone to the formatted string. If given calendar or timezone is null
+     * then a default string of N/A is returned.
+     * If no pattern is given a default of 'dd MMM yyyy' will be used.
+     *
+     * @param calendar          to transform
+     * @param timeZone          time zone of calendar
+     * @param pattern           pattern for the calender to be formatted after
+     * @param appendTimeZone    if the short display name of the timezone should be appended or not
+     *                          not the returned string
+     * @return string representation of given calendar
+     */
+    public static String toString(Calendar calendar, TimeZone timeZone, String pattern, boolean appendTimeZone) {
+        if (calendar == null || timeZone == null) {
+            return NOT_AVAILABLE;
+        }
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat(
+                StringUtils.isNotBlank(pattern) ? pattern : "dd MMM yyyy", Locale.ENGLISH);
+        dateFormat.setTimeZone(timeZone);
+
+        String timeZoneShortDisplayName = "";
+
+        if (appendTimeZone) {
+            String displayName = timeZone.getDisplayName(Locale.ENGLISH);
+            timeZoneShortDisplayName = " " + StringUtils.toRootUpperCase(
+                    Arrays.stream(displayName.split(" "))
+                            .map(s -> "" + s.charAt(0)).collect(Collectors.joining()));
+        }
+
+        return dateFormat.format(calendar.getTime()) + timeZoneShortDisplayName;
+    }
+
+    private static String numberFormat(double value, boolean largeNumberFormat) {
+        String str = largeNumberFormat ? largeNumberFormat(value) : smallNumberFormat(value);
+        return str.replace(",", ".");
+    }
+
+    private static String smallNumberFormat(double value) {
+        return DECIMAL_FORMAT.format(value);
+    }
+
+    private static String largeNumberFormat(double value) {
         // billion
-        if (marketCap >= BILLION) {
-            return MARKET_CAP_BILLION_FORMAT
-                    .format(SkvirrelUtils.round(marketCap / BILLION))
-                    .replace(",", ".");
+        if (value >= BILLION || value <= (BILLION * -1)) {
+            return BILLION_FORMAT
+                    .format(SkvirrelUtils.round(value / BILLION));
         }
 
         // million
-        if (marketCap >= MILLION) {
-            return MARKET_CAP_MILLION_FORMAT
-                    .format(SkvirrelUtils.round(marketCap / MILLION))
-                    .replace(",", ".");
+        if (value >= MILLION || value <= (MILLION * -1)) {
+            return MILLION_FORMAT
+                    .format(SkvirrelUtils.round(value / MILLION));
         }
 
-        return MARKET_CAP_FORMAT.format(marketCap).replace(",", ".");
+        return HUNDRED_FORMAT.format(value);
     }
 
-    /**
-     * Convenience method to transform given annual yield and percentage into a string.
-     * If either the annual yield or percentage {@link SkvirrelUtils#UNSET}
-     * then a default string of N/A is returned
-     *
-     * @param annualYield        to transform
-     * @param annualYieldPercent to transform
-     * @return string representation of annual yield and percentage
-     */
-    public static String getDividendString(double annualYield, double annualYieldPercent) {
-        if (SkvirrelUtils.UNSET == annualYield || SkvirrelUtils.UNSET == annualYieldPercent) {
-            return NOT_AVAILABLE;
+    private static String addPrefix(double value, String string) {
+        String sign = value > 0 ? "+" : value < 0 ? "-" : "";
+
+        // validate first character of number if it's not a number remove it
+        char c = string.charAt(0);
+        if (!(c >= '0' && c <= '9')) {
+            string = string.substring(1);
         }
-        return String.format("%s(%s%%)", getString(annualYield), getString(annualYieldPercent));
-    }
 
-    /**
-     * Convenience method to transform given long to a string. If given long {@link Long#MIN_VALUE}
-     * then a default string of N/A is returned
-     *
-     * @param l long to transform
-     * @return string representation of given long
-     */
-    public static String getString(Long l) {
-        if (l == Long.MIN_VALUE) {
-            return NOT_AVAILABLE;
-        }
-        return VOLUME_FORMAT.format(l).replace(".", ",");
-    }
-
-    /**
-     * Convenience method to transform given calendar to a string. If given calendar is null then a
-     * default string of N/A is returned
-     *
-     * @param calendar to transform
-     * @return string representation of given calendar
-     */
-    public static String getString(Calendar calendar) {
-        if (calendar == null) {
-            return NOT_AVAILABLE;
-        }
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
-        return dateFormat.format(calendar.getTime());
-    }
-
-    @Override
-    @NonNull
-    public String toString() {
-        return "ParcelableStock {" +
-                "\n\tticker='" + ticker + '\'' +
-                "\n\tname='" + name + '\'' +
-                "\n\tstockExchange='" + stockExchange + '\'' +
-                "\n\tcurrency='" + currency + '\'' +
-                "\n\tprice='" + getString(price) + '\'' +
-                "\n\tchange='" + getString(change) + '\'' +
-                "\n\tchangePercent='" + getString(changePercent, "%") + '\'' +
-                "\n\tpreviousClose='" + getString(previousClose) + '\'' +
-                "\n\topen='" + getString(open) + '\'' +
-                "\n\tlow='" + getString(low) + '\'' +
-                "\n\thigh='" + getString(high) + '\'' +
-                "\n\tlow52Week='" + getString(low52Week) + '\'' +
-                "\n\thigh52Week='" + getString(high52Week) + '\'' +
-                "\n\tmarketCap='" + getMarketCapString(marketCap) + '\'' +
-                "\n\tpe='" + getString(pe, "x") + '\'' +
-                "\n\teps='" + getString(eps) + '\'' +
-                "\n\tannualYield='" + getString(annualYield) + '\'' +
-                "\n\tannualYieldPercent='" + getString(annualYieldPercent, "%") + '\'' +
-                "\n\tdividend='" + getDividendString(annualYield, annualYieldPercent) + '\'' +
-                "\n\tvolume='" + getString(volume) + '\'' +
-                "\n\tavgVolume='" + getString(avgVolume) + '\'' +
-                "\n\tearnings='" + getString(earnings) + '\'' +
-                "\n\tsma50Close='" + getString(sma50Close) + '\'' +
-                "\n\tema50Close='" + getString(ema50Close) + '\'' +
-                "\n\trsi14Close='" + getString(rsi14Close) + '\'' +
-                "\n}";
+        return sign + string;
     }
 }

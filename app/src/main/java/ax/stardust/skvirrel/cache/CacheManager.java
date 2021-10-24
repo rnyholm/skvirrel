@@ -7,25 +7,18 @@ import androidx.annotation.NonNull;
 import java.util.ArrayList;
 
 import ax.stardust.skvirrel.persistence.DatabaseManager;
+import lombok.RequiredArgsConstructor;
 import timber.log.Timber;
 
 /**
  * Manager for caches within application.
  */
+@RequiredArgsConstructor
 public class CacheManager {
 
     private final Context context;
 
     private DatabaseManager databaseManager;
-
-    /**
-     * Creates a new instance with given context
-     *
-     * @param context context of cache handler
-     */
-    public CacheManager(@NonNull Context context) {
-        this.context = context;
-    }
 
     /**
      * To get indicator cache for given ticker. If an indicator cache doesn't exists in the database

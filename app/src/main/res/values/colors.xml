@@ -24,5 +24,7 @@
     <color name="colorBackground">#FAFAFA</color>
     <color name="colorHeadingText">#737373</color>
     <color name="colorText">#737373</color>
+    <color name="colorTextGreen">#77D473</color>
+    <color name="colorTextRed">#FF9999</color>
     <color name="colorInputText">#4A4A4A</color>
 </resources>
