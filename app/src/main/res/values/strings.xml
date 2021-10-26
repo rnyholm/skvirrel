@@ -2,6 +2,7 @@
     <!-- common app -->
     <string name="app_name" translatable="false">skvirrel</string>
     <string name="author" translatable="false">by @rupert,</string>
+    <string name="skvirrel_email" translatable="false">skvirrel.app@gmail.com</string>
 
     <!-- stock fragment -->
     <string name="enter_ticker_hint">Enter a ticker..</string>
@@ -56,6 +57,10 @@
     <string name="stock_details_ema_title">EMA(50,close)</string>
     <string name="stock_details_rsi_title">RSI(14,close)</string>
     <string name="stock_details_close">Close</string>
+    <string name="crash_report_dialog_title">Oh no&#128533;</string>
+    <string name="crash_report_dialog_message">Unfortunately skvirrel has crashed, or in other words, the developer has f%#ked up!\nWould you like to help out with the investigation of the problem by sending the crash report to the developer?</string>
+    <string name="crash_report_dialog_send">Send</string>
+    <string name="crash_report_dialog_cancel" >Cancel</string>
 
     <!-- other stock related texts -->
     <string name="add_stock_monitoring">Add stock monitoring</string>
@@ -68,6 +73,10 @@
     <!-- getting started -->
     <string name="getting_started_title">Hi there&#128075;</string>
     <string name="getting_started">"Press the \"Add stock monitoring\" button above to get started. Then enter a ticker for the stock you would like to monitor along with one or more monitoring options of your interest and you are good to go&#128077;\nskvirrel is now monitoring the stock for you and will notify you if your monitoring trigger, easy peasy&#128512;"</string>
+
+    <!-- crash report -->
+    <string name="crash_report_email_subject" translatable="false">skvirrel crash report</string>
+    <string name="crash_report_filename" translatable="false">skvirrel-crash-report.stacktrace</string>
 
     <!-- characters -->
     <string name="dash" translatable="false">-</string>

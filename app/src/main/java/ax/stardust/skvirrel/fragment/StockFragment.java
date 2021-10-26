@@ -20,7 +20,6 @@ import androidx.fragment.app.Fragment;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Objects;
 import java.util.SplittableRandom;
 
 import ax.stardust.skvirrel.R;
@@ -48,6 +47,7 @@ import timber.log.Timber;
 /**
  * Fragment holding ui and data behind it for a stock monitoring.
  */
+@SuppressWarnings("deprecation")
 public class StockFragment extends Fragment implements DialogInteractionListener {
     // parent of fragment
     private final Skvirrel activity;
@@ -237,7 +237,7 @@ public class StockFragment extends Fragment implements DialogInteractionListener
             // show the stock details dialog already but with a spinner, indicating user that we're fetching data
             stockDetailsDialog = new StockDetailsDialog();
             stockDetailsDialog.setTargetFragment(this, (int) stockMonitoring.getId());
-            stockDetailsDialog.show(Objects.requireNonNull(getFragmentManager()), StockDetailsDialog.FRAGMENT_TAG);
+            stockDetailsDialog.show(requireFragmentManager(), StockDetailsDialog.FRAGMENT_TAG);
         });
 
         resetNotificationButton.setOnClickListener(view -> {
@@ -267,7 +267,7 @@ public class StockFragment extends Fragment implements DialogInteractionListener
                 getString(R.string.remove_stock_monitoring_dialog_cancel));
 
         removeDialog.setTargetFragment(this, (int) stockMonitoring.getId());
-        removeDialog.show(Objects.requireNonNull(getFragmentManager()), ConfirmDialog.FRAGMENT_TAG);
+        removeDialog.show(requireFragmentManager(), ConfirmDialog.FRAGMENT_TAG);
     }
 
     private void updateCompanyWidget() {

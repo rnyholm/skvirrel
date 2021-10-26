@@ -47,4 +47,8 @@
     <string name="stock_details_sma_title">SMA(50,close)</string>
     <string name="stock_details_ema_title">EMA(50,close)</string>
     <string name="stock_details_rsi_title">RSI(14,close)</string>
+    <string name="crash_report_dialog_title">Oh no&#128533;</string>
+    <string name="crash_report_dialog_message">Unfortunately skvirrel has crashed, or in other words, the developer has f%#ked up!\nWould you like to help out with the investigation of the problem by sending the crash report to the developer?</string>
+    <string name="crash_report_dialog_send">Send</string>
+    <string name="crash_report_dialog_cancel" >Cancel</string>
 </resources>

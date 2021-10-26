@@ -43,6 +43,14 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".activity.SkvirrelCrashReportDialog"
+            android:theme="@style/Theme.AppCompat.Dialog"
+            android:process=":acra"
+            android:excludeFromRecents="true"
+            android:finishOnTaskLaunch="true"
+            android:launchMode="singleInstance" />
+
         <service android:name=".service.StockService"
             android:label="Yahoo Finance communication service"
             android:permission="android.permission.BIND_JOB_SERVICE"/>

@@ -1,11 +1,19 @@
 package ax.stardust.skvirrel.application;
 
 import android.app.Application;
+import android.content.Context;
 import android.util.Log;
 
+import org.acra.ACRA;
+import org.acra.config.CoreConfigurationBuilder;
+import org.acra.config.DialogConfigurationBuilder;
+import org.acra.config.MailSenderConfigurationBuilder;
+import org.acra.data.StringFormat;
 import org.jetbrains.annotations.NotNull;
 
 import ax.stardust.skvirrel.BuildConfig;
+import ax.stardust.skvirrel.R;
+import ax.stardust.skvirrel.activity.SkvirrelCrashReportDialog;
 import ax.stardust.skvirrel.notification.NotificationHandler;
 import ax.stardust.skvirrel.schedule.MonitoringScheduler;
 import timber.log.Timber;
@@ -37,6 +45,34 @@ public class SkvirrelApplication extends Application {
         // create notification handler and schedule monitoring job
         NotificationHandler.createNotificationChannel(this);
         MonitoringScheduler.scheduleJob(this);
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+
+        // configure acra
+        CoreConfigurationBuilder builder = new CoreConfigurationBuilder(this);
+
+        // core configuration
+        builder.withBuildConfigClass(BuildConfig.class)
+                .withReportFormat(StringFormat.JSON);
+
+        // mail configuration
+        builder.getPluginConfigurationBuilder(MailSenderConfigurationBuilder.class)
+                .withSubject(getString(R.string.crash_report_email_subject))
+                .withMailTo(getString(R.string.skvirrel_email))
+                .withReportFileName(getString(R.string.crash_report_filename))
+                .withReportAsFile(true)
+                //make sure to enable all plugins you want to use:
+                .withEnabled(true);
+
+        // dialog configuration
+        builder.getPluginConfigurationBuilder(DialogConfigurationBuilder.class)
+                .withReportDialogClass(SkvirrelCrashReportDialog.class)
+                .withEnabled(true);
+
+        ACRA.init(this, builder);
     }
 
     /**
