@@ -1,4 +1,4 @@
-name: DevBuild(develop)
+name: develop-build
 
 on:
   push:
