@@ -39,7 +39,8 @@ android {
 
     // configure keystore if git action is running the build
     if (System.getenv("CI") == "true") {
-        def path = System.getProperty("user.home") + "/work/_temp/keystore/"
+        def path = System.getenv("RUNNER_TEMP") + "/keystore"
+        // def path = System.getProperty("user.home") + "/work/_temp/keystore/"
         def files = new File(path).listFiles()
 
         if (files != null) {
