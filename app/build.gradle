@@ -48,7 +48,7 @@ android {
             keystoreFile.renameTo("keystore/skvirrel.jks")
         }
 
-        signingConfigs.release.storeFile = file("/home/runner/work/_temp/keystore/skvirrel.jks")
+        signingConfigs.release.storeFile = file(System.getenv("RUNNER_TEMP") + "/keystore/skvirrel.jks")
         signingConfigs.release.storePassword System.getenv("SIGNING_STORE_PASSWORD")
         signingConfigs.release.keyAlias System.getenv("SIGNING_KEY_ALIAS")
         signingConfigs.release.keyPassword System.getenv("SIGNING_KEY_PASSWORD")
