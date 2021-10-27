@@ -13,7 +13,7 @@ jobs:
       uses: timheuer/base64-to-file@v1
       with:
         fileName: 'keystore/skvirrel.jks'
-        encodeString: ${{ secrets.KEYSTORE }}
+        encodedString: ${{ secrets.KEYSTORE }}
 
     - name: Checkout code
       uses: actions/checkout@v2
