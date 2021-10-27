@@ -1,9 +1,4 @@
-# skvirrel [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://raw.githubusercontent.com/rnyholm/runcalc/master/LICENSE)
-
-Branch | Travis opinion
--------|-------
-Master | [![Build Status](https://travis-ci.com/rnyholm/skvirrel.svg?branch=master)](https://travis-ci.com/rnyholm/skvirrel)
-Develop | [![Build Status](https://travis-ci.com/rnyholm/skvirrel.svg?branch=dev-v1.0)](https://travis-ci.com/rnyholm/skvirrel)
+# skvirrel [![develop-build](https://github.com/rnyholm/skvirrel/actions/workflows/dev-build.yml/badge.svg?branch=develop)](https://github.com/rnyholm/skvirrel/actions/workflows/dev-build.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://raw.githubusercontent.com/rnyholm/runcalc/master/LICENSE)
 
 ## Introduction
 Application for monitoring preferred stocks and some key values for them. Depending on user settings notifications will be dispatched to notify user of changes of selected key values, eg. price crossing, RSI below and so on.
