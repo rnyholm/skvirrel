@@ -45,7 +45,7 @@ jobs:
           path: app/build/outputs/
 
     - name: Create Release
-      if: github.event_name == 'release'
+      if: github.ref == 'refs/heads/develop'
       id: create_release
       uses: actions/create-release@v1
       env:
@@ -57,7 +57,7 @@ jobs:
           prerelease: false
 
     - name: Upload apk to release
-      if: github.event_name == 'release'
+      if: github.ref == 'refs/heads/develop'
       id: upload-release-asset 
       uses: actions/upload-release-asset@v1
       env:
