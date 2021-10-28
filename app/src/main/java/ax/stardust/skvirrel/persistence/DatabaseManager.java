@@ -293,17 +293,17 @@ public class DatabaseManager {
     }
 
     private StockMonitoring getStockMonitoring(Cursor cursor) {
-        StockMonitoring stockMonitoring = new StockMonitoring(cursor.getInt(cursor.getColumnIndex(DatabaseHelper.ID_COLUMN)));
-        stockMonitoring.setTicker(cursor.getString(cursor.getColumnIndex(DatabaseHelper.TICKER_COLUMN)));
-        stockMonitoring.setCompanyName(cursor.getString(cursor.getColumnIndex(DatabaseHelper.COMPANY_NAME_COLUMN)));
-        stockMonitoring.setViewState(StockMonitoring.ViewState.valueOf(cursor.getString(cursor.getColumnIndex(DatabaseHelper.VIEW_STATE_COLUMN))));
-        stockMonitoring.setSortingOrder(cursor.getInt(cursor.getColumnIndex(DatabaseHelper.SORTING_ORDER_COLUMN)));
+        StockMonitoring stockMonitoring = new StockMonitoring(cursor.getInt(getColumnIndex(cursor, DatabaseHelper.ID_COLUMN)));
+        stockMonitoring.setTicker(cursor.getString(getColumnIndex(cursor, DatabaseHelper.TICKER_COLUMN)));
+        stockMonitoring.setCompanyName(cursor.getString(getColumnIndex(cursor, DatabaseHelper.COMPANY_NAME_COLUMN)));
+        stockMonitoring.setViewState(StockMonitoring.ViewState.valueOf(cursor.getString(getColumnIndex(cursor, DatabaseHelper.VIEW_STATE_COLUMN))));
+        stockMonitoring.setSortingOrder(cursor.getInt(getColumnIndex(cursor, DatabaseHelper.SORTING_ORDER_COLUMN)));
 
         // special handling for monitoring options as the specific monitorings within it should
         // hold a reference to the stock monitoring that owns it, and this reference is not
         // serializable which means we must set it manual
         StockMonitoring.MonitoringOptions monitoringOptions = gson.fromJson(
-                cursor.getString(cursor.getColumnIndex(DatabaseHelper.MONITORING_OPTIONS_COLUMN)),
+                cursor.getString(getColumnIndex(cursor, DatabaseHelper.MONITORING_OPTIONS_COLUMN)),
                 StockMonitoring.MonitoringOptions.class);
         monitoringOptions.setStockMonitoring(stockMonitoring);
 
@@ -315,13 +315,21 @@ public class DatabaseManager {
 
     private IndicatorCache getIndicatorCache(Cursor cursor) {
         IndicatorCache indicatorCache = new IndicatorCache(
-                cursor.getInt(cursor.getColumnIndex(DatabaseHelper.ID_COLUMN)),
-                cursor.getString(cursor.getColumnIndex(DatabaseHelper.TICKER_COLUMN)));
-        indicatorCache.setSma(cursor.getDouble(cursor.getColumnIndex(DatabaseHelper.SMA_COLUMN)));
-        indicatorCache.setEma(cursor.getDouble(cursor.getColumnIndex(DatabaseHelper.EMA_COLUMN)));
-        indicatorCache.setRsi(cursor.getDouble(cursor.getColumnIndex(DatabaseHelper.RSI_COLUMN)));
-        indicatorCache.setExpires(cursor.getLong(cursor.getColumnIndex(DatabaseHelper.EXPIRES_COLUMN)));
+                cursor.getInt(getColumnIndex(cursor, DatabaseHelper.ID_COLUMN)),
+                cursor.getString(getColumnIndex(cursor, DatabaseHelper.TICKER_COLUMN)));
+        indicatorCache.setSma(cursor.getDouble(getColumnIndex(cursor, DatabaseHelper.SMA_COLUMN)));
+        indicatorCache.setEma(cursor.getDouble(getColumnIndex(cursor, DatabaseHelper.EMA_COLUMN)));
+        indicatorCache.setRsi(cursor.getDouble(getColumnIndex(cursor, DatabaseHelper.RSI_COLUMN)));
+        indicatorCache.setExpires(cursor.getLong(getColumnIndex(cursor, DatabaseHelper.EXPIRES_COLUMN)));
 
         return indicatorCache;
+    }
+
+    private int getColumnIndex(Cursor cursor, String column) {
+        int columnIndex = cursor.getColumnIndex(column);
+        if (columnIndex < 0) {
+            throw new IllegalArgumentException(String.format("No column exists for given argument: %s", column));
+        }
+        return columnIndex;
     }
 }
