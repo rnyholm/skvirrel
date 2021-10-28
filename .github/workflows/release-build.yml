@@ -1,8 +1,8 @@
-name: Build
+name: Release build
 
 on:
   push:
-    branches: [ master, develop ]
+    branches: [ master ]
   release:
     types: [ created ]
 
@@ -51,5 +51,6 @@ jobs:
         repo_token: ${{ secrets.GH_ACTIONS_ACCESS_TOKEN }}
         file: app/build/outputs/apk/release/*release.apk
         tag: ${{ github.ref }}
+        body: ""
         overwrite: true
         file_glob: true
