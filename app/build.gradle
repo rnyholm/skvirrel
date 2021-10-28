@@ -61,7 +61,7 @@ android {
     }
 
     lintOptions {
-        abortOnError false // todo: change this
+        abortOnError false
         ignoreWarnings false
     }
 
