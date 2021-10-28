@@ -1,4 +1,4 @@
-name: build
+name: Build
 
 on:
   push:
@@ -46,7 +46,7 @@ jobs:
           path: app/build/outputs/
 
     - name: Upload apk to release
-      # if: github.ref == 'refs/heads/develop'
+      if: github.event_name == 'release'
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GH_ACTIONS_ACCESS_TOKEN }}
