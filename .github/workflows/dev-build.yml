@@ -44,22 +44,12 @@ jobs:
           name: Build Artifacts
           path: app/build/outputs/
 
-    - name: Create Release
-      if: github.ref == 'refs/heads/develop'
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-          GITHUB_TOKEN: ${{ secrets.GH_ACTIONS_ACCESS_TOKEN }}
-      with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
-
     - name: Upload apk to release
       if: github.ref == 'refs/heads/develop'
-      uses: csexton/release-asset-action@v2
+      uses: svenstaro/upload-release-action@v2
       with:
-       pattern: "app/build/outputs/apk/release/*release.apk"
-       github-token: ${{ secrets.GH_ACTIONS_ACCESS_TOKEN }}
-       release-url: ${{ steps.create_release.outputs.upload_url }}
+        repo_token: ${{ secrets.GH_ACTIONS_ACCESS_TOKEN }}
+        file: app/build/outputs/apk/release/*release.apk
+        tag: ${{ github.ref }}
+        overwrite: true
+        file_glob: true
