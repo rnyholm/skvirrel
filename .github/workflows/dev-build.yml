@@ -10,6 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+    - run: echo ${{github.ref}}
     - name: Decode keystore
       env:
             ENCODED_STRING: ${{ secrets.KEYSTORE }}
@@ -45,7 +46,7 @@ jobs:
           path: app/build/outputs/
 
     - name: Upload apk to release
-      if: github.ref == 'refs/heads/develop'
+      # if: github.ref == 'refs/heads/develop'
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GH_ACTIONS_ACCESS_TOKEN }}
