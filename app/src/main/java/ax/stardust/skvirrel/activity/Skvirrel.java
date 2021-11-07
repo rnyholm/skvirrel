@@ -101,7 +101,12 @@ public class Skvirrel extends AppCompatActivity {
     }
 
     private void addStockFragment(StockMonitoring stockMonitoring) {
-        final StockFragment stockFragment = new StockFragment(this, stockMonitoring, alphanumericKeyboard, numericKeyboard);
+        // not entirely correct way to initialize a fragment in. Creating it with a no-args
+        // constructor is fine, but setting necessary data to it without using bundles are not a
+        // optimal way, data can be lost if fragment is recreated. However I think it will do
+        // in this simple app
+        final StockFragment stockFragment = new StockFragment();
+        stockFragment.initFragment(this, stockMonitoring, alphanumericKeyboard, numericKeyboard);
         fragmentManager = getSupportFragmentManager();
         fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.add(R.id.stock_fragment_container, stockFragment, String.valueOf(stockMonitoring.getId()));
@@ -155,6 +160,7 @@ public class Skvirrel extends AppCompatActivity {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (data != null) {
             // figure out what fragment is responsible for intent and let it handle result

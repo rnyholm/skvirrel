@@ -43,17 +43,20 @@ import ax.stardust.skvirrel.persistence.DatabaseManager;
 import ax.stardust.skvirrel.service.ServiceParams;
 import ax.stardust.skvirrel.service.StockService;
 import ax.stardust.skvirrel.stock.parcelable.ParcelableStock;
+import lombok.NoArgsConstructor;
 import timber.log.Timber;
 
 /**
  * Fragment holding ui and data behind it for a stock monitoring.
  */
 @SuppressWarnings("deprecation")
+@NoArgsConstructor
 public class StockFragment extends Fragment implements DialogInteractionListener {
+
     // parent of fragment
-    private final Skvirrel activity;
-    private final AlphanumericKeyboard alphanumericKeyboard;
-    private final NumericKeyboard numericKeyboard;
+    private Skvirrel activity;
+    private AlphanumericKeyboard alphanumericKeyboard;
+    private NumericKeyboard numericKeyboard;
 
     private StockMonitoring stockMonitoring;
     private DatabaseManager databaseManager;
@@ -88,18 +91,18 @@ public class StockFragment extends Fragment implements DialogInteractionListener
     private RadioButton rsiAboveRadioButton;
 
     /**
-     * Creates a new instance of {@link StockFragment}
+     * Initializes this {@link StockFragment} with necessary data
      *
      * @param activity             parent of this fragment
      * @param stockMonitoring      stock monitoring belonging to this fragment
      * @param alphanumericKeyboard alpha numeric keyboard of the application
      * @param numericKeyboard      numeric keyboard of the application
      */
-    public StockFragment(Skvirrel activity, StockMonitoring stockMonitoring,
-                         AlphanumericKeyboard alphanumericKeyboard, NumericKeyboard numericKeyboard) {
+    public void initFragment(Skvirrel activity, StockMonitoring stockMonitoring,
+                                              AlphanumericKeyboard alphanumericKeyboard, NumericKeyboard numericKeyboard) {
         if (activity == null || stockMonitoring == null
                 || alphanumericKeyboard == null || numericKeyboard == null) {
-            String errorMessage = "Cannot instantiate fragment with null activity, stockMonitoring, alphanumeric or numeric keyboard";
+            String errorMessage = "Cannot initialize fragment with null activity, stockMonitoring, alphanumeric or numeric keyboard";
             IllegalArgumentException exception = new IllegalArgumentException(errorMessage);
             Timber.e(exception, "Unable to instantiate StockFragment");
             throw exception;
