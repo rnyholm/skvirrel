@@ -35,6 +35,7 @@ import ax.stardust.skvirrel.component.watcher.ReferencedTextWatcher;
 import ax.stardust.skvirrel.component.widget.KeyboardlessEditText;
 import ax.stardust.skvirrel.monitoring.AbstractMonitoring;
 import ax.stardust.skvirrel.monitoring.Criteria;
+import ax.stardust.skvirrel.monitoring.PeMonitoring;
 import ax.stardust.skvirrel.monitoring.PriceMonitoring;
 import ax.stardust.skvirrel.monitoring.RsiMonitoring;
 import ax.stardust.skvirrel.monitoring.StockMonitoring;
@@ -68,6 +69,7 @@ public class StockFragment extends Fragment implements DialogInteractionListener
 
     private KeyboardlessEditText tickerEditText;
     private KeyboardlessEditText priceEditText;
+    private KeyboardlessEditText peEditText;
     private KeyboardlessEditText rsiEditText;
 
     private Button viewStockInfoButton;
@@ -75,10 +77,13 @@ public class StockFragment extends Fragment implements DialogInteractionListener
     private Button removeStockMonitoringButton;
 
     private RadioGroup priceRadioGroup;
+    private RadioGroup peRadioGroup;
     private RadioGroup rsiRadioGroup;
 
     private RadioButton priceBelowRadioButton;
     private RadioButton priceAboveRadioButton;
+    private RadioButton peBelowRadioButton;
+    private RadioButton peAboveRadioButton;
     private RadioButton rsiBelowRadioButton;
     private RadioButton rsiAboveRadioButton;
 
@@ -123,6 +128,7 @@ public class StockFragment extends Fragment implements DialogInteractionListener
 
         tickerEditText = view.findViewById(R.id.ticker_et);
         priceEditText = view.findViewById(R.id.price_et);
+        peEditText = view.findViewById(R.id.pe_et);
         rsiEditText = view.findViewById(R.id.rsi_et);
 
         viewStockInfoButton = view.findViewById(R.id.view_stock_info_btn);
@@ -130,10 +136,13 @@ public class StockFragment extends Fragment implements DialogInteractionListener
         removeStockMonitoringButton = view.findViewById(R.id.remove_stock_monitoring_btn);
 
         priceRadioGroup = view.findViewById(R.id.price_rg);
+        peRadioGroup = view.findViewById(R.id.pe_rg);
         rsiRadioGroup = view.findViewById(R.id.rsi_rg);
 
         priceBelowRadioButton = view.findViewById(R.id.price_below_rb);
         priceAboveRadioButton = view.findViewById(R.id.price_above_rb);
+        peBelowRadioButton = view.findViewById(R.id.pe_below_rb);
+        peAboveRadioButton = view.findViewById(R.id.pe_above_rb);
         rsiAboveRadioButton = view.findViewById(R.id.rsi_above_rb);
         rsiBelowRadioButton = view.findViewById(R.id.rsi_below_rb);
     }
@@ -141,6 +150,7 @@ public class StockFragment extends Fragment implements DialogInteractionListener
     private void setInputTypes() {
         tickerEditText.setInput(KeyboardlessEditText.Input.TEXT);
         priceEditText.setInput(KeyboardlessEditText.Input.NUMERIC_DECIMAL);
+        peEditText.setInput(KeyboardlessEditText.Input.NUMERIC_INTEGER);
         rsiEditText.setInput(KeyboardlessEditText.Input.NUMERIC_INTEGER);
     }
 
@@ -211,6 +221,7 @@ public class StockFragment extends Fragment implements DialogInteractionListener
         });
 
         PriceMonitoring priceMonitoring = stockMonitoring.getMonitoringOptions().getPriceMonitoring();
+        PeMonitoring peMonitoring = stockMonitoring.getMonitoringOptions().getPeMonitoring();
         RsiMonitoring rsiMonitoring = stockMonitoring.getMonitoringOptions().getRsiMonitoring();
 
         priceRadioGroup.setOnCheckedChangeListener(new ReferencedRadioGroupWatcher(this, priceBelowRadioButton, priceAboveRadioButton, priceMonitoring));
@@ -218,6 +229,12 @@ public class StockFragment extends Fragment implements DialogInteractionListener
         priceEditText.setOnFocusChangeListener(new KeyboardHandler(numericKeyboard));
         priceEditText.setOnTouchListener(new KeyboardHandler(numericKeyboard));
         priceEditText.addTextChangedListener(new ReferencedTextWatcher(this, priceEditText, numericKeyboard, priceMonitoring));
+
+        peRadioGroup.setOnCheckedChangeListener(new ReferencedRadioGroupWatcher(this, peBelowRadioButton, peAboveRadioButton, peMonitoring));
+
+        peEditText.setOnFocusChangeListener(new KeyboardHandler(numericKeyboard));
+        peEditText.setOnTouchListener(new KeyboardHandler(numericKeyboard));
+        peEditText.addTextChangedListener(new ReferencedTextWatcher(this, peEditText, numericKeyboard, peMonitoring));
 
         rsiRadioGroup.setOnCheckedChangeListener(new ReferencedRadioGroupWatcher(this, rsiBelowRadioButton, rsiAboveRadioButton, rsiMonitoring));
 
@@ -301,6 +318,7 @@ public class StockFragment extends Fragment implements DialogInteractionListener
     private void updateMonitoringOptionsWidgets() {
         StockMonitoring.MonitoringOptions monitoringOptions = stockMonitoring.getMonitoringOptions();
         PriceMonitoring priceMonitoring = monitoringOptions.getPriceMonitoring();
+        PeMonitoring peMonitoring = monitoringOptions.getPeMonitoring();
         RsiMonitoring rsiMonitoring = monitoringOptions.getRsiMonitoring();
 
         if (priceMonitoring.getComparator().equals(Criteria.Comparator.BELOW)) {
@@ -313,6 +331,18 @@ public class StockFragment extends Fragment implements DialogInteractionListener
 
         if (priceMonitoring.getPrice() > 0) {
             priceEditText.setText(String.valueOf(priceMonitoring.getPrice()));
+        }
+
+        if (peMonitoring.getComparator().equals(Criteria.Comparator.BELOW)) {
+            peBelowRadioButton.setChecked(true);
+            peAboveRadioButton.setChecked(false);
+        } else {
+            peBelowRadioButton.setChecked(false);
+            peAboveRadioButton.setChecked(true);
+        }
+
+        if (peMonitoring.getPe() > 0) {
+            peEditText.setText(String.valueOf(peMonitoring.getPe()));
         }
 
         if (rsiMonitoring.getComparator().equals(Criteria.Comparator.BELOW)) {

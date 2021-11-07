@@ -21,6 +21,7 @@ public abstract class AbstractMonitoring {
      */
     public enum MonitoringType {
         PRICE(R.string.price),
+        PE(R.string.pe_ratio),
         RSI(R.string.rsi);
 
         private final int stringResourceId;
@@ -36,7 +37,15 @@ public abstract class AbstractMonitoring {
          * @return translated name
          */
         public String getTranslatedName(Context context) {
-            return context.getString(stringResourceId);
+            String translatedName = context.getString(stringResourceId);
+
+            // special handling for PE monitoring
+            if (MonitoringType.PE.equals(this)) {
+                String[] split = StringUtils.split(translatedName);
+                translatedName = String.format("%s %s", split[0], StringUtils.toRootLowerCase(split[1]));
+            }
+
+            return translatedName;
         }
     }
 
@@ -115,7 +124,7 @@ public abstract class AbstractMonitoring {
                     MonitoringType monitoringType = monitoring.getMonitoringType();
                     String translatedName = monitoringType.getTranslatedName(context);
                     if (MonitoringType.PRICE.equals(monitoringType)) {
-                        return StringUtils.toRootLowerCase(translatedName);
+                        translatedName = StringUtils.toRootLowerCase(translatedName);
                     }
                     return translatedName;
                 })

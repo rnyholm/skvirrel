@@ -23,7 +23,7 @@ public class StockMonitoring {
      * UI state, if this stock monitoring should be displayed as collapsed or expanded.
      */
     public enum ViewState {
-        @SuppressWarnings("unused") COLLAPSED, EXPANDED
+        /** COLLAPSED, */ EXPANDED
     }
 
     private long id;
@@ -177,6 +177,7 @@ public class StockMonitoring {
          */
         public MonitoringOptions(StockMonitoring stockMonitoring) {
             monitoringOptions.add(new PriceMonitoring(stockMonitoring));
+            monitoringOptions.add(new PeMonitoring(stockMonitoring));
             monitoringOptions.add(new RsiMonitoring(stockMonitoring));
         }
 
@@ -196,6 +197,10 @@ public class StockMonitoring {
 
         public PriceMonitoring getPriceMonitoring() {
             return (PriceMonitoring) getMonitoringOfType(AbstractMonitoring.MonitoringType.PRICE);
+        }
+
+        public PeMonitoring getPeMonitoring() {
+            return (PeMonitoring) getMonitoringOfType(AbstractMonitoring.MonitoringType.PE);
         }
 
         public RsiMonitoring getRsiMonitoring() {

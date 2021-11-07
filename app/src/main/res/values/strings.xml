@@ -19,6 +19,7 @@
     <string name="price">Price</string>
     <string name="below">Below</string>
     <string name="above">Above</string>
+    <string name="pe_ratio" translatable="false">PE Ratio</string>
     <string name="rsi" translatable="false">RSI</string>
     <string name="rsi_14" translatable="false">RSI(14)</string>
     <string name="reset_notification">Reset notification</string>

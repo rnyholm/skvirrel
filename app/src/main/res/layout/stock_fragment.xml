@@ -146,6 +146,74 @@
         app:layout_constraintBottom_toBottomOf="@id/price_rg"/>
 
     <TextView
+        android:id="@+id/pe_tv"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:fontFamily="@font/montserrat"
+        android:text="@string/pe_ratio"
+        android:textColor="@color/colorHeadingText"
+        android:textSize="14sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/price_rg" />
+
+    <RadioGroup
+        android:id="@+id/pe_rg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="0dp"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:baselineAlignedChildIndex="0"
+        android:baselineAligned="true"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pe_tv">
+
+        <RadioButton
+            android:id="@+id/pe_below_rb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/radio_button_left_black_selector"
+            android:button="@android:color/transparent"
+            android:checked="true"
+            android:fontFamily="@font/montserrat"
+            android:textSize="14sp"
+            android:text="@string/below"
+            android:textColor="@drawable/radio_button_text_selector"/>
+
+        <RadioButton
+            android:id="@+id/pe_above_rb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/radio_button_right_black_selector"
+            android:button="@android:color/transparent"
+            android:fontFamily="@font/montserrat"
+            android:textSize="14sp"
+            android:text="@string/above"
+            android:textColor="@drawable/radio_button_text_selector"/>
+    </RadioGroup>
+
+    <ax.stardust.skvirrel.component.widget.KeyboardlessEditText
+        android:id="@+id/pe_et"
+        android:layout_width="80dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:background="@drawable/input_default"
+        android:ems="10"
+        android:fontFamily="@font/open_sans"
+        android:hint="@string/zero"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:textAlignment="center"
+        android:textColor="@color/colorInputText"
+        android:textCursorDrawable="@drawable/input_cursor_default"
+        app:layout_constraintStart_toEndOf="@id/pe_rg"
+        app:layout_constraintTop_toTopOf="@id/pe_rg"
+        app:layout_constraintTop_toBottomOf="@id/pe_tv"/>
+
+    <TextView
         android:id="@+id/rsi_tv"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -155,7 +223,7 @@
         android:textColor="@color/colorHeadingText"
         android:textSize="14sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/price_rg" />
+        app:layout_constraintTop_toBottomOf="@id/pe_rg" />
 
     <RadioGroup
         android:id="@+id/rsi_rg"
