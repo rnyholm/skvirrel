@@ -6,7 +6,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import ax.stardust.skvirrel.exception.MonitoringException;
 import ax.stardust.skvirrel.stock.parcelable.ParcelableStock;
 import ax.stardust.skvirrel.util.SkvirrelUtils;
 
@@ -83,12 +82,7 @@ public class TestPeMonitoring {
         monitoring.setComparator(Criteria.Comparator.BELOW);
         monitoring.setValue("11");
 
-        try {
-            monitoring.checkMonitoringCriteria(mockStock);
-            fail("Unable to check monitoring, PE not set");
-        } catch (MonitoringException ignore) {
-            // expected
-        }
+        assertFalse(monitoring.checkMonitoringCriteria(mockStock));
 
         Mockito.when(mockStock.getPe()).thenReturn(10.6);
 

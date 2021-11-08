@@ -1,8 +1,9 @@
 package ax.stardust.skvirrel.monitoring;
 
+import android.annotation.SuppressLint;
+
 import org.apache.commons.lang3.math.NumberUtils;
 
-import ax.stardust.skvirrel.exception.MonitoringException;
 import ax.stardust.skvirrel.stock.parcelable.ParcelableStock;
 import ax.stardust.skvirrel.util.SkvirrelUtils;
 import lombok.Getter;
@@ -53,13 +54,14 @@ public class PeMonitoring extends AbstractMonitoring {
     }
 
     @Override
+    @SuppressLint("BinaryOperationInTimber")
     public boolean checkMonitoringCriteria(ParcelableStock parcelableStock) {
         double stockPe = parcelableStock.getPe();
 
         if (SkvirrelUtils.UNSET == stockPe) {
-            MonitoringException exception = new MonitoringException("PE ratio of parcelable stock is unset");
-            Timber.e(exception, "Unable to check monitoring criteria");
-            throw exception;
+            Timber.w("PE ratio of parcelable stock with ticker: %s is missing, probably it's missing from " +
+                    "yahoo finance as well. Monitoring criteria therefore not met.", parcelableStock.getTicker());
+            return false;
         }
 
         if (Criteria.Comparator.BELOW.equals(comparator)) {
