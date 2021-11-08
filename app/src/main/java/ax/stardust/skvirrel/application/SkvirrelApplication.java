@@ -2,6 +2,9 @@ package ax.stardust.skvirrel.application;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import org.acra.ACRA;
@@ -17,12 +20,15 @@ import ax.stardust.skvirrel.activity.SkvirrelCrashReportDialog;
 import ax.stardust.skvirrel.notification.NotificationHandler;
 import ax.stardust.skvirrel.persistence.DatabaseManager;
 import ax.stardust.skvirrel.schedule.MonitoringScheduler;
+import lombok.SneakyThrows;
 import timber.log.Timber;
 
 /**
  * Base class for maintaining global application state and different setups.
  */
 public class SkvirrelApplication extends Application {
+
+    private static final String VERSION_CODE = "version_code";
 
     private DatabaseManager databaseManager;
 
@@ -34,6 +40,7 @@ public class SkvirrelApplication extends Application {
     }
 
     @Override
+    @SneakyThrows
     public void onCreate() {
         // very, very important to call on create
         super.onCreate();
@@ -49,8 +56,8 @@ public class SkvirrelApplication extends Application {
         NotificationHandler.createNotificationChannel(this);
         MonitoringScheduler.scheduleJob(this);
 
-        // a bit of house keeping by adding any eventual new monitorings that has been added
-        getDatabaseManager().addMonitoringsIfMissing();
+        // some house keeping if needed
+        addMissingMonitoringsIfNeeded();
     }
 
     @Override
@@ -79,6 +86,24 @@ public class SkvirrelApplication extends Application {
                 .withEnabled(true);
 
         ACRA.init(this, builder);
+    }
+
+    private void addMissingMonitoringsIfNeeded() throws PackageManager.NameNotFoundException {
+        // get version codes, both from package and shared preferences
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        int preferencesVersionCode = preferences.getInt(VERSION_CODE, 1);
+        int packageVersionCode = getPackageManager().getPackageInfo(this.getPackageName(), 0).versionCode;
+
+        // if app has been updated, add monitorings if missing and store new version code in preferences,
+        // this way we get a bit optimized startup by not invoking addMonitoringsIfMissing if not needed
+        if (packageVersionCode > preferencesVersionCode) {
+            // a bit of house keeping by adding any eventual new monitorings that has been added
+            getDatabaseManager().addMonitoringsIfMissing();
+
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putInt(VERSION_CODE, packageVersionCode);
+            editor.apply();
+        }
     }
 
     private DatabaseManager getDatabaseManager() {
