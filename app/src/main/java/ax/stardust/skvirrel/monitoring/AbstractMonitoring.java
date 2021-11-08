@@ -17,17 +17,20 @@ import ax.stardust.skvirrel.util.SkvirrelUtils;
 public abstract class AbstractMonitoring {
 
     /**
-     * The different monitoring types and their corresponding string resource id's.
+     * The different monitoring types and their corresponding string resource id's and
+     * monitoring classes.
      */
     public enum MonitoringType {
-        PRICE(R.string.price),
-        PE(R.string.pe_ratio),
-        RSI(R.string.rsi);
+        PRICE(R.string.price, PriceMonitoring.class),
+        PE(R.string.pe_ratio, PeMonitoring.class),
+        RSI(R.string.rsi, RsiMonitoring.class);
 
         private final int stringResourceId;
+        private final Class<? extends AbstractMonitoring> monitoringClass;
 
-        MonitoringType(int stringResourceId) {
+        MonitoringType(int stringResourceId, Class<? extends AbstractMonitoring> monitoringClass) {
             this.stringResourceId = stringResourceId;
+            this.monitoringClass = monitoringClass;
         }
 
         /**
@@ -46,6 +49,15 @@ public abstract class AbstractMonitoring {
             }
 
             return translatedName;
+        }
+
+        /**
+         * To get this monitoring types associated monitoring class
+         *
+         * @return monitoring class associated to this type
+         */
+        public Class<? extends AbstractMonitoring> getMonitoringClass() {
+            return monitoringClass;
         }
     }
 

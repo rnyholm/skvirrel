@@ -265,6 +265,20 @@ public class DatabaseManager {
         });
     }
 
+    /**
+     * Adds any missing monitoring to an existing stock monitoring, can be seen as a clean up
+     * operation to ensure any newly introduced monitorings in the code has been added to any
+     * existing stock monitoring
+     */
+    public void addMonitoringsIfMissing() {
+        fetchAllStockMonitorings().forEach(stockMonitoring -> {
+            if (stockMonitoring.getMonitoringOptions().addMonitoringsIfMissing(stockMonitoring)) {
+                // monitoring has been added, update the stock monitoring in database
+                update(stockMonitoring);
+            }
+        });
+    }
+
     private ContentValues getContentValues(StockMonitoring stockMonitoring) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseHelper.TICKER_COLUMN, stockMonitoring.getTicker());

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import ax.stardust.skvirrel.exception.MonitoringException;
 import ax.stardust.skvirrel.exception.MonitoringNotFoundException;
 import lombok.Getter;
 import lombok.Setter;
@@ -193,6 +194,44 @@ public class StockMonitoring {
          */
         public List<AbstractMonitoring> get() {
             return monitoringOptions;
+        }
+
+        /**
+         * Creates and adds any missing monitoring to this monitoring options. Any newly created
+         * monitoring will be referenced to given stock monitoring
+         *
+         * @param stockMonitoring to reference any new monitorings to
+         * @return true if a monitoring has been created and added to this monitoring options, else false
+         */
+        public boolean addMonitoringsIfMissing(StockMonitoring stockMonitoring) {
+            boolean monitoringAdded = false;
+
+            for (AbstractMonitoring.MonitoringType monitoringType : AbstractMonitoring.MonitoringType.values()) {
+                boolean hasMonitoringOfType = monitoringOptions.stream()
+                        .anyMatch(m -> m.getClass().isAssignableFrom(monitoringType.getMonitoringClass()));
+
+                if (!hasMonitoringOfType) {
+                    try {
+                        // create the missing monitoring with reference to stock monitoring
+                        AbstractMonitoring abstractMonitoring = monitoringType.getMonitoringClass()
+                                .getConstructor(StockMonitoring.class)
+                                .newInstance(stockMonitoring);
+
+                        // add it to the monitoring options and return it
+                        monitoringOptions.add(abstractMonitoring);
+
+                        monitoringAdded = true;
+                    } catch (Exception e) {
+                        MonitoringException exception =
+                                new MonitoringException(String.format("Unable to create monitoring of type %s",
+                                        monitoringType.getMonitoringClass().getSimpleName()));
+                        Timber.e(exception, "Unable to add monitoring to existing list of monitorings");
+                        throw exception;
+                    }
+                }
+            }
+
+            return monitoringAdded;
         }
 
         public PriceMonitoring getPriceMonitoring() {

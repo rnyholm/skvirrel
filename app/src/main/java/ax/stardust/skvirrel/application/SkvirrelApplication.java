@@ -15,6 +15,7 @@ import ax.stardust.skvirrel.BuildConfig;
 import ax.stardust.skvirrel.R;
 import ax.stardust.skvirrel.activity.SkvirrelCrashReportDialog;
 import ax.stardust.skvirrel.notification.NotificationHandler;
+import ax.stardust.skvirrel.persistence.DatabaseManager;
 import ax.stardust.skvirrel.schedule.MonitoringScheduler;
 import timber.log.Timber;
 
@@ -22,6 +23,8 @@ import timber.log.Timber;
  * Base class for maintaining global application state and different setups.
  */
 public class SkvirrelApplication extends Application {
+
+    private DatabaseManager databaseManager;
 
     /**
      * Creates a new instance of skvirrel application
@@ -45,6 +48,9 @@ public class SkvirrelApplication extends Application {
         // create notification handler and schedule monitoring job
         NotificationHandler.createNotificationChannel(this);
         MonitoringScheduler.scheduleJob(this);
+
+        // a bit of house keeping by adding any eventual new monitorings that has been added
+        getDatabaseManager().addMonitoringsIfMissing();
     }
 
     @Override
@@ -73,6 +79,13 @@ public class SkvirrelApplication extends Application {
                 .withEnabled(true);
 
         ACRA.init(this, builder);
+    }
+
+    private DatabaseManager getDatabaseManager() {
+        if (databaseManager == null) {
+            databaseManager = new DatabaseManager(this);
+        }
+        return databaseManager;
     }
 
     /**
